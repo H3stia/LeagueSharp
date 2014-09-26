@@ -195,9 +195,9 @@ namespace SKOJarvanIV
 
         private static void KillSteal(Obj_AI_Hero target)
         {
-            var Qdmg = Q.GetDamage(target, DamageLib.StageType.Default);
-            var Edmg = E.GetDamage(target, DamageLib.StageType.Default);
-            var igniteDmg = DamageLib.getDmg(target, DamageLib.SpellType.IGNITE);
+            var Qdmg = Player.GetSpellDamage(target, SpellSlot.Q);
+            var Edmg = Player.GetSpellDamage(target, SpellSlot.E);
+            var igniteDmg = Player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite);
 
             if (target != null) 
             {
