@@ -1,4 +1,4 @@
 LeagueSharp
 ===========
 
-AJumper by Quangcha, all credits to him.
+Some updated assemblies, all credits to original authors!
