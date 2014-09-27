@@ -1,1 +1,2 @@
 H:\Quangcha\trunk\LeeSin\bin\Release\LeeSin.exe.config
+D:\League#\LeagueSharp\LeagueSharp\WIP LeeSin-Hestia\bin\Release\LeeSin.exe.config

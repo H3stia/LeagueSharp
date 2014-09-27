@@ -45,8 +45,6 @@ namespace LeeSinSharp
         
         public static void checkLock(Obj_AI_Hero target)
         {
-            //if (!target.IsValidTarget())
-            //    return;
             if ( !LeeSinSharp.Config.Item("ActiveHarass").GetValue<KeyBind>().Active && LockedTarget != null)//Reset all values
             {
                 LockedTarget = null;
@@ -80,20 +78,23 @@ namespace LeeSinSharp
 
         public static void combo()
         {
-            if (Player.GetSpellDamage(LockedTarget, SpellSlot.Q) + Player.CalcDamage(LockedTarget, Damage.DamageType.Physical, Q.Level * 30 + 20 + ObjectManager.Player.BaseAttackDamage * 0.9 + 0.08 * (LockedTarget.MaxHealth - LockedTarget.Health)) + Player.GetSpellDamage(LockedTarget, SpellSlot.E) + Player.GetSpellDamage(LockedTarget, SpellSlot.R) <= LockedTarget.Health)
+            if (LeeSinSharp.Config.Item("ActiveCombo").GetValue<KeyBind>().Active)
             {
-                castQFirstSmart();
-                castQSecondSmart();
-                castEFirst();
-                castE2();
-            }
-            else
-            {
-                castQFirstSmart();
-                castR();
-                castQSecondSmart();
-                castEFirst();
-                castE2();
+                if (Player.GetSpellDamage(LockedTarget, SpellSlot.Q) + Player.CalcDamage(LockedTarget, Damage.DamageType.Physical, Q.Level * 30 + 20 + ObjectManager.Player.BaseAttackDamage * 0.9 + 0.08 * (LockedTarget.MaxHealth - LockedTarget.Health)) + Player.GetSpellDamage(LockedTarget, SpellSlot.E) + Player.GetSpellDamage(LockedTarget, SpellSlot.R) <= LockedTarget.Health)
+                {
+                    castQFirstSmart();
+                    castQSecondSmart();
+                    castEFirst();
+                    castE2();
+                }
+                else
+                {
+                    castQFirstSmart();
+                    castR();
+                    castQSecondSmart();
+                    castEFirst();
+                    castE2();
+                }
             }
         }
 
