@@ -4,14 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EasyAhri
+namespace LeeSinSharp
 {
     class Program
     {
-        private static Champion Ahri;
         static void Main(string[] args)
         {
-            Ahri = new Ahri();
+            new LeeSinSharp();
         }
     }
 }
