@@ -80,20 +80,28 @@ namespace LeeSinSharp
         {
             if (LeeSinSharp.Config.Item("ActiveCombo").GetValue<KeyBind>().Active)
             {
-                if (Player.GetSpellDamage(LockedTarget, SpellSlot.Q) + Player.CalcDamage(LockedTarget, Damage.DamageType.Physical, Q.Level * 30 + 20 + ObjectManager.Player.BaseAttackDamage * 0.9 + 0.08 * (LockedTarget.MaxHealth - LockedTarget.Health)) + Player.GetSpellDamage(LockedTarget, SpellSlot.E) + Player.GetSpellDamage(LockedTarget, SpellSlot.R) <= LockedTarget.Health)
+                if (!R.IsReady() || Player.GetSpellDamage(LockedTarget, SpellSlot.Q) + Player.CalcDamage(LockedTarget, Damage.DamageType.Physical, Q.Level * 30 + 20 + ObjectManager.Player.BaseAttackDamage * 0.9 + 0.08 * (LockedTarget.MaxHealth - LockedTarget.Health)) + Player.GetSpellDamage(LockedTarget, SpellSlot.E) + Player.GetSpellDamage(LockedTarget, SpellSlot.R) <= LockedTarget.Health)
                 {
                     castQFirstSmart();
                     castQSecondSmart();
                     castEFirst();
                     castE2();
                 }
-                else
+                if (R.IsReady() && (Player.Distance(LockedTarget) < 375) && Player.GetSpellDamage(LockedTarget, SpellSlot.Q) + Player.CalcDamage(LockedTarget, Damage.DamageType.Physical, Q.Level * 30 + 20 + ObjectManager.Player.BaseAttackDamage * 0.9 + 0.08 * (LockedTarget.MaxHealth - LockedTarget.Health)) + Player.GetSpellDamage(LockedTarget, SpellSlot.E) + Player.GetSpellDamage(LockedTarget, SpellSlot.R) > LockedTarget.Health)
                 {
                     castQFirstSmart();
                     castR();
                     castQSecondSmart();
                     castEFirst();
                     castE2();
+                }
+                if (R.IsReady() && (Player.Distance(LockedTarget) > 375) && Player.GetSpellDamage(LockedTarget, SpellSlot.Q) + Player.CalcDamage(LockedTarget, Damage.DamageType.Physical, Q.Level * 30 + 20 + ObjectManager.Player.BaseAttackDamage * 0.9 + 0.08 * (LockedTarget.MaxHealth - LockedTarget.Health)) + Player.GetSpellDamage(LockedTarget, SpellSlot.E) + Player.GetSpellDamage(LockedTarget, SpellSlot.R) > LockedTarget.Health)
+                {
+                    castQFirstSmart();
+                    castQSecondSmart();
+                    castEFirst();
+                    castE2();
+                    castR();
                 }
             }
         }
