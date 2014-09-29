@@ -1,0 +1,14 @@
+c:\users\davide\documents\visual studio 2013\Projects\WardMagnet\WardMagnet\bin\Debug\WardMagnet.exe.config
+C:\Users\Davide\Documents\Visual Studio 2013\Projects\WardMagnet\WardMagnet\bin\Debug\WardMagnet.exe
+C:\Users\Davide\Documents\Visual Studio 2013\Projects\WardMagnet\WardMagnet\bin\Debug\WardMagnet.pdb
+C:\Users\Davide\Documents\Visual Studio 2013\Projects\WardMagnet\WardMagnet\bin\Debug\LeagueSharp.Common.dll
+C:\Users\Davide\Documents\Visual Studio 2013\Projects\WardMagnet\WardMagnet\bin\Debug\LeagueSharp.dll
+C:\Users\Davide\Documents\Visual Studio 2013\Projects\WardMagnet\WardMagnet\bin\Debug\SharpDX.Direct3D9.dll
+C:\Users\Davide\Documents\Visual Studio 2013\Projects\WardMagnet\WardMagnet\bin\Debug\SharpDX.dll
+C:\Users\Davide\Documents\Visual Studio 2013\Projects\WardMagnet\WardMagnet\bin\Debug\SharpDX.Toolkit.dll
+C:\Users\Davide\Documents\Visual Studio 2013\Projects\WardMagnet\WardMagnet\bin\Debug\SharpDX.Toolkit.Graphics.dll
+C:\Users\Davide\Documents\Visual Studio 2013\Projects\WardMagnet\WardMagnet\bin\Debug\LeagueSharp.xml
+C:\Users\Davide\Documents\Visual Studio 2013\Projects\WardMagnet\WardMagnet\bin\Debug\SharpDX.Toolkit.xml
+C:\Users\Davide\Documents\Visual Studio 2013\Projects\WardMagnet\WardMagnet\bin\Debug\SharpDX.Toolkit.Graphics.xml
+C:\Users\Davide\Documents\Visual Studio 2013\Projects\WardMagnet\WardMagnet\obj\Debug\WardMagnet.exe
+C:\Users\Davide\Documents\Visual Studio 2013\Projects\WardMagnet\WardMagnet\obj\Debug\WardMagnet.pdb
