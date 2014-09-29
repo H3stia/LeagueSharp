@@ -12,3 +12,6 @@ C:\Users\Davide\Documents\Visual Studio 2013\Projects\WardMagnet\WardMagnet\bin\
 C:\Users\Davide\Documents\Visual Studio 2013\Projects\WardMagnet\WardMagnet\bin\Debug\SharpDX.Toolkit.Graphics.xml
 C:\Users\Davide\Documents\Visual Studio 2013\Projects\WardMagnet\WardMagnet\obj\Debug\WardMagnet.exe
 C:\Users\Davide\Documents\Visual Studio 2013\Projects\WardMagnet\WardMagnet\obj\Debug\WardMagnet.pdb
+C:\Users\Davide\Documents\GitHub\LeagueSharp\WardMagnet\WardMagnet\bin\Debug\WardMagnet.exe.config
+C:\Users\Davide\Documents\GitHub\LeagueSharp\WardMagnet\WardMagnet\obj\Debug\WardMagnet.exe
+C:\Users\Davide\Documents\GitHub\LeagueSharp\WardMagnet\WardMagnet\obj\Debug\WardMagnet.pdb
