@@ -133,7 +133,8 @@ namespace Blitzcrank
             bool useR = Config.Item("UseRCombo").GetValue<bool>();
 
             //Init of the combo. Q Grab.
-            if (qTarget !=null && useQ && Q.IsReady())  Q.Cast(qTarget);
+            if (qTarget !=null && useQ && Q.IsReady())  
+                Q.CastIfHitchanceEquals(qTarget, HitChance.High);
 
             //AutoE when you pull the enemy. Q-E Combo.
             if (qTarget !=null && useE && E.IsReady())  
@@ -144,11 +145,13 @@ namespace Blitzcrank
 
             //Cast Q if you can't use E and the target is near you.
             //Done to be able to use E even if you didn't land the Q.
-            if (eTarget !=null && useE && E.IsReady() && !Q.IsReady()) E.Cast();
+            if (eTarget !=null && useE && E.IsReady() && !Q.IsReady()) 
+                E.Cast();
 
             //If you can't use the Q, it uses the R.
             //Done to be able to do the Q-E-R combo.
-            if (rTarget != null && !Q.IsReady() && useR && R.IsReady()) R.Cast(rTarget, false, true);
+            if (rTarget != null && !Q.IsReady() && useR && R.IsReady()) 
+                R.Cast(rTarget, false, true);
         }
 
         private static void Game_OnGameUpdate(EventArgs args)
