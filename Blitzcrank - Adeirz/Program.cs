@@ -98,7 +98,7 @@ namespace Blitzcrank
             Config.SubMenu("Drawings").AddItem(new MenuItem("RRange", "R Range").SetValue(new Circle(true, Color.FromArgb(150, Color.DodgerBlue))));
             Config.AddToMainMenu();
 
-            ts = new TargetSelector(Q.Range, TargetSelector.TargetingMode.NearMouse);
+            ts = new TargetSelector(Q.Range*3, TargetSelector.TargetingMode.NearMouse);
             ts.SetDrawCircleOfTarget(true);
 
             //Add the events we are going to use:
