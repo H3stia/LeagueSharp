@@ -1,2 +1,3 @@
 c:\users\davide\documents\visual studio 2013\Projects\Kennen\Kennen\bin\Debug\Kennen.exe.config
 D:\League#\LeagueSharp\Kennen\Kennen\bin\Debug\Kennen.exe.config
+D:\League#\LeagueSharp\WIP Kennen\Kennen\bin\Debug\Kennen.exe.config
