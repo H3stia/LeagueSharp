@@ -127,16 +127,24 @@ namespace Blitzcrank
             bool useR = Config.Item("UseRCombo").GetValue<bool>();
 
             //Init of the combo. Q Grab.
-            if (qTarget != null && useQ && Q.IsReady())
-            {
-                if (Config.Item("Qhitchance").GetValue<StringList>().SelectedIndex == 1)
-                    Q.CastIfHitchanceEquals(qTarget , HitChance.Low);
-                if (Config.Item("Qhitchance").GetValue<StringList>().SelectedIndex == 2)
-                    Q.CastIfHitchanceEquals(qTarget , HitChance.Medium);
-                if (Config.Item("Qhitchance").GetValue<StringList>().SelectedIndex == 3)
-                    Q.CastIfHitchanceEquals(qTarget , HitChance.High);
-                if (Config.Item("Qhitchance").GetValue<StringList>().SelectedIndex == 4)
-                    Q.CastIfHitchanceEquals(qTarget , HitChance.VeryHigh);
+                var qMode = Config.Item("Qhitchance").GetValue<StringList>().SelectedIndex;
+                if (qTarget != null && useQ && Q.IsReady())
+                {
+                    switch (qMode)
+                    {
+                        case 1://Low
+                            Q.Cast(qTarget);
+                            break;
+                        case 2://Medium
+                            Q.CastIfHitchanceEquals(qTarget, HitChance.Medium);
+                            break;
+                        case 3://High
+                            Q.CastIfHitchanceEquals(qTarget, HitChance.High);
+                            break;
+                        case 4://VeryHigh
+                            Q.CastIfHitchanceEquals(qTarget, HitChance.VeryHigh);
+                            break;
+                    }
             }
 
             //AutoE when you pull the enemy. Q-E Combo.
