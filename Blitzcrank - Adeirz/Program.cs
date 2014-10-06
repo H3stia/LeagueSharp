@@ -19,9 +19,6 @@ namespace Blitzcrank
         //Orbwalker instance
         public static Orbwalking.Orbwalker Orbwalker;
 
-        //Target Selector
-        public static TargetSelector ts;
-
         //Spells
         public static List<Spell> SpellList = new List<Spell>();
 
@@ -63,9 +60,9 @@ namespace Blitzcrank
             Config.AddSubMenu(new Menu("Orbwalking", "Orbwalking"));
 
             //Add the target selector to the menu as submenu.
-            Config.AddSubMenu(new Menu("Target Selector", "TSSettings"));
-            Config.SubMenu("TSSettings").AddItem(new MenuItem("Focus", "Mode:")).SetValue(new StringList(new[] { "Auto", "Closest", "LessAttack", "LessCast", "LowHP", "MostAD", "MostAP", "NearMouse" }, 7));
-
+            var targetSelectorMenu = new Menu("Target Selector", "Target Selector");
+            SimpleTs.AddToMenu(targetSelectorMenu);
+            Config.AddSubMenu(targetSelectorMenu);
 
             //Load the orbwalker and add it to the menu as submenu.
             Orbwalker = new Orbwalking.Orbwalker(Config.SubMenu("Orbwalking"));
@@ -98,8 +95,6 @@ namespace Blitzcrank
             Config.SubMenu("Drawings").AddItem(new MenuItem("RRange", "R Range").SetValue(new Circle(true, Color.FromArgb(150, Color.DodgerBlue))));
             Config.AddToMainMenu();
 
-            ts = new TargetSelector(Q.Range*3, TargetSelector.TargetingMode.NearMouse);
-            ts.SetDrawCircleOfTarget(true);
 
             //Add the events we are going to use:
             Game.OnGameUpdate += Game_OnGameUpdate;
@@ -108,36 +103,6 @@ namespace Blitzcrank
             Game.PrintChat(ChampionName + " Loaded!");
         }
 
-        public static void ModeFocus()
-        {
-            switch (Config.Item("Focus").GetValue<StringList>().SelectedIndex)
-            {
-                case 0:
-                    ts.SetTargetingMode(TargetSelector.TargetingMode.AutoPriority);
-                    break;
-                case 1:
-                    ts.SetTargetingMode(TargetSelector.TargetingMode.Closest);
-                    break;
-                case 2:
-                    ts.SetTargetingMode(TargetSelector.TargetingMode.LessAttack);
-                    break;
-                case 3:
-                    ts.SetTargetingMode(TargetSelector.TargetingMode.LessCast);
-                    break;
-                case 4:
-                    ts.SetTargetingMode(TargetSelector.TargetingMode.LowHP);
-                    break;
-                case 5:
-                    ts.SetTargetingMode(TargetSelector.TargetingMode.MostAD);
-                    break;
-                case 6:
-                    ts.SetTargetingMode(TargetSelector.TargetingMode.MostAP);
-                    break;
-                case 7:
-                    ts.SetTargetingMode(TargetSelector.TargetingMode.NearMouse);
-                    break;
-            }
-        }
 
         private static void Interrupter_OnPossibleToInterrupt(Obj_AI_Base unit, InterruptableSpell spell)
         {
@@ -153,40 +118,43 @@ namespace Blitzcrank
         {
             Orbwalker.SetAttacks(true);
 
+            var qTarget = SimpleTs.GetTarget(Q.Range*3, SimpleTs.DamageType.Magical);
+            var eTarget = SimpleTs.GetTarget(E.Range, SimpleTs.DamageType.Physical);
+            var rTarget = SimpleTs.GetTarget(R.Range, SimpleTs.DamageType.Magical);
 
             bool useQ = Config.Item("UseQCombo").GetValue<bool>();
             bool useE = Config.Item("UseECombo").GetValue<bool>();
             bool useR = Config.Item("UseRCombo").GetValue<bool>();
 
             //Init of the combo. Q Grab.
-            if (ts.Target != null && useQ && Q.IsReady())
+            if (qTarget != null && useQ && Q.IsReady())
             {
                 if (Config.Item("Qhitchance").GetValue<StringList>().SelectedIndex == 1)
-                    Q.CastIfHitchanceEquals(ts.Target , HitChance.Low);
+                    Q.CastIfHitchanceEquals(qTarget , HitChance.Low);
                 if (Config.Item("Qhitchance").GetValue<StringList>().SelectedIndex == 2)
-                    Q.CastIfHitchanceEquals(ts.Target , HitChance.Medium);
+                    Q.CastIfHitchanceEquals(qTarget , HitChance.Medium);
                 if (Config.Item("Qhitchance").GetValue<StringList>().SelectedIndex == 3)
-                    Q.CastIfHitchanceEquals(ts.Target , HitChance.High);
+                    Q.CastIfHitchanceEquals(qTarget , HitChance.High);
                 if (Config.Item("Qhitchance").GetValue<StringList>().SelectedIndex == 4)
-                    Q.CastIfHitchanceEquals(ts.Target , HitChance.VeryHigh);
+                    Q.CastIfHitchanceEquals(qTarget , HitChance.VeryHigh);
             }
 
             //AutoE when you pull the enemy. Q-E Combo.
-            if (ts.Target  !=null && useE && E.IsReady())  
+            if (eTarget != null && useE && E.IsReady())  
             {
-                if (ts.Target .HasBuff("RocketGrab"))
+                if (eTarget.HasBuff("RocketGrab"))
                     E.Cast();
             }
 
             //Cast Q if you can't use E and the target is near you.
             //Done to be able to use E even if you didn't land the Q.
-            if (ts.Target  !=null && useE && E.IsReady() && !Q.IsReady()) 
+            if (eTarget != null && useE && E.IsReady() && !Q.IsReady()) 
                 E.Cast();
 
             //If you can't use the Q, it uses the R.
             //Done to be able to do the Q-E-R combo.
-            if (ts.Target  != null && !Q.IsReady() && useR && R.IsReady()) 
-                R.Cast(ts.Target , false, true);
+            if (rTarget  != null && !Q.IsReady() && useR && R.IsReady()) 
+                R.Cast(rTarget , false, true);
         }
 
         private static void Game_OnGameUpdate(EventArgs args)
@@ -195,7 +163,7 @@ namespace Blitzcrank
             if (Player.IsDead) return;
             Orbwalker.SetAttacks(true);
             Orbwalker.SetMovement(true);
-            ModeFocus();
+
 
             var useRKS = Config.Item("KillstealR").GetValue<bool>() && R.IsReady();
 
