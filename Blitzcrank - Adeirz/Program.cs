@@ -133,7 +133,7 @@ namespace Blitzcrank
                     switch (qMode)
                     {
                         case 1://Low
-                            Q.Cast(qTarget);
+                            Q.CastIfHitchanceEquals(qTarget, HitChance.Low);
                             break;
                         case 2://Medium
                             Q.CastIfHitchanceEquals(qTarget, HitChance.Medium);
