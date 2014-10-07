@@ -118,7 +118,7 @@ namespace Blitzcrank
         {
             Orbwalker.SetAttacks(true);
 
-            var qTarget = SimpleTs.GetTarget(Q.Range*3, SimpleTs.DamageType.Magical);
+            var qTarget = SimpleTs.GetTarget(Q.Range, SimpleTs.DamageType.Magical);
             var eTarget = SimpleTs.GetTarget(E.Range, SimpleTs.DamageType.Physical);
             var rTarget = SimpleTs.GetTarget(R.Range, SimpleTs.DamageType.Magical);
 
@@ -128,12 +128,12 @@ namespace Blitzcrank
 
             //Init of the combo. Q Grab.
                 var qMode = Config.Item("Qhitchance").GetValue<StringList>().SelectedIndex;
-                if (qTarget != null && useQ && Q.IsReady())
+                if (qTarget != null && useQ && Q.IsReady() && Player.Distance(qTarget) < Q.Range)
                 {
                     switch (qMode)
                     {
                         case 1://Low
-                            Q.CastIfHitchanceEquals(qTarget, HitChance.Low);
+                            Q.Cast(qTarget);
                             break;
                         case 2://Medium
                             Q.CastIfHitchanceEquals(qTarget, HitChance.Medium);
