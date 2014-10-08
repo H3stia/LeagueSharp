@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using LeagueSharp;
 using LeagueSharp.Common;
-using SharpDX;
 using Color = System.Drawing.Color;
 
 #endregion
@@ -29,22 +28,22 @@ namespace Blitzcrank
         //Menu
         public static Menu Config;
 
-        private static Obj_AI_Hero Player;
+        private static Obj_AI_Hero _player;
 
-        private static void Main(string[] args)
+        private static void Main()
         {
             CustomEvents.Game.OnGameLoad += Game_OnGameLoad;
         }
 
         private static void Game_OnGameLoad(EventArgs args)
         {
-            Player = ObjectManager.Player;
+            _player = ObjectManager.Player;
 
-            if (Player.BaseSkinName != ChampionName) return;
+            if (_player.BaseSkinName != ChampionName) return;
 
             //Create the spells
             Q = new Spell(SpellSlot.Q, 1000);
-            E = new Spell(SpellSlot.E, Player.AttackRange+50);
+            E = new Spell(SpellSlot.E, _player.AttackRange+50);
             R = new Spell(SpellSlot.R, 600);
 
             Q.SetSkillshot(0.25f, 70f, 1800f, true, SkillshotType.SkillshotLine);
@@ -70,7 +69,7 @@ namespace Blitzcrank
             //Combo menu:
             Config.AddSubMenu(new Menu("Combo", "Combo"));
             Config.SubMenu("Combo").AddItem(new MenuItem("UseQCombo", "Use Q").SetValue(true));
-            Config.SubMenu("Combo").AddItem(new MenuItem("Qhitchance", "Q HitChance")).SetValue(new StringList(new string[] {"Low", "Medium", "High", "Very High"}));
+            Config.SubMenu("Combo").AddItem(new MenuItem("Qhitchance", "Q HitChance")).SetValue(new StringList(new[] {"Low", "Medium", "High", "Very High"}, 2));
             Config.SubMenu("Combo").AddItem(new MenuItem("UseECombo", "Use E").SetValue(true));
             Config.SubMenu("Combo").AddItem(new MenuItem("UseRCombo", "Use R").SetValue(true));
 
@@ -86,7 +85,7 @@ namespace Blitzcrank
             Config.SubMenu("Misc").AddItem(new MenuItem("KillstealR", "Killsteal with R").SetValue(false));
             Config.SubMenu("Misc").AddItem(new MenuItem("APToggle", "Auto Pull on stun").SetValue(true));
             Config.SubMenu("Misc").AddSubMenu(new Menu("Autopull", "AutoPull"));
-            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != Player.Team))
+            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != _player.Team))
                 Config.SubMenu("Misc").SubMenu("AutoPull").AddItem(new MenuItem("AutoPull" + enemy.BaseSkinName, enemy.BaseSkinName).SetValue(false));
 
             //Drawings menu:
@@ -108,7 +107,7 @@ namespace Blitzcrank
         {
             if (!Config.Item("InterruptSpells").GetValue<bool>()) return;
 
-            if (Player.Distance(unit) < R.Range && R.IsReady())
+            if (_player.Distance(unit) < R.Range && R.IsReady())
             {
                 R.Cast();
             }
@@ -128,20 +127,20 @@ namespace Blitzcrank
 
             //Init of the combo. Q Grab.
                 var qMode = Config.Item("Qhitchance").GetValue<StringList>().SelectedIndex;
-                if (qTarget != null && useQ && Q.IsReady() && Player.Distance(qTarget) < Q.Range)
+                if (qTarget != null && useQ && Q.IsReady() && _player.Distance(qTarget) < Q.Range)
                 {
                     switch (qMode)
                     {
-                        case 1://Low
+                        case 0://Low
                             Q.Cast(qTarget);
                             break;
-                        case 2://Medium
+                        case 1://Medium
                             Q.CastIfHitchanceEquals(qTarget, HitChance.Medium);
                             break;
-                        case 3://High
+                        case 2://High
                             Q.CastIfHitchanceEquals(qTarget, HitChance.High);
                             break;
-                        case 4://VeryHigh
+                        case 3://VeryHigh
                             Q.CastIfHitchanceEquals(qTarget, HitChance.VeryHigh);
                             break;
                     }
@@ -168,27 +167,27 @@ namespace Blitzcrank
         private static void Game_OnGameUpdate(EventArgs args)
         {
 
-            if (Player.IsDead) return;
+            if (_player.IsDead) return;
             Orbwalker.SetAttacks(true);
             Orbwalker.SetMovement(true);
 
 
-            var useRKS = Config.Item("KillstealR").GetValue<bool>() && R.IsReady();
+            var useRks = Config.Item("KillstealR").GetValue<bool>() && R.IsReady();
 
             if (Config.Item("ComboActive").GetValue<KeyBind>().Active) 
                 Combo();
-            if (useRKS) 
+            if (useRks) 
                 Killsteal();
             if (Config.Item("AutoUlt").GetValue<bool>() && Utility.CountEnemysInRange((int)R.Range) >= Config.Item("CountR").GetValue<Slider>().Value && R.IsReady()) 
                 R.Cast();
             if (Config.Item("APToggle").GetValue<bool>())
             {
-                foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != Player.Team))
+                foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != _player.Team))
                 {
                     if (Config.Item("AutoPull" + enemy.BaseSkinName).GetValue<bool>() && Q.IsReady())
                         //foreach (var buff in enemy.Buffs.Where(buff => (buff.Type == (BuffType.Stun) || buff.Type == BuffType.Knockup || buff.Type == BuffType.Snare || buff.Type == BuffType.Suppression)))
                         //    if (buff.EndTime == 0.3 + Q.Delay + (Player.Distance(enemy)/Q.Speed))
-                        Q.CastIfHitchanceEquals(enemy, HitChance.Immobile, false);
+                        Q.CastIfHitchanceEquals(enemy, HitChance.Immobile);
                 }
             }
         }
@@ -200,7 +199,7 @@ namespace Blitzcrank
             {
                 var menuItem = Config.Item(spell.Slot + "Range").GetValue<Circle>();
                 if (menuItem.Active)
-                    Utility.DrawCircle(Player.Position, spell.Range, menuItem.Color);
+                    Utility.DrawCircle(_player.Position, spell.Range, menuItem.Color);
             }
         }
         
@@ -209,7 +208,7 @@ namespace Blitzcrank
             foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.IsValidTarget(R.Range)))
             {
                 if (R.IsReady() && hero.Distance(ObjectManager.Player) <= R.Range &&
-                    Damage.GetSpellDamage(Player, hero, SpellSlot.R) >= hero.Health)
+                    Damage.GetSpellDamage(_player, hero, SpellSlot.R) >= hero.Health)
                     R.Cast();
             }
         }
