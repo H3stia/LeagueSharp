@@ -167,7 +167,9 @@ namespace Kennen
                 return;
             var rTarget = SimpleTs.GetTarget(R.Range, SimpleTs.DamageType.Magical);
             var useR = Config.Item("UseRCombo").GetValue<bool>();
-            if (rTarget != null && useR && GetComboDamage() > rTarget.Health)
+            //if (rTarget != null && useR && GetComboDamage() > rTarget.Health)
+                //R.Cast();
+            if (rTarget != null && useR && Player.GetSpellDamage(rTarget, SpellSlot.R) > rTarget.Health)
                 R.Cast();
         }
 
@@ -228,19 +230,19 @@ namespace Kennen
 
         public static void KillSteal()
         {
-            foreach (var target in ObjectManager.Get<Obj_AI_Hero>())
+            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
             {
-                if (Config.Item("UseQKS").GetValue<bool>() && Player.GetSpellDamage(target, SpellSlot.Q) > target.Health && (Player.Distance(target) < Q.Range) && Q.IsReady())
-                    Q.Cast(target);
+                if (Config.Item("UseQKS").GetValue<bool>() && Player.GetSpellDamage(enemy, SpellSlot.Q) > enemy.Health && Q.IsReady())
+                    Q.Cast(enemy);
 
-                if (W.IsReady() && Config.Item("UseWKS").GetValue<bool>() && Player.GetSpellDamage(target, SpellSlot.W) > target.Health && (Player.Distance(target) < W.Range) && W.IsReady())
+                if (W.IsReady() && Config.Item("UseWKS").GetValue<bool>() && Player.GetSpellDamage(enemy, SpellSlot.W) > enemy.Health && W.IsReady())
                     W.Cast();
 
-                if (IgniteSlot != SpellSlot.Unknown && Player.SummonerSpellbook.CanUseSpell(IgniteSlot) == SpellState.Ready && Player.Distance(target) < 600 && Config.Item("UseIKS").GetValue<bool>())
+                if (IgniteSlot != SpellSlot.Unknown && Player.SummonerSpellbook.CanUseSpell(IgniteSlot) == SpellState.Ready && Config.Item("UseIKS").GetValue<bool>())
                 {
-                    if (Player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite) > target.Health)
+                    if (Player.GetSummonerSpellDamage(enemy, Damage.SummonerSpell.Ignite) > enemy.Health)
                     {
-                        Player.SummonerSpellbook.CastSpell(IgniteSlot, target);
+                        Player.SummonerSpellbook.CastSpell(IgniteSlot, enemy);
                     }
                 }
             }
