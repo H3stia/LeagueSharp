@@ -1,2 +1,0 @@
-E:\Leaguesharp-master\Blitzcrank\bin\Debug\Blitzcrank.exe.config
-D:\League#\LeagueSharp\Blitzcrank - Adeirz\bin\Debug\Blitzcrank.exe.config
