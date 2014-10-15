@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
+using Color = System.Drawing.Color;
 using System.Linq;
 using LeagueSharp;
 using LeagueSharp.Common;
@@ -66,16 +66,17 @@ namespace Kennen
             Config.SubMenu("Combo").AddItem(new MenuItem("qHitchance", "Q Hitchance").SetValue(new StringList(new[] { "Low", "Medium", "High", "Very High" }, 2)));
             Config.SubMenu("Combo").AddItem(new MenuItem("UseWCombo", "Use W").SetValue(new StringList(new[] {"Always", "Only Stunnable"}))); //TODO on stunnable
             Config.SubMenu("Combo").AddItem(new MenuItem("UseRCombo", "Use smart R").SetValue(true));
-            Config.SubMenu("Combo").AddItem(new MenuItem("UseRmulti", "Use R on min X targets").SetValue(new Slider(2, 0, 5))); //0 to deactivate
+            //Config.SubMenu("Combo").AddItem(new MenuItem("UseRmulti", "Use R on min X targets").SetValue(new Slider(2, 0, 5))); //0 to deactivate
             Config.SubMenu("Combo").AddItem(new MenuItem("ComboActive", "Combo!").SetValue(new KeyBind(32, KeyBindType.Press)));
-            /*
+            
             //Harass Menu
-            _config.AddSubMenu(new Menu("Harass", "Harass"));
-            _config.SubMenu("Harass").AddItem(new MenuItem("UseQHarass", "Use Q").SetValue(true));
-            _config.SubMenu("Harass").AddItem(new MenuItem("UseWHarass", "Use W").SetValue(new StringList(new string[] { "Always", "Only Stunnable" })));
-            _config.SubMenu("Harass").AddItem(new MenuItem("HarassActive", "Harass!").SetValue(new KeyBind("C".ToCharArray()[0], KeyBindType.Press)));
-            _config.SubMenu("Harass").AddItem(new MenuItem("HarassToggle", "Harass (toggle)!").SetValue(new KeyBind("L".ToCharArray()[0], KeyBindType.Toggle)));
-            */
+            Config.AddSubMenu(new Menu("Harass", "Harass"));
+            Config.SubMenu("Harass").AddItem(new MenuItem("UseQHarass", "Use Q").SetValue(true));
+            Config.SubMenu("Harass").AddItem(new MenuItem("qHitchanceH", "Q Hitchance").SetValue(new StringList(new[] { "Low", "Medium", "High", "Very High" }, 2)));
+            Config.SubMenu("Harass").AddItem(new MenuItem("UseWHarass", "Use W").SetValue(new StringList(new [] { "Always", "Only Stunnable" })));
+            Config.SubMenu("Harass").AddItem(new MenuItem("HarassActive", "Harass!").SetValue(new KeyBind("C".ToCharArray()[0], KeyBindType.Press)));
+            Config.SubMenu("Harass").AddItem(new MenuItem("HarassToggle", "Harass (toggle)!").SetValue(new KeyBind("L".ToCharArray()[0], KeyBindType.Toggle)));
+            
             //Killsteal Menu
             Config.AddSubMenu(new Menu("KillSteal", "KillSteal"));
             Config.SubMenu("KillSteal").AddItem(new MenuItem("Killsteal", "Activate KillSteal").SetValue(true));
@@ -85,9 +86,9 @@ namespace Kennen
 
             //Drawings Menu
             Config.AddSubMenu(new Menu("Drawings", "Drawings"));
-            Config.SubMenu("Drawings").AddItem(new MenuItem("QRange", "Q range").SetValue(new Circle(true, Color.FromArgb(255, 255, 255, 255))));
-            Config.SubMenu("Drawings").AddItem(new MenuItem("ERange", "W range").SetValue(new Circle(false, Color.FromArgb(255, 255, 255, 255))));
-            Config.SubMenu("Drawings").AddItem(new MenuItem("RRange", "R range").SetValue(new Circle(false, Color.FromArgb(255, 255, 255, 255))));
+            Config.SubMenu("Drawings").AddItem(new MenuItem("QRange", "Q range").SetValue(true));
+            Config.SubMenu("Drawings").AddItem(new MenuItem("ERange", "W range").SetValue(false));
+            Config.SubMenu("Drawings").AddItem(new MenuItem("RRange", "R range").SetValue(false));
             Config.AddToMainMenu();
 
             Drawing.OnDraw += Drawing_OnDraw;
@@ -102,37 +103,64 @@ namespace Kennen
             if (Config.Item("Killsteal").GetValue<bool>())
                 KillSteal();
 
-            CastRmulti();
             /* TODO
-            if ((_config.Item("HarassActive").GetValue<KeyBind>().Active) || (_config.Item("HarassActiveT").GetValue<KeyBind>().Active))
+            CastRmulti();
+            */
+
+            if ((Config.Item("HarassActive").GetValue<KeyBind>().Active) || (Config.Item("HarassActiveT").GetValue<KeyBind>().Active))
                 Harass();
-             * */
+             
         }
 
         public static void CastQ() //Q casting 
         {
             if (!Q.IsReady())
                 return;
+
             var qTarget = SimpleTs.GetTarget(Q.Range, SimpleTs.DamageType.Magical);
             var useQ = Config.Item("UseQCombo").GetValue<bool>();
-            var qMode = Config.Item("qHitchance").GetValue<StringList>().SelectedIndex;
+
+            var qLow = Config.Item("qHitchance").GetValue<StringList>().SelectedIndex == 0;
+            var qMedium = Config.Item("qHitchance").GetValue<StringList>().SelectedIndex == 1;
+            var qHigh = Config.Item("qHitchance").GetValue<StringList>().SelectedIndex == 2;
+            var qVeryHigh = Config.Item("qHitchance").GetValue<StringList>().SelectedIndex == 3;
+
             if (qTarget != null && useQ)
             {
-                switch (qMode)
-                {
-                    case 0://low
-                        Q.CastIfHitchanceEquals(qTarget, HitChance.Low);
-                        break;
-                    case 1://medium
-                        Q.CastIfHitchanceEquals(qTarget, HitChance.Medium);
-                        break;
-                    case 2://hgih
-                        Q.CastIfHitchanceEquals(qTarget, HitChance.High);
-                        break;
-                    case 3://very high
-                        Q.CastIfHitchanceEquals(qTarget, HitChance.VeryHigh);
-                        break;
-                }
+                if (qLow)
+                    Q.Cast(qTarget);
+                else if (qMedium)
+                    Q.CastIfHitchanceEquals(qTarget, HitChance.Medium);
+                else if (qHigh)
+                    Q.CastIfHitchanceEquals(qTarget, HitChance.High);
+                else if (qVeryHigh)
+                    Q.CastIfHitchanceEquals(qTarget, HitChance.VeryHigh);
+            }
+        }
+
+        public static void CastQharass() //Q casting in harass
+        {
+            if (!Q.IsReady())
+                return;
+
+            var qTarget = SimpleTs.GetTarget(Q.Range, SimpleTs.DamageType.Magical);
+            var useQ = Config.Item("UseQHarass").GetValue<bool>();
+
+            var qLow = Config.Item("qHitchanceH").GetValue<StringList>().SelectedIndex == 0;
+            var qMedium = Config.Item("qHitchanceH").GetValue<StringList>().SelectedIndex == 1;
+            var qHigh = Config.Item("qHitchanceH").GetValue<StringList>().SelectedIndex == 2;
+            var qVeryHigh = Config.Item("qHitchanceH").GetValue<StringList>().SelectedIndex == 3;
+
+            if (qTarget != null && useQ)
+            {
+                if (qLow)
+                    Q.Cast(qTarget);
+                else if (qMedium)
+                    Q.CastIfHitchanceEquals(qTarget, HitChance.Medium);
+                else if (qHigh)
+                    Q.CastIfHitchanceEquals(qTarget, HitChance.High);
+                else if (qVeryHigh)
+                    Q.CastIfHitchanceEquals(qTarget, HitChance.VeryHigh);
             }
         }
 
@@ -141,23 +169,47 @@ namespace Kennen
             if (!W.IsReady())
                 return;
             var wTarget = SimpleTs.GetTarget(W.Range, SimpleTs.DamageType.Magical);
-            var wMode = Config.Item("UseWCombo").GetValue<StringList>().SelectedIndex;
+            var wMode1 = Config.Item("UseWCombo").GetValue<StringList>().SelectedIndex == 0;
+            //var wMode2 = Config.Item("UseWCombo").GetValue<StringList>().SelectedIndex == 1;
+
             if (wTarget != null)
-                switch (wMode)
-                {
-                    case 0://always
-                        W.Cast();
-                        break;
-                    /*
-                    case 1: //only stunnable 
+            {
+                if (wMode1)
+                    W.Cast();
+                /*
+                  if (wMode2)
                         foreach (var buff in wTarget.Buffs)
                         {
                             if (buff.Name == "" && buff.Count == 2) //missing kennen debuff name
                                 _w.Cast();
                         }
-                        break;
+                       
                      */
-                }
+            }
+        }
+
+        public static void CastWharass()
+        {
+            if (!W.IsReady())
+                return;
+            var wTarget = SimpleTs.GetTarget(W.Range, SimpleTs.DamageType.Magical);
+            var wMode1 = Config.Item("UseWHarass").GetValue<StringList>().SelectedIndex == 0;
+            //var wMode2 = Config.Item("UseWHarass").GetValue<StringList>().SelectedIndex == 1;
+
+            if (wTarget != null)
+            {
+                if (wMode1)
+                    W.Cast();
+                /*
+                  if (wMode2)
+                        foreach (var buff in wTarget.Buffs)
+                        {
+                            if (buff.Name == "" && buff.Count == 2) //missing kennen debuff name
+                                _w.Cast();
+                        }
+                       
+                     */
+            }
         }
 
         //ulti if killable
@@ -196,6 +248,7 @@ namespace Kennen
             return (float)comboDamage;
         }
 
+        /* TODO
         //auto ult for X enemies in range, 0 to deactivate
         public static void CastRmulti()
         {
@@ -220,7 +273,7 @@ namespace Kennen
                 R.Cast();
 
         }
-
+        */
         public static void Combo()
         {
             CastQ();
@@ -230,42 +283,45 @@ namespace Kennen
 
         public static void KillSteal()
         {
-            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
+            var qTarget = SimpleTs.GetTarget(Q.Range, SimpleTs.DamageType.Magical);
+            var wTarget = SimpleTs.GetTarget(W.Range, SimpleTs.DamageType.Magical);
+            var iTarget = SimpleTs.GetTarget(600, SimpleTs.DamageType.True);
+
+            var useQks = Config.Item("UseQKS").GetValue<bool>();
+            var useWks = Config.Item("UseWKS").GetValue<bool>();
+            var useIks = Config.Item("UseIKS").GetValue<bool>();
+
+            if (Q.IsReady() && useQks && Player.GetSpellDamage(qTarget, SpellSlot.Q) > qTarget.Health)
+                Q.Cast(qTarget);
+
+            if (W.IsReady() && useWks && Player.GetSpellDamage(wTarget, SpellSlot.W) > wTarget.Health)
+                W.Cast(wTarget);
+
+            if (IgniteSlot != SpellSlot.Unknown && Player.SummonerSpellbook.CanUseSpell(IgniteSlot) == SpellState.Ready && useIks)
             {
-                if (Config.Item("UseQKS").GetValue<bool>() && Player.GetSpellDamage(enemy, SpellSlot.Q) > enemy.Health && Q.IsReady())
-                    Q.Cast(enemy);
-
-                if (W.IsReady() && Config.Item("UseWKS").GetValue<bool>() && Player.GetSpellDamage(enemy, SpellSlot.W) > enemy.Health && W.IsReady())
-                    W.Cast();
-
-                if (IgniteSlot != SpellSlot.Unknown && Player.SummonerSpellbook.CanUseSpell(IgniteSlot) == SpellState.Ready && Config.Item("UseIKS").GetValue<bool>())
+                if (Player.GetSummonerSpellDamage(iTarget, Damage.SummonerSpell.Ignite) > iTarget.Health)
                 {
-                    if (Player.GetSummonerSpellDamage(enemy, Damage.SummonerSpell.Ignite) > enemy.Health)
-                    {
-                        Player.SummonerSpellbook.CastSpell(IgniteSlot, enemy);
-                    }
+                    Player.SummonerSpellbook.CastSpell(IgniteSlot, iTarget);
                 }
             }
         }
-        /* TODO
+
         public static void Harass()
         {
-
+            CastQharass();
+            CastWharass();
         }
-        */
+       
         public static void Drawing_OnDraw(EventArgs args)
         {
-            if (SpellList == null) return;
-
-            foreach (var spell in SpellList)
-            {
-                var menuItem = Config.Item(spell.Slot + "Range").GetValue<Circle>();
-
-                if (menuItem.Active)
-                {
-                    Utility.DrawCircle(Player.Position, spell.Range, menuItem.Color);
-                }
-            }
+            if (Player.IsDead) 
+                return;
+            if (Config.Item("QRange").GetValue<bool>() && Q.Level > 0)
+                Utility.DrawCircle(Player.Position, Q.Range, Q.IsReady() ? Color.CornflowerBlue : Color.OrangeRed);
+            if (Config.Item("WRange").GetValue<bool>() && W.Level > 0)
+                Utility.DrawCircle(Player.Position, Q.Range, Q.IsReady() ? Color.CornflowerBlue : Color.OrangeRed);
+            if (Config.Item("RRange").GetValue<bool>() && R.Level > 0)
+                Utility.DrawCircle(Player.Position, Q.Range, Q.IsReady() ? Color.CornflowerBlue : Color.OrangeRed);
         }
     }
 }
