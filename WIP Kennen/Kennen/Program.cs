@@ -12,8 +12,6 @@ namespace Kennen
     {
         public const string ChampionName = "Kennen";
 
-
-        public static readonly List<Spell> SpellList = new List<Spell>();
         public static Spell Q, W, E, R;
 
         public static Obj_AI_Hero Player;
@@ -36,15 +34,9 @@ namespace Kennen
             //Spells
             Q = new Spell(SpellSlot.Q, 1050);
             W = new Spell(SpellSlot.W, 800);
-            E = new Spell(SpellSlot.E, 0);
             R = new Spell(SpellSlot.R, 550);
 
-            Q.SetSkillshot(0.125f, 50, 1700, true, SkillshotType.SkillshotLine);
-
-            SpellList.Add(Q);
-            SpellList.Add(W);
-            SpellList.Add(E);
-            SpellList.Add(R);
+            Q.SetSkillshot(0.65f, 50, 1700, true, SkillshotType.SkillshotLine);
 
             IgniteSlot = ObjectManager.Player.GetSpellSlot("SummonerDot");
 
@@ -64,9 +56,10 @@ namespace Kennen
             Config.AddSubMenu(new Menu("Combo", "Combo"));
             Config.SubMenu("Combo").AddItem(new MenuItem("UseQCombo", "Use Q").SetValue(true));
             Config.SubMenu("Combo").AddItem(new MenuItem("qHitchance", "Q Hitchance").SetValue(new StringList(new[] { "Low", "Medium", "High", "Very High" }, 2)));
-            Config.SubMenu("Combo").AddItem(new MenuItem("UseWCombo", "Use W").SetValue(new StringList(new[] {"Always", "Only Stunnable"}))); //TODO on stunnable
+            Config.SubMenu("Combo").AddItem(new MenuItem("UseWCombo", "Use W").SetValue(new StringList(new[] {"Always", "Only Stunnable"})));
             Config.SubMenu("Combo").AddItem(new MenuItem("UseRCombo", "Use smart R").SetValue(true));
-            //Config.SubMenu("Combo").AddItem(new MenuItem("UseRmulti", "Use R on min X targets").SetValue(new Slider(2, 0, 5))); //0 to deactivate
+            Config.SubMenu("Combo").AddItem(new MenuItem("UseRmul", "Use R for multiple targets").SetValue(true));
+            Config.SubMenu("Combo").AddItem(new MenuItem("UseRmulti", "Use R on min X targets").SetValue(new Slider(2, 1, 5)));
             Config.SubMenu("Combo").AddItem(new MenuItem("ComboActive", "Combo!").SetValue(new KeyBind(32, KeyBindType.Press)));
             
             //Harass Menu
@@ -103,9 +96,8 @@ namespace Kennen
             if (Config.Item("Killsteal").GetValue<bool>())
                 KillSteal();
 
-            /* TODO
+           
             CastRmulti();
-            */
 
             if ((Config.Item("HarassActive").GetValue<KeyBind>().Active) || (Config.Item("HarassActiveT").GetValue<KeyBind>().Active))
                 Harass();
@@ -114,12 +106,12 @@ namespace Kennen
 
         public static void CastQ() //Q casting 
         {
-            if (!Q.IsReady())
+            var qTarget = SimpleTs.GetTarget(Q.Range, SimpleTs.DamageType.Magical);
+
+            if (!Q.IsReady() && !qTarget.IsValidTarget(Q.Range))
                 return;
 
-            var qTarget = SimpleTs.GetTarget(Q.Range, SimpleTs.DamageType.Magical);
             var useQ = Config.Item("UseQCombo").GetValue<bool>();
-
             var qLow = Config.Item("qHitchance").GetValue<StringList>().SelectedIndex == 0;
             var qMedium = Config.Item("qHitchance").GetValue<StringList>().SelectedIndex == 1;
             var qHigh = Config.Item("qHitchance").GetValue<StringList>().SelectedIndex == 2;
@@ -140,12 +132,12 @@ namespace Kennen
 
         public static void CastQharass() //Q casting in harass
         {
-            if (!Q.IsReady())
+            var qTarget = SimpleTs.GetTarget(Q.Range, SimpleTs.DamageType.Magical);
+
+            if (!Q.IsReady() && !qTarget.IsValidTarget(Q.Range))
                 return;
 
-            var qTarget = SimpleTs.GetTarget(Q.Range, SimpleTs.DamageType.Magical);
             var useQ = Config.Item("UseQHarass").GetValue<bool>();
-
             var qLow = Config.Item("qHitchanceH").GetValue<StringList>().SelectedIndex == 0;
             var qMedium = Config.Item("qHitchanceH").GetValue<StringList>().SelectedIndex == 1;
             var qHigh = Config.Item("qHitchanceH").GetValue<StringList>().SelectedIndex == 2;
@@ -166,62 +158,61 @@ namespace Kennen
 
         public static void CastW()
         {
-            if (!W.IsReady())
-                return;
             var wTarget = SimpleTs.GetTarget(W.Range, SimpleTs.DamageType.Magical);
             var wMode1 = Config.Item("UseWCombo").GetValue<StringList>().SelectedIndex == 0;
-            //var wMode2 = Config.Item("UseWCombo").GetValue<StringList>().SelectedIndex == 1;
+            var wMode2 = Config.Item("UseWCombo").GetValue<StringList>().SelectedIndex == 1;
+
+            if (!W.IsReady() && !wTarget.IsValidTarget(W.Range))
+                return;
 
             if (wTarget != null)
             {
-                if (wMode1)
+                if (wMode1 && wTarget.HasBuff("kennenmarkofstorm", true))
                     W.Cast();
-                /*
-                  if (wMode2)
-                        foreach (var buff in wTarget.Buffs)
+                
+                if (wMode2)
+                    foreach (var buff in wTarget.Buffs)
                         {
-                            if (buff.Name == "" && buff.Count == 2) //missing kennen debuff name
-                                _w.Cast();
+                            if (buff.Name == "kennenmarkofstorm" && buff.Count == 2)
+                                W.Cast();
                         }
-                       
-                     */
             }
         }
 
         public static void CastWharass()
         {
-            if (!W.IsReady())
-                return;
             var wTarget = SimpleTs.GetTarget(W.Range, SimpleTs.DamageType.Magical);
             var wMode1 = Config.Item("UseWHarass").GetValue<StringList>().SelectedIndex == 0;
-            //var wMode2 = Config.Item("UseWHarass").GetValue<StringList>().SelectedIndex == 1;
+            var wMode2 = Config.Item("UseWHarass").GetValue<StringList>().SelectedIndex == 1;
+
+            if (!W.IsReady() && !wTarget.IsValidTarget(W.Range))
+                return;
 
             if (wTarget != null)
             {
-                if (wMode1)
+                if (wMode1 && wTarget.HasBuff("kennenmarkofstorm", true))
                     W.Cast();
-                /*
-                  if (wMode2)
-                        foreach (var buff in wTarget.Buffs)
+
+                if (wMode2)
+                    foreach (var buff in wTarget.Buffs)
                         {
-                            if (buff.Name == "" && buff.Count == 2) //missing kennen debuff name
-                                _w.Cast();
+                            if (buff.Name == "kennenmarkofstorm" && buff.Count == 2)
+                                W.Cast();
                         }
-                       
-                     */
             }
         }
 
         //ulti if killable
         public static void CastR()
         {
-            if (!R.IsReady())
-                return;
             var rTarget = SimpleTs.GetTarget(R.Range, SimpleTs.DamageType.Magical);
+
+            if (!R.IsReady() && !rTarget.IsValidTarget(R.Range))
+                return;
+
             var useR = Config.Item("UseRCombo").GetValue<bool>();
-            //if (rTarget != null && useR && GetComboDamage() > rTarget.Health)
-                //R.Cast();
-            if (rTarget != null && useR && Player.GetSpellDamage(rTarget, SpellSlot.R) > rTarget.Health)
+
+            if (rTarget != null && useR && GetComboDamage() > rTarget.Health)
                 R.Cast();
         }
 
@@ -237,10 +228,10 @@ namespace Kennen
                 comboDamage += Player.GetSpellDamage(qTarget, SpellSlot.Q);
 
             if (W.IsReady() && wTarget != null)
-                comboDamage += Player.GetSpellDamage(qTarget, SpellSlot.W);
+                comboDamage += Player.GetSpellDamage(wTarget, SpellSlot.W);
 
             if (R.IsReady() && rTarget != null)
-                comboDamage += Player.GetSpellDamage(qTarget, SpellSlot.R);
+                comboDamage += Player.GetSpellDamage(rTarget, SpellSlot.R);
 
             if (IgniteSlot != SpellSlot.Unknown && Player.SummonerSpellbook.CanUseSpell(IgniteSlot) == SpellState.Ready)
                 comboDamage += Player.GetSummonerSpellDamage(qTarget, Damage.SummonerSpell.Ignite);
@@ -248,32 +239,17 @@ namespace Kennen
             return (float)comboDamage;
         }
 
-        /* TODO
         //auto ult for X enemies in range, 0 to deactivate
         public static void CastRmulti()
         {
-            if (!R.IsReady())
+            var rTarget = SimpleTs.GetTarget(R.Range, SimpleTs.DamageType.Magical);
+
+            if (!R.IsReady() && !rTarget.IsValidTarget(R.Range))
                 return;
-
-            //Thanks to xSalice
-            int hit = 0;
-            var minHit = Config.Item("UseRmulti").GetValue<Slider>().Value;
-            if (minHit == 0)
-                return;
-            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
-            {
-                if (enemy != null && !enemy.IsDead)
-                {
-                    if (Player.Distance(enemy) < R.Range)
-                        hit++;
-                }
-            }
-
-            if (hit >= minHit)
-                R.Cast();
-
+            if (Config.Item("UseRmult").GetValue<bool>() && Utility.CountEnemysInRange((int) R.Range) >= Config.Item("UseRmulti").GetValue<Slider>().Value)
+                R.Cast(rTarget);
         }
-        */
+        
         public static void Combo()
         {
             CastQ();
