@@ -1,2 +1,3 @@
 C:\Users\Davide\Desktop\Leaguesharp-master\Aatrox\bin\Debug\Aatrox.exe.config
 E:\Leaguesharp-master\Aatrox\bin\Debug\Aatrox.exe.config
+D:\League#\LeagueSharp\Aatrox - Adeirz\bin\Debug\Aatrox.exe.config

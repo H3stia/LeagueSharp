@@ -1,2 +1,0 @@
-D:\League#\LeagueSharp\WIP Kennen\Kennen\bin\Release\Kennen.exe.config
-C:\Users\Davide\Documents\GitHub\LeagueSharp\WIP Kennen\Kennen\bin\Release\Kennen.exe.config

@@ -153,7 +153,7 @@ namespace Aatrox
 
         private static void Combo()
         {
-            Orbwalker.SetAttacks(true);
+            Orbwalker.SetAttack(true);
 
             var qTarget = SimpleTs.GetTarget(Q.Range, SimpleTs.DamageType.Magical);
             var eTarget = SimpleTs.GetTarget(E.Range, SimpleTs.DamageType.Magical);
@@ -242,7 +242,7 @@ namespace Aatrox
             //foreach (var buff in ObjectManager.Player.Buffs) { Game.PrintChat(buff.DisplayName); }
             CheckWHealing();
             if (Player.IsDead) return;
-            Orbwalker.SetAttacks(true);
+            Orbwalker.SetAttack(true);
             Orbwalker.SetMovement(true);
 
             var useEKS = Config.Item("KillstealE").GetValue<bool>() && E.IsReady();

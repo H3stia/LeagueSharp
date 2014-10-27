@@ -10,7 +10,6 @@ namespace Kennen
 {
     class Program
     {
-        public const string ChampionName = "Kennen";
 
         public static Spell Q, W, E, R;
 
@@ -27,7 +26,7 @@ namespace Kennen
 
         public static void Game_OnGameLoad(EventArgs args)
         {
-            if (ObjectManager.Player.ChampionName != ChampionName) return;
+            if (Player.ChampionName != "Kennen") return;
 
             Game.PrintChat("Hestia Kennen loaded. Enjoy!");
 
