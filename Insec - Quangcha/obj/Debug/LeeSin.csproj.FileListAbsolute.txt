@@ -1,2 +1,0 @@
-H:\Quangcha\trunk\LeeSin\bin\Release\LeeSin.exe.config
-D:\League#\LeagueSharp\Insec - Quangcha\bin\Release\LeeSin.exe.config
