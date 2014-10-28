@@ -2,7 +2,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Drawing;
+using Color = System.Drawing.Color;
 using System.Linq;
 using LeagueSharp;
 using LeagueSharp.Common;
@@ -25,8 +25,8 @@ namespace Akali
         public static Spell R;
 
         //public static SpellSlot IgniteSlot;
-        public static Items.Item HEX;
-        public static Items.Item DFG;
+        public static Items.Item Hex;
+        public static Items.Item Dfg;
         public static Items.Item Cutlass;
 
         public static Menu Config;
@@ -54,8 +54,8 @@ namespace Akali
             SpellList.Add(R);
 
              //IgniteSlot = Player.GetSpellSlot("SummonerDot");
-            HEX = new Items.Item(3146, 700);
-            DFG = new Items.Item(3128, 750);
+            Hex = new Items.Item(3146, 700);
+            Dfg = new Items.Item(3128, 750);
             Cutlass = new Items.Item(3144, 450);
 
             Config = new Menu(ChampionName, ChampionName, true);
@@ -113,10 +113,10 @@ namespace Akali
             
             Config.AddSubMenu(new Menu("Drawings", "Drawings"));
             Config.SubMenu("Drawings")
-                .AddItem(new MenuItem("QRange", "Q Range").SetValue(new Circle(true, System.Drawing.Color.FromArgb(255, 255, 255, 255))));
+                .AddItem(new MenuItem("QRange", "Q Range").SetValue(new Circle(true, Color.FromArgb(255, 255, 255, 255))));
             Config.SubMenu("Drawings")
                 .AddItem(
-                    new MenuItem("RRange", "R Range").SetValue(new Circle(true, System.Drawing.Color.FromArgb(255, 255, 255, 255))));
+                    new MenuItem("RRange", "R Range").SetValue(new Circle(true, Color.FromArgb(255, 255, 255, 255))));
 
             Config.AddToMainMenu();
 
@@ -134,7 +134,7 @@ namespace Akali
         }
         private static void Game_OnGameUpdate(EventArgs args)
         {
-            Orbwalker.SetAttacks(true);
+            Orbwalker.SetAttack(true);
             if (Config.Item("ComboActive").GetValue<KeyBind>().Active)
             {
                 Combo();
@@ -159,7 +159,7 @@ namespace Akali
         private static void Combo()
         {
             Obj_AI_Hero target = SimpleTs.GetTarget(R.Range, 0);
-            Orbwalker.SetAttacks(!R.IsReady(0) && !Q.IsReady(0) && !E.IsReady(0) && Geometry.Distance(Player, target) < 800f);
+            Orbwalker.SetAttack(!R.IsReady() && !Q.IsReady() && !E.IsReady() && Geometry.Distance(Player, target) < 800f);
             bool value = Config.Item("HEX").GetValue<bool>();
             bool value2 = Config.Item("DFG").GetValue<bool>();
             bool value3 = Config.Item("Cutlass").GetValue<bool>();
@@ -167,49 +167,49 @@ namespace Akali
             {
                 if (Geometry.Distance(Player, target) <= 800f)
                 {
-                    if (Geometry.Distance(Player, target) >= 630f && R.IsReady(0))
+                    if (Geometry.Distance(Player, target) >= 630f && R.IsReady())
                     {
                         R.CastOnUnit(target, true);
-                        if (Q.IsReady(0))
+                        if (Q.IsReady())
                         {
                             Q.CastOnUnit(target, true);
                         }
-                        if (E.IsReady(0))
+                        if (E.IsReady())
                         {
                             E.CastOnUnit(target, true);
                         }
                     }
                     else
                     {
-                        if (Q.IsReady(0) && Geometry.Distance(Player, target) <= 600f)
+                        if (Q.IsReady() && Geometry.Distance(Player, target) <= 600f)
                         {
                             Q.CastOnUnit(target, true);
-                            if (R.IsReady(0))
+                            if (R.IsReady())
                             {
                                 R.CastOnUnit(target, true);
                             }
-                            if (E.IsReady(0))
+                            if (E.IsReady())
                             {
                                 E.CastOnUnit(target, true);
                             }
                         }
                         else
                         {
-                            if (R.IsReady(0))
+                            if (R.IsReady())
                             {
                                 R.CastOnUnit(target, true);
-                                if (value &&  HEX.IsReady())
+                                if (value &&  Hex.IsReady())
                                 {
-                                    HEX.Cast(target);
+                                    Hex.Cast(target);
                                 }
                             }
-                            if (E.IsReady(0))
+                            if (E.IsReady())
                             {
                                 E.CastOnUnit(target, true);
                             }
-                            if (value2 && DFG.IsReady())
+                            if (value2 && Dfg.IsReady())
                             {
-                                DFG.Cast(target);
+                                Dfg.Cast(target);
                             }
                             if (value3 && Cutlass.IsReady())
                             {
@@ -220,7 +220,7 @@ namespace Akali
                 }
                 else
                 {
-                    if (Damage.GetSpellDamage(Player, target, SpellSlot.Q, 4) > (double)target.Health)
+                    if (Damage.GetSpellDamage(Player, target, SpellSlot.Q, 4) > target.Health)
                     {
                         Q.CastOnUnit(target, true);
                     }
