@@ -1,12 +1,16 @@
 LeagueSharp
 ===========
 
-Some updated assemblies, all credits to original authors!
-
-
-Kennen
+Kennen - The ThunderRat
 -----------
-- Q usage, including KS if killable
-- W usage with different settings (always or only if stunnable-TODO-)
-- R combo usage if enemy killable
-- Auto R on X enemies in range
+- Q usage, selectable HitChance;
+- W usage (always/only if stunnable), selectable HitChance;
+- Smart R usage in combo (if enemy killable by combo);
+- Auto R on X enemies in range;
+- KillSteal with spells and ignite;
+- Items Usage (-TODO-);
+
+
+Credits @:
+-Trees for some functions
+-Common lib devs in general
