@@ -11,6 +11,5 @@ Kennen - The ThunderRat
 - Items Usage (-TODO-);
 
 
-Credits @:
--Trees for some functions
--Common lib devs in general
+Credits:
+Trees for some functions, Common lib devs in general
