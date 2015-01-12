@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using Color = System.Drawing.Color;
 using System.Linq;
+using Color = System.Drawing.Color;
 using LeagueSharp;
 using LeagueSharp.Common;
 
-
-namespace Kennen
+namespace Nautilus
 {
     class Program
     {
@@ -24,42 +23,35 @@ namespace Kennen
         //Ignite
         public static SpellDataInst Ignite;
 
-        #region Main
-
         public static void Main(string[] args)
         {
             Utils.ClearConsole();
             CustomEvents.Game.OnGameLoad += Game_OnGameLoad;
         }
 
-        #endregion
-
-        #region GameLoad
-
         private static void Game_OnGameLoad(EventArgs args)
         {
-            if (!Player.ChampionName.Equals("Kennen"))
+            if (!Player.ChampionName.Equals("Nautilus"))
                 return;
 
 
             #region Spell Data
 
-            Q = new Spell(SpellSlot.Q, 1050);
-            Q.SetSkillshot(0.125f, 50, 1700, true, SkillshotType.SkillshotLine);
+            Q = new Spell(SpellSlot.Q, 1100);
+            Q.SetSkillshot(0.250f, 90, 2000, true, SkillshotType.SkillshotLine);
 
-            W = new Spell(SpellSlot.W, 800);
+            E = new Spell(SpellSlot.E, 600);
 
-            R = new Spell(SpellSlot.R, 550);
+            R = new Spell(SpellSlot.R, 825);
 
             Ignite = Player.Spellbook.GetSpell(Player.GetSpellSlot("summonerdot"));
 
             #endregion
 
-
             #region Config Menu
 
             //Menu
-            Config = new Menu("Kennen - The ThunderRat", "Kennen", true);
+            Config = new Menu("Nautilus - Depths Terror", "Nautilus", true);
 
             //Orbwalker
             Config.AddSubMenu(new Menu("Orbwalking", "Orbwalking"));
@@ -82,11 +74,20 @@ namespace Kennen
 
             var comboW = combo.AddSubMenu(new Menu("W Settings", "W"));
             comboW.AddItem(new MenuItem("UseWCombo", "Use W").SetValue(true));
-            comboW.AddItem(
-                new MenuItem("UseWmodeC", "W Mode").SetValue(new StringList(new[] { "Always", "Only Stunnable" })));
+
+            var comboE = combo.AddSubMenu(new Menu("E Settings", "E"));
+            comboE.AddItem(new MenuItem("UseECombo", "Use E").SetValue(true));
 
             var comboR = combo.AddSubMenu(new Menu("R Settings", "R"));
-            comboR.AddItem(new MenuItem("UseRCombo", "Use smart R").SetValue(true));
+            comboR.AddItem(new MenuItem("UseRCombo", "Use R").SetValue(true));
+            comboR.AddSubMenu(new Menu("Don't use Ult on", "DontUlt"));
+            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != Player.Team))
+            {
+                Config.SubMenu("Combo")
+                    .SubMenu("R")
+                    .SubMenu("DontUlt")
+                    .AddItem(new MenuItem("DontUlt" + enemy.BaseSkinName, enemy.BaseSkinName).SetValue(false));
+            }
 
             combo.AddItem(new MenuItem("ComboActive", "Combo!").SetValue(new KeyBind(32, KeyBindType.Press)));
 
@@ -100,30 +101,28 @@ namespace Kennen
                     new StringList(
                         new[] { HitChance.Low.ToString(), HitChance.Medium.ToString(), HitChance.High.ToString() }, 1)));
 
-            var harassW = harass.AddSubMenu(new Menu("W Settings", "W"));
-            harassW.AddItem(new MenuItem("UseWHarass", "Use W").SetValue(true));
-            harassW.AddItem(
-                new MenuItem("UseWmodeH", "W Mode").SetValue(new StringList(new[] { "Always", "Only Stunnable" })));
-            harass.AddItem(new MenuItem("HarassActive", "Harass!").SetValue(new KeyBind((byte) 'C', KeyBindType.Press)));
+            var harassE = harass.AddSubMenu(new Menu("E Settings", "E"));
+            harassE.AddItem(new MenuItem("UseEHarass", "Use E").SetValue(true));
+            harass.AddItem(new MenuItem("HarassActive", "Harass!").SetValue(new KeyBind((byte)'C', KeyBindType.Press)));
 
             //Killsteal Menu
             var killsteal = Config.AddSubMenu(new Menu("KillSteal Settings", "KillSteal"));
             killsteal.AddItem(new MenuItem("Killsteal", "Activate KillSteal").SetValue(true));
-            killsteal.AddItem(new MenuItem("UseQKS", "Use Q to KillSteal").SetValue(true));
-            killsteal.AddItem(new MenuItem("UseWKS", "Use W to KillSteal").SetValue(true));
+            killsteal.AddItem(new MenuItem("UseEKS", "Use E to KillSteal").SetValue(true));
             killsteal.AddItem(new MenuItem("UseIKS", "Use Ignite to KillSteal").SetValue(true));
 
             //Misc Menu
             var misc = Config.AddSubMenu(new Menu("Misc Settings", "Misc"));
-            misc.AddItem(new MenuItem("UseRmul", "Use R for multiple targets").SetValue(true));
-            misc.AddItem(new MenuItem("UseRmulti", "Use R on min X targets").SetValue(new Slider(2, 1, 5)));
+            misc.AddItem(new MenuItem("InterruptSpells", "Interrupt Spells").SetValue(true));
+            misc.AddItem(new MenuItem("wTargetted", "Shield targetted spells").SetValue(true));
+            
 
             //Drawings Menu
             var drawings = Config.AddSubMenu(new Menu("Drawings", "Drawings"));
             drawings.AddItem(
                 new MenuItem("DrawQ", "Q range").SetValue(new Circle(true, Color.CornflowerBlue, Q.Range)));
             drawings.AddItem(
-                new MenuItem("DrawW", "W range").SetValue(new Circle(false, Color.CornflowerBlue, W.Range)));
+                new MenuItem("DrawE", "E range").SetValue(new Circle(false, Color.CornflowerBlue, E.Range)));
             drawings.AddItem(
                 new MenuItem("DrawR", "R range").SetValue(new Circle(false, Color.CornflowerBlue, R.Range)));
 
@@ -132,9 +131,67 @@ namespace Kennen
             #endregion
 
 
-            Game.PrintChat("<b><font color =\"#9900CC\">Kennen - The ThunderRat </font><font color=\"#FFFFFF\">by Hestia loaded!</font>");
+            Game.PrintChat("<b><font color =\"#4980E6\">Nautilus - Depths Terror </font><font color=\"#FFFFFF\">by Hestia loaded!</font>");
             Drawing.OnDraw += Drawing_OnDraw;
             Game.OnGameUpdate += Game_OnGameUpdate;
+            Interrupter.OnPossibleToInterrupt += Interrupter_OnPossibleToInterrupt;
+            Obj_AI_Base.OnProcessSpellCast += Obj_AI_Hero_OnProcessSpellCast;
+        }
+
+        #region Interrupter
+
+        //Needs testing
+        private static void Interrupter_OnPossibleToInterrupt(Obj_AI_Base target, InterruptableSpell args)
+        {
+            var interruptSpells = Config.Item("InterruptSpells").GetValue<KeyBind>().Active;
+            if (!interruptSpells)
+                return;
+
+            if (Player.Distance(target) < Q.Range)
+            {
+                Q.Cast(target);
+            }
+
+            if (Player.Distance(target) < R.Range)
+            {
+                R.CastOnUnit(target);
+            }
+        }
+
+        #endregion
+
+        #region Shield Targetted
+
+        //W Targetted Spells - Credits @legacy @Kortatu
+        private static void Obj_AI_Hero_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        {
+            if (!sender.IsValid<Obj_AI_Hero>())
+            {
+                return;
+            }
+
+            if (!Config.Item("wTargetted").GetValue<bool>())
+            {
+                return;
+            }
+
+            if (!sender.IsEnemy)
+            {
+                return;
+            }
+
+            if (args.Target == null || !args.Target.IsValid || !args.Target.IsMe)
+            {
+                return;
+            }
+
+            if (args.SData.IsAutoAttack())
+            {
+                return;
+            }
+
+            //Delay the Cast a bit to make it look more human
+            Utility.DelayAction.Add(100, () => W.Cast());
         }
 
         #endregion
@@ -175,59 +232,36 @@ namespace Kennen
         {
             var castQ = Config.Item("UseQCombo").GetValue<bool>() && Q.IsReady();
             var castW = Config.Item("UseWCombo").GetValue<bool>() && W.IsReady();
+            var castE = Config.Item("UseECombo").GetValue<bool>() && E.IsReady();
             var castR = Config.Item("UseRCombo").GetValue<bool>() && R.IsReady();
 
-            if (castQ && Q.IsInRange(Target, 1000))
+            if (castQ && Q.IsInRange(Target, 1050))
             {
                 Q.CastIfHitchanceEquals(Target, GetHitChance("qHitchance"));
             }
 
-            var modeW = Config.Item("UseWmodeC").GetValue<StringList>();
-            if (castW && W.IsInRange(Target, W.Range))
+            if (castW && (Player.Distance(Target) < 250))
             {
-                if (modeW.SelectedIndex == 0)
-                    W.Cast();
-                else if (modeW.SelectedIndex == 1)
-                {
-                    foreach (var buff in Target.Buffs)
-                    {
-                        if (buff.Name == "kennenmarkofstorm" && buff.Count == 2)
-                            W.Cast();
-                    }
-                }
+                W.Cast();
+            }
+
+            if (castE && E.IsInRange(Target, 550))
+            {
+                E.Cast();
             }
 
             if (castR && R.IsInRange(Target, R.Range))
             {
-                CastSmartR();
+                CastR();
             }
         }
 
-        //Ulti if killable
-        private static void CastSmartR()
+        //Ulti
+        private static void CastR()
         {
-            if (Target.Health < GetComboDamage(Target) && Player.Distance(Target) < 500)
-                R.Cast();
-        }
-
-        //Calculate Combo Damage
-        private static float GetComboDamage(Obj_AI_Base enemy)
-        {
-            var comboDamage = 0d;
-
-            if (Q.IsReady())
-                comboDamage += Player.GetSpellDamage(enemy, SpellSlot.Q);
-
-            if (W.IsReady())
-                comboDamage += Player.GetSpellDamage(enemy, SpellSlot.W);
-
-            if (R.IsReady())
-                comboDamage += Player.GetSpellDamage(enemy, SpellSlot.R);
-
-            if (Ignite.IsReady())
-                comboDamage += Player.GetSummonerSpellDamage(enemy, Damage.SummonerSpell.Ignite);
-
-            return (float) comboDamage;
+            var useR = (Config.Item("DontUlt" + Target.BaseSkinName) != null && Config.Item("DontUlt" + Target.BaseSkinName).GetValue<bool>() == false);
+            if (useR && Player.Distance(Target) < R.Range)
+                R.CastOnUnit(Target);
         }
 
         #endregion
@@ -247,27 +281,18 @@ namespace Kennen
         private static void Harass()
         {
             var castQ = Config.Item("UseQHarass").GetValue<bool>() && Q.IsReady();
-            var castW = Config.Item("UseWHarass").GetValue<bool>() && W.IsReady();
+            var castE = Config.Item("UseEHarass").GetValue<bool>() && E.IsReady();
 
-            if (castQ && Q.IsInRange(Target, 1000))
+            if (castQ && Q.IsInRange(Target, 1050))
             {
                 Q.CastIfHitchanceEquals(Target, GetHitChance("qHitchanceH"));
             }
 
-            var modeW = Config.Item("UseWmodeH").GetValue<StringList>();
-            if (castW && W.IsInRange(Target, W.Range))
+            if (castE && E.IsInRange(Target, 550))
             {
-                if (modeW.SelectedIndex == 0)
-                    W.Cast();
-                else if (modeW.SelectedIndex == 1)
-                {
-                    foreach (var buff in Target.Buffs)
-                    {
-                        if (buff.Name == "kennenmarkofstorm" && buff.Count == 2)
-                            W.Cast();
-                    }
-                }
+                E.Cast();
             }
+
         }
 
         #endregion
@@ -280,39 +305,23 @@ namespace Kennen
             if (!Config.Item("Killsteal").GetValue<bool>())
                 return;
 
-            Qks();
-            Wks();
+            Eks();
             Iks();
         }
 
-        //Q Killsteal
-        private static void Qks()
+        //E Killsteal
+        private static void Eks()
         {
-            //Q killsteal
-            if (!Config.Item("UseQKS").GetValue<bool>())
+            //E killsteal
+            if (!Config.Item("UseEKS").GetValue<bool>())
                 return;
 
-            var unit = ObjectManager.Get<Obj_AI_Hero>().FirstOrDefault( obj => obj.IsValidTarget(Q.Range) && obj.Health < Player.GetSpellDamage(obj, SpellSlot.Q));
+            var unit = ObjectManager.Get<Obj_AI_Hero>().FirstOrDefault(obj => obj.IsValidTarget(E.Range) && obj.Health < Player.GetSpellDamage(obj, SpellSlot.E));
 
-            if (!unit.IsValidTarget(Q.Range))
+            if (!unit.IsValidTarget(E.Range))
                 return;
 
-            Q.Cast(unit);
-        }
-
-        //W Killsteal
-        private static void Wks()
-        {
-            //W killsteal
-            if (!Config.Item("UseWKS").GetValue<bool>())
-                return;
-
-            var unit = ObjectManager.Get<Obj_AI_Hero>().FirstOrDefault(obj => obj.IsValidTarget(W.Range) && obj.Health < Player.GetSpellDamage(obj, SpellSlot.W));
-
-            if (!unit.IsValidTarget(W.Range))
-                return;
-
-            W.Cast();
+            E.Cast();
         }
 
         //Ignite killsteal
@@ -337,23 +346,6 @@ namespace Kennen
 
         #endregion
 
-        #region MultiR
-
-        //auto ult for X enemies in range
-        private static void CastRmulti()
-        {
-            if (!Config.Item("ComboActive").GetValue<bool>())
-                return;
-
-            var castR = Config.Item("UseRmul").GetValue<bool>() && R.IsReady();
-            var minR = Config.Item("UseRmulti").GetValue<Slider>().Value;
-            var hits = Player.CountEnemysInRange(R.Range);
-            if (castR && R.IsInRange(Target, R.Range) && hits >= minR)
-                R.Cast();
-        }
-
-        #endregion
-
         #region Events
 
         private static void Game_OnGameUpdate(EventArgs args)
@@ -370,18 +362,16 @@ namespace Kennen
 
             ExecuteCombo();
             ExecuteHarass();
-            CastRmulti();
         }
 
         private static void Drawing_OnDraw(EventArgs args)
         {
-            foreach (var circle in new List<string> { "Q", "W", "R" }.Select(spell => Config.Item("Draw" + spell).GetValue<Circle>()).Where(circle => circle.Active))
+            foreach (var circle in new List<string> { "Q", "E", "R" }.Select(spell => Config.Item("Draw" + spell).GetValue<Circle>()).Where(circle => circle.Active))
             {
                 Render.Circle.DrawCircle(Player.Position, circle.Radius, circle.Color);
             }
         }
 
         #endregion
-
     }
 }
