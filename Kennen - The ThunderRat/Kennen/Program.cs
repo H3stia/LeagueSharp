@@ -45,7 +45,7 @@ namespace Kennen
             #region Spell Data
 
             Q = new Spell(SpellSlot.Q, 1050);
-            Q.SetSkillshot(0.65f, 50, 1700, true, SkillshotType.SkillshotLine);
+            Q.SetSkillshot(0.125f, 50, 1700, true, SkillshotType.SkillshotLine);
 
             W = new Spell(SpellSlot.W, 800);
 
