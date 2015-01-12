@@ -11,5 +11,14 @@ Kennen - The ThunderRat
 - Items Usage (-TODO-)
 
 
+Nautilus - Depths Terror
+-----------
+- Q usage, selectable HitChance
+- W usage, settings to shield targetted spells (thanks legacy & kortatu)
+- Smart R usage in combo (can exclude R targets)
+- KillSteal with spells and ignite
+- Items Usage (-TODO-)
+
+
 Credits:
-Trees for some functions, Common lib devs in general
+Trees, legacy, Kortatu, Common lib devs in general
