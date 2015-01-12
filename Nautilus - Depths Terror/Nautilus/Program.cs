@@ -80,6 +80,7 @@ namespace Nautilus
 
             var comboR = combo.AddSubMenu(new Menu("R Settings", "R"));
             comboR.AddItem(new MenuItem("UseRCombo", "Use R").SetValue(true));
+            comboR.AddItem(new MenuItem("minRhealth", "Min target Health for R")).SetValue(new Slider(60, 1));
             comboR.AddSubMenu(new Menu("Don't use Ult on", "DontUlt"));
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != Player.Team))
             {
@@ -141,20 +142,20 @@ namespace Nautilus
         #region Interrupter
 
         //Needs testing
-        private static void Interrupter_OnPossibleToInterrupt(Obj_AI_Base target, InterruptableSpell args)
+        private static void Interrupter_OnPossibleToInterrupt(Obj_AI_Base intTarget, InterruptableSpell args)
         {
             var interruptSpells = Config.Item("InterruptSpells").GetValue<KeyBind>().Active;
             if (!interruptSpells)
                 return;
 
-            if (Player.Distance(target) < Q.Range)
+            if (Player.Distance(intTarget) < Q.Range)
             {
-                Q.Cast(target);
+                Q.Cast(intTarget);
             }
 
-            if (Player.Distance(target) < R.Range)
+            if (Player.Distance(intTarget) < R.Range)
             {
-                R.CastOnUnit(target);
+                R.CastOnUnit(intTarget);
             }
         }
 
@@ -260,7 +261,8 @@ namespace Nautilus
         private static void CastR()
         {
             var useR = (Config.Item("DontUlt" + Target.BaseSkinName) != null && Config.Item("DontUlt" + Target.BaseSkinName).GetValue<bool>() == false);
-            if (useR && Player.Distance(Target) < R.Range)
+            var minHp = Config.Item("minRhealth").GetValue<Slider>().Value;
+            if (useR && (Player.Distance(Target) < R.Range) && (Target.HealthPercentage() <= minHp))
                 R.CastOnUnit(Target);
         }
 
