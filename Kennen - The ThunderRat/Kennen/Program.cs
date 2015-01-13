@@ -186,7 +186,11 @@ namespace Kennen
             if (castW && W.IsInRange(Target, W.Range))
             {
                 if (modeW.SelectedIndex == 0)
-                    W.Cast();
+                    foreach (var buff in Target.Buffs)
+                    {
+                        if (buff.Name == "kennenmarkofstorm")
+                            W.Cast();
+                    }
                 else if (modeW.SelectedIndex == 1)
                 {
                     foreach (var buff in Target.Buffs)
@@ -258,7 +262,11 @@ namespace Kennen
             if (castW && W.IsInRange(Target, W.Range))
             {
                 if (modeW.SelectedIndex == 0)
-                    W.Cast();
+                    foreach (var buff in Target.Buffs)
+                    {
+                        if (buff.Name == "kennenmarkofstorm")
+                            W.Cast();
+                    }
                 else if (modeW.SelectedIndex == 1)
                 {
                     foreach (var buff in Target.Buffs)
