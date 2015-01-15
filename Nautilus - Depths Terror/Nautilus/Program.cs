@@ -80,7 +80,7 @@ namespace Nautilus
 
             var comboR = combo.AddSubMenu(new Menu("R Settings", "R"));
             comboR.AddItem(new MenuItem("UseRCombo", "Use R").SetValue(true));
-            comboR.AddItem(new MenuItem("minRhealth", "Min target Health for R")).SetValue(new Slider(60, 1));
+            comboR.AddItem(new MenuItem("minRhealth", "Min target Health % for R ")).SetValue(new Slider(60, 1));
             comboR.AddSubMenu(new Menu("Don't use Ult on", "DontUlt"));
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != Player.Team))
             {
@@ -141,11 +141,10 @@ namespace Nautilus
 
         #region Interrupter
 
-        //Needs testing
+        //Interrup spells with Q and R
         private static void Interrupter_OnPossibleToInterrupt(Obj_AI_Base intTarget, InterruptableSpell args)
         {
-            var interruptSpells = Config.Item("InterruptSpells").GetValue<KeyBind>().Active;
-            if (!interruptSpells)
+            if (!Config.Item("InterruptSpells").GetValue<bool>())
                 return;
 
             if (Player.Distance(intTarget) < Q.Range)
