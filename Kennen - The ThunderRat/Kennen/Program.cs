@@ -355,7 +355,7 @@ namespace Kennen
 
             var castR = Config.Item("UseRmul").GetValue<bool>() && R.IsReady();
             var minR = Config.Item("UseRmulti").GetValue<Slider>().Value;
-            var hits = Player.CountEnemysInRange(R.Range);
+            var hits = Player.CountEnemiesInRange(R.Range);
             if (castR && R.IsInRange(Target, R.Range) && hits >= minR)
                 R.Cast();
         }
