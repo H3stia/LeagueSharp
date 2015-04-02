@@ -5,7 +5,6 @@ using System.Linq;
 using LeagueSharp;
 using LeagueSharp.Common;
 
-
 namespace Kennen
 {
     class Program
@@ -134,7 +133,7 @@ namespace Kennen
 
             Game.PrintChat("<b><font color =\"#9900CC\">Kennen - The ThunderRat </font><font color=\"#FFFFFF\">by Hestia loaded!</font>");
             Drawing.OnDraw += Drawing_OnDraw;
-            Game.OnGameUpdate += Game_OnGameUpdate;
+            Game.OnUpdate += Game_OnUpdate;
         }
 
         #endregion
@@ -364,7 +363,7 @@ namespace Kennen
 
         #region Events
 
-        private static void Game_OnGameUpdate(EventArgs args)
+        private static void Game_OnUpdate(EventArgs args)
         {
             if (Player.IsDead)
                 return;
@@ -385,7 +384,7 @@ namespace Kennen
         {
             foreach (var circle in new List<string> { "Q", "W", "R" }.Select(spell => Config.Item("Draw" + spell).GetValue<Circle>()).Where(circle => circle.Active))
             {
-                Render.Circle.DrawCircle(Player.Position, circle.Radius, circle.Color);
+                Render.Circle.DrawCircle(Player.ServerPosition, circle.Radius, circle.Color);
             }
         }
 
