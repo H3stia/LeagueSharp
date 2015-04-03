@@ -14,7 +14,7 @@ namespace Kennen
 
         //Targets
         public static Obj_AI_Hero Target;
-        public static Obj_AI_Hero Player = ObjectManager.Player;
+        public static Obj_AI_Hero Player;
 
         //Menu
         public static Menu Config;
