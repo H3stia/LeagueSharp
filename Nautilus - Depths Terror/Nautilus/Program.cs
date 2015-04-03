@@ -134,15 +134,15 @@ namespace Nautilus
 
             Game.PrintChat("<b><font color =\"#4980E6\">Nautilus - Depths Terror </font><font color=\"#FFFFFF\">by Hestia loaded!</font>");
             Drawing.OnDraw += Drawing_OnDraw;
-            Game.OnGameUpdate += Game_OnGameUpdate;
-            Interrupter.OnPossibleToInterrupt += Interrupter_OnPossibleToInterrupt;
+            Game.OnUpdate += Game_OnUpdate;
+            Interrupter2.OnInterruptableTarget += Interrupter2_OnInterruptableTarget;
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Hero_OnProcessSpellCast;
         }
 
         #region Interrupter
 
         //Interrup spells with Q and R
-        private static void Interrupter_OnPossibleToInterrupt(Obj_AI_Base intTarget, InterruptableSpell args)
+        private static void Interrupter2_OnInterruptableTarget(Obj_AI_Hero intTarget, Interrupter2.InterruptableTargetEventArgs args)
         {
             if (!Config.Item("InterruptSpells").GetValue<bool>())
                 return;
@@ -261,7 +261,7 @@ namespace Nautilus
         {
             var useR = (Config.Item("DontUlt" + Target.BaseSkinName) != null && Config.Item("DontUlt" + Target.BaseSkinName).GetValue<bool>() == false);
             var minHp = Config.Item("minRhealth").GetValue<Slider>().Value;
-            if (useR && (Player.Distance(Target) < R.Range) && (Target.HealthPercentage() <= minHp))
+            if (useR && (Player.Distance(Target) < R.Range) && (Target.HealthPercent <= minHp))
                 R.CastOnUnit(Target);
         }
 
@@ -349,7 +349,7 @@ namespace Nautilus
 
         #region Events
 
-        private static void Game_OnGameUpdate(EventArgs args)
+        private static void Game_OnUpdate(EventArgs args)
         {
             if (Player.IsDead)
                 return;
@@ -369,7 +369,7 @@ namespace Nautilus
         {
             foreach (var circle in new List<string> { "Q", "E", "R" }.Select(spell => Config.Item("Draw" + spell).GetValue<Circle>()).Where(circle => circle.Active))
             {
-                Render.Circle.DrawCircle(Player.Position, circle.Radius, circle.Color);
+                Render.Circle.DrawCircle(Player.ServerPosition, circle.Radius, circle.Color);
             }
         }
 
