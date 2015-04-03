@@ -27,7 +27,6 @@ namespace Kennen
 
         public static void Main(string[] args)
         {
-            Utils.ClearConsole();
             CustomEvents.Game.OnGameLoad += Game_OnGameLoad;
         }
 
