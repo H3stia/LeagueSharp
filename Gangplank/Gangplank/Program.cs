@@ -121,7 +121,16 @@ namespace Gangplank
 
         private static void Game_OnUpdate(EventArgs args)
         {
-            throw new NotImplementedException();
+            if (Player.IsDead)
+                return;
+
+            Target = TargetSelector.GetTarget(1300, TargetSelector.DamageType.Magical);
+            if (!Target.IsValidTarget(1300))
+                return;
+
+            KillSteal();
+            ExecuteCombo();
+            ExecuteHarass();
         }
 
         private static void Drawing_OnDraw(EventArgs args)
