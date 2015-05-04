@@ -76,7 +76,7 @@ namespace Kennen
             comboQ.AddItem(
                 new MenuItem("qHitchance", "Q Hitchance").SetValue(
                     new StringList(
-                        new[] { HitChance.Low.ToString(), HitChance.Medium.ToString(), HitChance.High.ToString() }, 1)));
+                        new[] { HitChance.Low.ToString(), HitChance.Medium.ToString(), HitChance.High.ToString(), HitChance.VeryHigh.ToString() }, 2)));
 
             var comboW = combo.AddSubMenu(new Menu("W Settings", "W"));
             comboW.AddItem(new MenuItem("UseWCombo", "Use W").SetValue(true));
@@ -96,7 +96,7 @@ namespace Kennen
             harassQ.AddItem(
                 new MenuItem("qHitchanceH", "Q Hitchance").SetValue(
                     new StringList(
-                        new[] { HitChance.Low.ToString(), HitChance.Medium.ToString(), HitChance.High.ToString() }, 1)));
+                        new[] { HitChance.Low.ToString(), HitChance.Medium.ToString(), HitChance.High.ToString(), HitChance.VeryHigh.ToString() }, 2)));
 
             var harassW = harass.AddSubMenu(new Menu("W Settings", "W"));
             harassW.AddItem(new MenuItem("UseWHarass", "Use W").SetValue(true));
@@ -129,8 +129,7 @@ namespace Kennen
 
             #endregion
 
-
-            Game.PrintChat("<b><font color =\"#9900CC\">Kennen - The ThunderRat </font><font color=\"#FFFFFF\">by Hestia loaded!</font>");
+            Notifications.AddNotification("Kennen by Hestia loaded!", 5000);
             Drawing.OnDraw += Drawing_OnDraw;
             Game.OnUpdate += Game_OnUpdate;
         }
@@ -151,8 +150,10 @@ namespace Kennen
                     return HitChance.Medium;
                 case "High":
                     return HitChance.High;
+                case "Very High":
+                    return HitChance.VeryHigh;
             }
-            return HitChance.Medium;
+            return HitChance.High;
         }
 
         #endregion
