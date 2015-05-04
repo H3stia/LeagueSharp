@@ -384,7 +384,7 @@ namespace Kennen
         {
             foreach (var circle in new List<string> { "Q", "W", "R" }.Select(spell => Config.Item("Draw" + spell).GetValue<Circle>()).Where(circle => circle.Active))
             {
-                Render.Circle.DrawCircle(Player.ServerPosition, circle.Radius, circle.Color);
+                Render.Circle.DrawCircle(Player.Position, circle.Radius, circle.Color);
             }
         }
 
