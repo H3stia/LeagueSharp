@@ -1,24 +1,23 @@
 LeagueSharp
 ===========
 
-Kennen - The ThunderRat
+Kennen
 -----------
 - Q usage, selectable HitChance
 - W usage (always/only if stunnable), selectable HitChance
 - Smart R usage in combo (if enemy killable by combo)
 - Auto R on X enemies in range
 - KillSteal with spells and ignite
-- Items Usage (-TODO-)
 
 
-Nautilus - Depths Terror
+Dr. Mundo
 -----------
-- Q usage, selectable HitChance
-- W usage, settings to shield targetted spells (thanks legacy & kortatu)
-- Smart R usage in combo (can exclude R targets)
-- KillSteal with spells and ignite
-- Items Usage (-TODO-)
-
+- Q usage, selectable HitChance and auto usage/HP % options
+- W usage with selectable HP %
+- E usage OnAttack
+- R usage with selectable HP 5
+- KillSteal
+- Q last hit
 
 Credits:
-Trees, legacy, Kortatu, Common lib devs in general
+LeagueSharp Developers :')
