@@ -4,6 +4,7 @@ using Color = System.Drawing.Color;
 using System.Linq;
 using LeagueSharp;
 using LeagueSharp.Common;
+using SharpDX;
 
 namespace Kennen
 {
@@ -14,7 +15,7 @@ namespace Kennen
 
         //Targets
         public static Obj_AI_Hero Target;
-        public static Obj_AI_Hero Player;
+        private static Obj_AI_Hero Player { get { return ObjectManager.Player; } }
 
         //Menu
         public static Menu Config;

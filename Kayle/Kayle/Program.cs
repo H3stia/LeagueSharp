@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using LeagueSharp;
 using LeagueSharp.Common;
+using SharpDX;
+using Color = System.Drawing.Color;
 
 namespace Kayle
 {
@@ -14,7 +15,7 @@ namespace Kayle
         public static Spell Q, W, E, R;
 
         //Player
-        public static Obj_AI_Hero Player;
+        private static Obj_AI_Hero Player { get { return ObjectManager.Player; } }
 
         //Menu
         public static Menu Config;

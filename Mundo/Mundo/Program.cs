@@ -2,26 +2,31 @@
 using System.Collections.Generic;
 using LeagueSharp;
 using LeagueSharp.Common;
-using System.Drawing;
 using System.Linq;
+using System.Reflection;
+using SharpDX;
+using Color = System.Drawing.Color;
 
 namespace Mundo
 {
     class Program
     {
 
+        //Champion
+        private const string Champion = "DrMundo";
+
         //Spells
-        public static Spell Q, W, E, R;
+        private static Spell Q, W, E, R;
 
         //Player
-        public static Obj_AI_Hero Player;
+        private static Obj_AI_Hero Player { get { return ObjectManager.Player; } }
 
         //Menu
-        public static Menu Config;
-        public static Orbwalking.Orbwalker Orbwalker;
+        private static Menu Config;
+        private static Orbwalking.Orbwalker Orbwalker;
 
         //Ignite
-        public static SpellDataInst Ignite;
+        private static SpellDataInst Ignite;
 
         static void Main(string[] args)
         {
@@ -32,7 +37,7 @@ namespace Mundo
 
         private static void Game_OnGameLoad(EventArgs args)
         {
-            if (!Player.ChampionName.Equals("DrMundo"))
+            if (Player.ChampionName != Champion)
                 return;
 
             #region Spells
@@ -51,19 +56,19 @@ namespace Mundo
             #region Config Menu
 
             //Menu
-            Config = new Menu("Kennen - The ThunderRat", "Kennen", true);
+            Config = new Menu(Player.ChampionName, Player.ChampionName, true);
 
             //Orbwalker
-            Config.AddSubMenu(new Menu("Orbwalking", "Orbwalking"));
-            Orbwalker = new Orbwalking.Orbwalker(Config.SubMenu("Orbwalking"));
+            var orbwalkerMenu = Config.AddSubMenu(new Menu("Orbwalker", "Orbwalker"));
+            Orbwalker = new Orbwalking.Orbwalker(orbwalkerMenu);
 
             //Target Selector
-            var targetSelectorMenu = new Menu("Target Selector", "Target Selector");
-            TargetSelector.AddToMenu(targetSelectorMenu);
-            Config.AddSubMenu(targetSelectorMenu);
+            var ts = Config.AddSubMenu(new Menu("Target Selector", "Target Selector")); ;
+            TargetSelector.AddToMenu(ts);
+
 
             //Combo Menu
-            var combo = Config.AddSubMenu(new Menu("Combo Settings", "Combo"));
+            var combo = new Menu("Combo Settings", "Combo");
 
             var comboQ = combo.AddSubMenu(new Menu("Q Settings", "Q"));
             comboQ.AddItem(new MenuItem("UseQCombo", "Use Q").SetValue(true));
@@ -89,9 +94,10 @@ namespace Mundo
             comboR.AddItem(new MenuItem("RHealthCombo", "Minimum HP% to use R").SetValue(new Slider(30, 1, 100)));
 
             combo.AddItem(new MenuItem("ComboActive", "Combo!").SetValue(new KeyBind(32, KeyBindType.Press)));
+            Config.AddSubMenu(combo);
 
             //Harass Menu
-            var harass = Config.AddSubMenu(new Menu("Harass Settings", "Harass"));
+            var harass = new Menu("Harass Settings", "Harass");
 
             var harassQ = harass.AddSubMenu(new Menu("Q Settings", "Q"));
             harassQ.AddItem(new MenuItem("UseQHarass", "Use Q").SetValue(true));
@@ -111,22 +117,26 @@ namespace Mundo
             var harassW = harass.AddSubMenu(new Menu("W Settings", "W"));
             harassW.AddItem(new MenuItem("UseWHarass", "Use W").SetValue(true));
             harassW.AddItem(new MenuItem("WHealthHarass", "Minimum HP% to use W").SetValue(new Slider(50, 1, 100)));
+            Config.AddSubMenu(harass);
 
             //Killsteal Menu
-            var killsteal = Config.AddSubMenu(new Menu("KillSteal Settings", "KillSteal"));
+            var killsteal = new Menu("KillSteal Settings", "KillSteal");
             killsteal.AddItem(new MenuItem("Killsteal", "Activate KillSteal").SetValue(true));
             killsteal.AddItem(new MenuItem("UseQKS", "Use Q to KillSteal").SetValue(true));
             killsteal.AddItem(new MenuItem("UseIKS", "Use Ignite to KillSteal").SetValue(true));
+            Config.AddSubMenu(killsteal);
 
             //Misc Menu
-            var misc = Config.AddSubMenu(new Menu("Misc Settings", "Misc"));
+            var misc = new Menu("Misc Settings", "Misc");
             misc.AddItem(new MenuItem("QLastHit", "Use Q to last hit minions").SetValue(true));
             misc.AddItem(new MenuItem("QLastHitHP", "Minimum HP% to use Q to lasthit").SetValue(new Slider(60, 1, 100)));
+            Config.AddSubMenu(misc);
 
             //Drawings Menu
-            var drawings = Config.AddSubMenu(new Menu("Drawings", "Drawings"));
+            var drawings = new Menu("Drawings", "Drawings");
             drawings.AddItem(new MenuItem("DrawQ", "Q range").SetValue(new Circle(true, Color.CornflowerBlue, Q.Range)));
             drawings.AddItem(new MenuItem("DrawW", "W range").SetValue(new Circle(false, Color.CornflowerBlue, W.Range)));
+            Config.AddSubMenu(drawings);
 
             Config.AddToMainMenu();
 
@@ -185,7 +195,7 @@ namespace Mundo
 
         private static void Game_OnUpdate(EventArgs args)
         {
-            if (Player.IsDead || Player.IsRecalling() || MenuGUI.IsChatOpen)
+            if (Player.IsDead)
                 return;
 
 
