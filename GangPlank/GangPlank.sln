@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.22823.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kayle", "Kayle\Kayle.csproj", "{042EF6EC-2042-42B6-B1E6-37568EB77074}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GangPlank", "GangPlank\GangPlank.csproj", "{19473D14-B8A2-4CB7-88BA-7BB1BE74FEEB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +11,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{042EF6EC-2042-42B6-B1E6-37568EB77074}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{042EF6EC-2042-42B6-B1E6-37568EB77074}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{042EF6EC-2042-42B6-B1E6-37568EB77074}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{042EF6EC-2042-42B6-B1E6-37568EB77074}.Release|Any CPU.Build.0 = Release|Any CPU
+		{19473D14-B8A2-4CB7-88BA-7BB1BE74FEEB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19473D14-B8A2-4CB7-88BA-7BB1BE74FEEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19473D14-B8A2-4CB7-88BA-7BB1BE74FEEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19473D14-B8A2-4CB7-88BA-7BB1BE74FEEB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

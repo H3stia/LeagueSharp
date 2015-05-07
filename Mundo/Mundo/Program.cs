@@ -14,17 +14,17 @@ namespace Mundo
         private const string Champion = "DrMundo";
 
         //Spells
-        private static Spell Q, W, E, R;
+        private static Spell q, w, e, r;
 
         //Player
-        private static Obj_AI_Hero Player { get { return ObjectManager.Player; } }
+        private static Obj_AI_Hero Player => ObjectManager.Player;
 
         //Menu
-        private static Menu Config;
-        private static Orbwalking.Orbwalker Orbwalker;
+        private static Menu config;
+        private static Orbwalking.Orbwalker orbwalker;
 
         //Ignite
-        private static SpellDataInst Ignite;
+        private static SpellDataInst ignite;
 
         static void Main(string[] args)
         {
@@ -40,37 +40,29 @@ namespace Mundo
 
             #region Spells
 
-            Q = new Spell(SpellSlot.Q, 1050);
-            Q.SetSkillshot(0.25f, 60, 2000, true, SkillshotType.SkillshotLine);
-
-            W = new Spell(SpellSlot.W, 325);
-
-            E = new Spell(SpellSlot.E);
-
-            R = new Spell(SpellSlot.R);
+            q = new Spell(SpellSlot.Q, 1050);
+            q.SetSkillshot(0.25f, 60, 2000, true, SkillshotType.SkillshotLine);
+            w = new Spell(SpellSlot.W, 325);
+            e = new Spell(SpellSlot.E);
+            r = new Spell(SpellSlot.R);
 
             #endregion
 
             #region Config Menu
 
             //Menu
-            Config = new Menu(Player.ChampionName, Player.ChampionName, true);
+            config = new Menu(Player.ChampionName, Player.ChampionName, true);
 
-            //Orbwalker
-            var orbwalkerMenu = Config.AddSubMenu(new Menu("Orbwalker", "Orbwalker"));
-            Orbwalker = new Orbwalking.Orbwalker(orbwalkerMenu);
+            var orbwalkerMenu = config.AddSubMenu(new Menu("Orbwalker", "Orbwalker"));
+            orbwalker = new Orbwalking.Orbwalker(orbwalkerMenu);
 
-            //Target Selector
-            var ts = Config.AddSubMenu(new Menu("Target Selector", "Target Selector")); ;
+            var ts = config.AddSubMenu(new Menu("Target Selector", "Target Selector")); ;
             TargetSelector.AddToMenu(ts);
 
-
-            //Combo Menu
-            var combo = new Menu("Combo Settings", "Combo");
-
+            var combo = config.AddSubMenu(new Menu("Combo Settings", "Combo"));
             var comboQ = combo.AddSubMenu(new Menu("Q Settings", "Q"));
             comboQ.AddItem(new MenuItem("UseQCombo", "Use Q").SetValue(true));
-            comboQ.AddItem(new MenuItem("QHealthCombo", "Minimum HP% to use Q").SetValue(new Slider(25, 1, 100)));
+            comboQ.AddItem(new MenuItem("QHealthCombo", "Minimum HP% to use Q").SetValue(new Slider(25, 1)));
             comboQ.AddItem(
                 new MenuItem("qHitchance", "Q Hitchance").SetValue(
                     new StringList(
@@ -79,27 +71,19 @@ namespace Mundo
                             HitChance.Low.ToString(), HitChance.Medium.ToString(), HitChance.High.ToString(),
                             HitChance.VeryHigh.ToString()
                         }, 2)));
-
             var comboW = combo.AddSubMenu(new Menu("W Settings", "W"));
             comboW.AddItem(new MenuItem("UseWCombo", "Use W").SetValue(true));
-            comboW.AddItem(new MenuItem("WHealthCombo", "Minimum HP% to use W").SetValue(new Slider(50, 1, 100)));
-
+            comboW.AddItem(new MenuItem("WHealthCombo", "Minimum HP% to use W").SetValue(new Slider(50, 1)));
             var comboE = combo.AddSubMenu(new Menu("E Settings", "E"));
             comboE.AddItem(new MenuItem("UseECombo", "Use E").SetValue(true));
-
             var comboR = combo.AddSubMenu(new Menu("R Settings", "R"));
             comboR.AddItem(new MenuItem("UseRCombo", "Use R").SetValue(true));
-            comboR.AddItem(new MenuItem("RHealthCombo", "Minimum HP% to use R").SetValue(new Slider(30, 1, 100)));
+            comboR.AddItem(new MenuItem("RHealthCombo", "Minimum HP% to use R").SetValue(new Slider(30, 1)));
 
-            combo.AddItem(new MenuItem("ComboActive", "Combo!").SetValue(new KeyBind(32, KeyBindType.Press)));
-            Config.AddSubMenu(combo);
-
-            //Harass Menu
-            var harass = new Menu("Harass Settings", "Harass");
-
+            var harass = config.AddSubMenu(new Menu("Harass Settings", "Harass"));
             var harassQ = harass.AddSubMenu(new Menu("Q Settings", "Q"));
             harassQ.AddItem(new MenuItem("UseQHarass", "Use Q").SetValue(true));
-            harassQ.AddItem(new MenuItem("UseQHarassHP", "Minimum HP% to use Q").SetValue(new Slider(50, 1, 100)));
+            harassQ.AddItem(new MenuItem("UseQHarassHP", "Minimum HP% to use Q").SetValue(new Slider(50, 1)));
             harassQ.AddItem(
                 new MenuItem("qHitchanceH", "Q Hitchance").SetValue(
                     new StringList(
@@ -108,32 +92,25 @@ namespace Mundo
                             HitChance.Low.ToString(), HitChance.Medium.ToString(), HitChance.High.ToString(),
                             HitChance.VeryHigh.ToString()
                         }, 2)));
-
             var harassW = harass.AddSubMenu(new Menu("W Settings", "W"));
             harassW.AddItem(new MenuItem("UseWHarass", "Use W").SetValue(true));
-            harassW.AddItem(new MenuItem("WHealthHarass", "Minimum HP% to use W").SetValue(new Slider(50, 1, 100)));
-            Config.AddSubMenu(harass);
+            harassW.AddItem(new MenuItem("WHealthHarass", "Minimum HP% to use W").SetValue(new Slider(50, 1)));
 
-            //Killsteal Menu
-            var killsteal = new Menu("KillSteal Settings", "KillSteal");
+            var killsteal = config.AddSubMenu(new Menu("KillSteal Settings", "KillSteal"));
             killsteal.AddItem(new MenuItem("Killsteal", "Activate KillSteal").SetValue(true));
             killsteal.AddItem(new MenuItem("UseQKS", "Use Q to KillSteal").SetValue(true));
             killsteal.AddItem(new MenuItem("UseIKS", "Use Ignite to KillSteal").SetValue(true));
-            Config.AddSubMenu(killsteal);
 
-            //Misc Menu
-            var misc = new Menu("Misc Settings", "Misc");
+            var misc = config.AddSubMenu(new Menu("Misc Settings", "Misc"));
             misc.AddItem(new MenuItem("QLastHit", "Use Q to last hit minions").SetValue(true));
-            misc.AddItem(new MenuItem("QLastHitHP", "Minimum HP% to use Q to lasthit").SetValue(new Slider(60, 1, 100)));
-            Config.AddSubMenu(misc);
+            misc.AddItem(new MenuItem("QLastHitHP", "Minimum HP% to use Q to lasthit").SetValue(new Slider(60, 1)));
 
-            //Drawings Menu
-            var drawings = new Menu("Drawings", "Drawings");
-            drawings.AddItem(new MenuItem("DrawQ", "Q range").SetValue(new Circle(true, Color.CornflowerBlue, Q.Range)));
-            drawings.AddItem(new MenuItem("DrawW", "W range").SetValue(new Circle(false, Color.CornflowerBlue, W.Range)));
-            Config.AddSubMenu(drawings);
+            var drawings = config.AddSubMenu(new Menu("Drawings", "Drawings"));
+            drawings.AddItem(new MenuItem("disableDraw", "Disable all drawings").SetValue(false));
+            drawings.AddItem(new MenuItem("drawQ", "Q range").SetValue(new Circle(true, Color.CornflowerBlue, q.Range)));
+            drawings.AddItem(new MenuItem("drawW", "W range").SetValue(new Circle(false, Color.CornflowerBlue, w.Range)));
 
-            Config.AddToMainMenu();
+            config.AddToMainMenu();
 
             #endregion
 
@@ -150,7 +127,7 @@ namespace Mundo
         //Hitchance
         private static HitChance GetHitChance(string name)
         {
-            var hc = Config.Item(name).GetValue<StringList>();
+            var hc = config.Item(name).GetValue<StringList>();
             switch (hc.SList[hc.SelectedIndex])
             {
                 case "Low":
@@ -171,17 +148,17 @@ namespace Mundo
 
         private static void Orbwalking_OnAttack(AttackableUnit unit, AttackableUnit target)
         {
-            if (!E.IsReady())
+            if (!e.IsReady())
                 return;
 
-            var comboMode = Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo;
-            var harassMode = Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed;
-            var laneClearMode = Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear;
-            var castE = Config.Item("UseECombo").GetValue<bool>() && E.IsReady();
+            var comboMode = orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo;
+            var harassMode = orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed;
+            var laneClearMode = orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear;
+            var castE = config.Item("UseECombo").GetValue<bool>() && e.IsReady();
 
             if ((((comboMode || harassMode) && target is Obj_AI_Hero) || (laneClearMode && target is Obj_AI_Minion)) && castE)
             {
-                E.Cast();
+                e.Cast();
             }
         } 
         #endregion
@@ -194,7 +171,7 @@ namespace Mundo
                 return;
 
 
-            switch (Orbwalker.ActiveMode)
+            switch (orbwalker.ActiveMode)
             {
                 case Orbwalking.OrbwalkingMode.Combo:
                     ExecuteCombo();
@@ -218,30 +195,33 @@ namespace Mundo
 
         private static void ExecuteCombo()
         {
-            var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
-            if (target == null || !target.IsValid)
+            var target = TargetSelector.GetTarget(q.Range, TargetSelector.DamageType.Magical);
+
+            if (Player.IsDead || target == null || !target.IsValid)
+            {
                 return;
+            }
 
-            var castQ = Config.Item("UseQCombo").GetValue<bool>() && Q.IsReady();
-            var castW = Config.Item("UseWCombo").GetValue<bool>() && W.IsReady();
-            var castR = Config.Item("UseRCombo").GetValue<bool>() && R.IsReady();
+            var castQ = config.Item("UseQCombo").GetValue<bool>() && q.IsReady();
+            var castW = config.Item("UseWCombo").GetValue<bool>() && w.IsReady();
+            var castR = config.Item("UseRCombo").GetValue<bool>() && r.IsReady();
 
-            var qHealth = Config.Item("QHealthCombo").GetValue<Slider>().Value;
+            var qHealth = config.Item("QHealthCombo").GetValue<Slider>().Value;
             if (castQ && Player.HealthPercent >= qHealth && target.IsValidTarget())
             {
-                Q.CastIfHitchanceEquals(target, GetHitChance("qHitchance"));
+                q.CastIfHitchanceEquals(target, GetHitChance("qHitchance"));
             }
 
-            var wHealth = Config.Item("WHealthCombo").GetValue<Slider>().Value;
+            var wHealth = config.Item("WHealthCombo").GetValue<Slider>().Value;
             if (castW && Player.HealthPercent >= wHealth && !Player.HasBuff("BurningAgony") && target.IsValidTarget())
             {
-                W.Cast();
+                w.Cast();
             }
 
-            var rHealth = Config.Item("RHealthCombo").GetValue<Slider>().Value;
+            var rHealth = config.Item("RHealthCombo").GetValue<Slider>().Value;
             if (castR && Player.HealthPercent <= rHealth && !Player.InFountain())
             {
-                R.Cast();
+                r.Cast();
             }
         }
 
@@ -251,23 +231,23 @@ namespace Mundo
 
         private static void ExecuteHarass()
         {
-            var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
+            var target = TargetSelector.GetTarget(q.Range, TargetSelector.DamageType.Magical);
             if (target == null || !target.IsValid)
                 return;
 
-            var castQ = Config.Item("UseQHarass").GetValue<bool>() && Q.IsReady();
-            var castW = Config.Item("UseWHarass").GetValue<bool>() && W.IsReady();
+            var castQ = config.Item("UseQHarass").GetValue<bool>() && q.IsReady();
+            var castW = config.Item("UseWHarass").GetValue<bool>() && w.IsReady();
 
-            var qHealth = Config.Item("UseQHarassHP").GetValue<Slider>().Value;
+            var qHealth = config.Item("UseQHarassHP").GetValue<Slider>().Value;
             if (castQ && Player.HealthPercent >= qHealth && target.IsValidTarget())
             {
-                Q.CastIfHitchanceEquals(target, GetHitChance("qHitchanceH"));
+                q.CastIfHitchanceEquals(target, GetHitChance("qHitchanceH"));
             }
 
-            var wHealth = Config.Item("WHealthHarass").GetValue<Slider>().Value;
+            var wHealth = config.Item("WHealthHarass").GetValue<Slider>().Value;
             if (castW && Player.HealthPercent >= wHealth && !Player.HasBuff("BurningAgony") && target.IsValidTarget())
             {
-                W.Cast();
+                w.Cast();
             }
         }
 
@@ -277,28 +257,32 @@ namespace Mundo
 
         private static void LastHit()
         {
-            var lastHitQ = Config.Item("QLastHit").GetValue<bool>() && Q.IsReady();
-            var qHealth = Config.Item("QLastHitHP").GetValue<Slider>().Value;
-
-            var minion =
-                MinionManager.GetMinions(Q.Range, MinionTypes.All, MinionTeam.NotAlly, MinionOrderTypes.MaxHealth)
-                    .Cast<Obj_AI_Minion>()
-                    .FirstOrDefault(minions => Q.IsKillable(minions));
-
-            if (lastHitQ && Player.HealthPercent >= qHealth && minion != null)
+            if (!q.IsReady() || !config.Item("QLastHit").GetValue<bool>() || Player.HealthPercent <= config.Item("QLastHitHP").GetValue<Slider>().Value)
             {
-                Q.Cast(minion);
+                return;
+            }
+
+            var minionCount = MinionManager.GetMinions(Player.Position, q.Range, MinionTypes.All, MinionTeam.NotAlly);
+
+            if (minionCount.Count > 0)
+            {
+                foreach (var minion in minionCount.Where(minion => minion.Health <= Player.GetSpellDamage(minion, SpellSlot.Q)))
+                {
+                    q.CastOnUnit(minion);
+                    return;
+                }
             }
         }
 
         #endregion
 
-        #region KillSteal
 
         private static void KillSteal()
         {
-            if (!Config.Item("Killsteal").GetValue<bool>())
+            if (!config.Item("Killsteal").GetValue<bool>())
+            {
                 return;
+            }
 
             Qks();
             Iks();
@@ -307,56 +291,49 @@ namespace Mundo
         private static void Qks()
         {
             //Q killsteal
-            if (!Config.Item("UseQKS").GetValue<bool>())
+            if (!config.Item("UseQKS").GetValue<bool>() || !q.IsReady())
+            {
                 return;
+            }
 
-            var target =
-                ObjectManager.Get<Obj_AI_Hero>()
-                    .FirstOrDefault(
-                        obj => obj.IsValidTarget(Q.Range) && obj.Health < Player.GetSpellDamage(obj, SpellSlot.Q));
+            var target = ObjectManager.Get<Obj_AI_Hero>().FirstOrDefault(enemy => enemy.IsValidTarget(q.Range) && enemy.Health < Player.GetSpellDamage(enemy, SpellSlot.Q));
 
-            if (!target.IsValidTarget())
-                return;
-
-            Q.Cast(target);
+            q.Cast(target);
         }
 
         private static void Iks()
         {
             //Ignite
-            if (!Config.Item("UseIKS").GetValue<bool>() || Ignite == null || Ignite.Slot == SpellSlot.Unknown ||
-                !Ignite.Slot.IsReady())
-                return;
-
-            var target =
-                ObjectManager.Get<Obj_AI_Hero>()
-                    .FirstOrDefault(
-                        obj =>
-                            obj.IsValidTarget(600) &&
-                            obj.Health < Player.GetSummonerSpellDamage(obj, Damage.SummonerSpell.Ignite));
-
-            if (target.IsValidTarget(600))
+            if (!config.Item("UseIKS").GetValue<bool>() || ignite == null || ignite.Slot == SpellSlot.Unknown || !ignite.Slot.IsReady())
             {
-                Player.Spellbook.CastSpell(Ignite.Slot, target);
+                return;
             }
+
+            var target = ObjectManager.Get<Obj_AI_Hero>().FirstOrDefault(enemy => enemy.IsValidTarget(600) && enemy.Health < Player.GetSummonerSpellDamage(enemy, Damage.SummonerSpell.Ignite));
+
+            Player.Spellbook.CastSpell(ignite.Slot, target);
+
         }
-
-        #endregion
-
-        #region Drawing
 
         private static void Drawing_OnDraw(EventArgs args)
         {
-            foreach (
-                var circle in
-                    new List<string> { "Q", "W" }.Select(spell => Config.Item("Draw" + spell).GetValue<Circle>())
-                        .Where(circle => circle.Active))
+            if (Player.IsDead || config.Item("disableDraw").GetValue<bool>())
             {
+                return;
+            }
+
+            if (config.Item("drawQ").GetValue<Circle>().Active && q.Level > 0)
+            {
+                var circle = config.Item("drawQ").GetValue<Circle>();
                 Render.Circle.DrawCircle(Player.Position, circle.Radius, circle.Color);
             }
+
+            if (config.Item("drawE").GetValue<Circle>().Active && e.Level > 0)
+            {
+                var circle = config.Item("drawE").GetValue<Circle>();
+                Render.Circle.DrawCircle(Player.Position, circle.Radius, circle.Color);
+            }
+
         }
-
-        #endregion
-
     }
 }
