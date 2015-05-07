@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using Color = System.Drawing.Color;
 using LeagueSharp;
 using LeagueSharp.Common;
-using System.Linq;
-using System.Reflection;
-using SharpDX;
-using Color = System.Drawing.Color;
 
 namespace Mundo
 {
@@ -101,9 +99,6 @@ namespace Mundo
 
             var harassQ = harass.AddSubMenu(new Menu("Q Settings", "Q"));
             harassQ.AddItem(new MenuItem("UseQHarass", "Use Q").SetValue(true));
-            harassQ.AddItem(
-                new MenuItem("UseQHarassAuto", "Auto Use Q").SetValue(
-                    new KeyBind("J".ToCharArray()[0], KeyBindType.Toggle)));
             harassQ.AddItem(new MenuItem("UseQHarassHP", "Minimum HP% to use Q").SetValue(new Slider(50, 1, 100)));
             harassQ.AddItem(
                 new MenuItem("qHitchanceH", "Q Hitchance").SetValue(
@@ -215,7 +210,6 @@ namespace Mundo
             }
 
             KillSteal();
-            AutoHarass();
         }
 
         #endregion
@@ -344,24 +338,6 @@ namespace Mundo
             if (target.IsValidTarget(600))
             {
                 Player.Spellbook.CastSpell(Ignite.Slot, target);
-            }
-        }
-
-        #endregion
-
-        #region AutoHarass
-
-        private static void AutoHarass()
-        {
-            var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
-            if (target == null || !target.IsValid || !Q.IsReady())
-                return;
-
-            var autoQ = Config.Item("UseQHarassAuto").GetValue<bool>();
-            var autoQhealth = Config.Item("UseQHarassHP").GetValue<Slider>().Value;
-            if (autoQ && Player.HealthPercent >= autoQhealth)
-            {
-                Q.CastIfHitchanceEquals(target, GetHitChance("qHitchanceH"));
             }
         }
 
