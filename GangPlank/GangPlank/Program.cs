@@ -22,6 +22,7 @@ namespace GangPlank
 
         //Spell declaration
         private static Spell q, w, e, r;
+        private static SpellDataInst ignite;
 
         //Debuffs list for W usage
         private static readonly List<BuffType> DebuffsList = new List<BuffType>();  
@@ -33,7 +34,6 @@ namespace GangPlank
 
         private static void Game_OnGameLoad(EventArgs args)
         {
-            Console.WriteLine("GP LOADED");
             if (Player.ChampionName != Champion)
             {
                 return;
@@ -70,8 +70,6 @@ namespace GangPlank
             comboMenuW.AddItem(new MenuItem("useWminHP", "Use W if HP%").SetValue(new Slider(50, 1)));
             var comboMenuE = comboMenu.AddSubMenu(new Menu("E Settings", "E Settings"));
             comboMenuE.AddItem(new MenuItem("useE", "Use E").SetValue(true));
-            var comboMenuR = comboMenu.AddSubMenu(new Menu("R Settings", "R Settings"));
-            comboMenuR.AddItem(new MenuItem("useR", "Use R").SetValue(true));
 
             var harassMenu = config.AddSubMenu(new Menu("Harass", "Harass"));
             harassMenu.AddItem(new MenuItem("useQharass", "Use Q in mixed mode"));
@@ -79,36 +77,58 @@ namespace GangPlank
 
             var miscMenu = config.AddSubMenu(new Menu("Misc Settings", "Misc Settings"));
             miscMenu.AddItem(new MenuItem("useWcleanse", "Use W to cleanse debuffs").SetValue(true));
-            var miscMenuWdebuff = comboMenuW.AddSubMenu(new Menu("Debuffs Settings", "Debuffs Settings"));
-            miscMenuWdebuff.AddItem(new MenuItem("Slow", "Slow").SetValue(true));
-            miscMenuWdebuff.AddItem(new MenuItem("Taunt", "Taunt").SetValue(true));
-            miscMenuWdebuff.AddItem(new MenuItem("Stun", "Stun").SetValue(true));
-            miscMenuWdebuff.AddItem(new MenuItem("Polymorph", "Polymorph").SetValue(true));
-            miscMenuWdebuff.AddItem(new MenuItem("Fear", "Fear").SetValue(true));
-            miscMenuWdebuff.AddItem(new MenuItem("Charm", "Charm").SetValue(true));
-            miscMenuWdebuff.AddItem(new MenuItem("Blind", "Blind").SetValue(true));
+            var miscMenuWdebuff = miscMenu.AddSubMenu(new Menu("Debuffs Settings", "Debuffs Settings"));
+            miscMenuWdebuff.AddItem(new MenuItem("slow", "Slow").SetValue(true));
+            miscMenuWdebuff.AddItem(new MenuItem("taunt", "Taunt").SetValue(true));
+            miscMenuWdebuff.AddItem(new MenuItem("stun", "Stun").SetValue(true));
+            miscMenuWdebuff.AddItem(new MenuItem("polymorph", "Polymorph").SetValue(true));
+            miscMenuWdebuff.AddItem(new MenuItem("fear", "Fear").SetValue(true));
+            miscMenuWdebuff.AddItem(new MenuItem("charm", "Charm").SetValue(true));
+            miscMenuWdebuff.AddItem(new MenuItem("blind", "Blind").SetValue(true));
 
             var lastHitMenu = config.AddSubMenu(new Menu("LastHit", "LastHit"));
             lastHitMenu.AddItem(new MenuItem("useQlh", "Use Q to Last Hit minions").SetValue(true));
             lastHitMenu.AddItem(new MenuItem("useQlhMana", "Use Q if MP%").SetValue(new Slider(50, 1)));
 
+            var laneClearMenu = config.AddSubMenu(new Menu("LaneClear", "LaneClear"));
+            laneClearMenu.AddItem(new MenuItem("useQlc", "Q to LH in lane clear").SetValue(true));
+            laneClearMenu.AddItem(new MenuItem("useQlcMana", "Use Q if MP%").SetValue(new Slider(50, 1)));
+            laneClearMenu.AddItem(new MenuItem("useElc", "Use E in lane clear").SetValue(true));
+            laneClearMenu.AddItem(new MenuItem("useElcMinions", "Use E if at least X minions").SetValue(new Slider(5, 1, 15)));
+            laneClearMenu.AddItem(new MenuItem("useElcMana", "Use E if MP%").SetValue(new Slider(50, 1)));
+
             var killsteal = config.AddSubMenu(new Menu("KillSteal Settings", "KillSteal"));
-            killsteal.AddItem(new MenuItem("Killsteal", "Activate KillSteal").SetValue(true));
+            killsteal.AddItem(new MenuItem("killsteal", "Activate KillSteal").SetValue(true));
             killsteal.AddItem(new MenuItem("useQks", "Use Q to KillSteal").SetValue(true));
             killsteal.AddItem(new MenuItem("useRks", "Use R to KillSteal").SetValue(true));
+            killsteal.AddItem(new MenuItem("useIks", "Use Ignite to KillSteal").SetValue(true));
 
             var drawingMenu = config.AddSubMenu(new Menu("Drawings", "Drawings"));
             drawingMenu.AddItem(new MenuItem("disableDraw", "Disable all drawings").SetValue(false));
             drawingMenu.AddItem(new MenuItem("drawQ", "Draw Q").SetValue(new Circle(true, Color.DarkOrange, q.Range)));
             drawingMenu.AddItem(new MenuItem("drawE", "Draw E").SetValue(new Circle(true, Color.DarkOrange, e.Range)));
-            drawingMenu.AddItem(new MenuItem("width", "Drawing width").SetValue(new Slider(2, 1, 5)));
+            drawingMenu.AddItem(new MenuItem("width", "Drawings width").SetValue(new Slider(2, 1, 5)));
 
             config.AddToMainMenu();
 
-            
             Notifications.AddNotification("GangPlank by Hestia loaded!", 5000);
             Game.OnUpdate += Game_OnGameUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
+            Orbwalking.AfterAttack += OrbwalkingAfterAttack;
+        }
+
+        private static void OrbwalkingAfterAttack(AttackableUnit unit, AttackableUnit target)
+        {
+            var t = target as Obj_AI_Hero;
+            if (t != null && (orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo || orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed) && unit.IsMe)
+            {
+                var castQ = config.Item("useQ").GetValue<bool>() && q.IsReady();
+
+                if (castQ)
+                {
+                    q.CastOnUnit(t);
+                }
+            }
         }
 
         private static void Game_OnGameUpdate(EventArgs args)
@@ -132,6 +152,10 @@ namespace GangPlank
                     LastHit();
                     ExecuteHarass();
                     break;
+
+                case Orbwalking.OrbwalkingMode.LaneClear:
+                    LaneClear();
+                    break;
             }
 
             AutoWdebuffs();
@@ -147,13 +171,13 @@ namespace GangPlank
                 return;
             }
 
-            var castQ = config.Item("UseQ").GetValue<bool>() && q.IsReady();
-            var castE = config.Item("UseE").GetValue<bool>() && e.IsReady();
-            var castW = config.Item("UseW").GetValue<bool>() && w.IsReady();
+            var castQ = config.Item("useQ").GetValue<bool>() && q.IsReady();
+            var castE = config.Item("useE").GetValue<bool>() && e.IsReady();
+            var castW = config.Item("useW").GetValue<bool>() && w.IsReady();
             var wHealth = config.Item("useWminHP").GetValue<Slider>().Value;
 
             var enemyCount = Utility.CountEnemiesInRange(e.Range);
-            if ((enemyCount > 1) && castE)
+            if ((enemyCount > 0) && castE)
             {
                 e.Cast();
             }
@@ -206,9 +230,40 @@ namespace GangPlank
 
         }
 
+        private static void LaneClear()
+        {
+            if (Player.IsDead)
+            {
+                return;
+            }
+
+            var castQ = config.Item("useQlc").GetValue<bool>();
+            var qMana = config.Item("useQlcMana").GetValue<Slider>().Value;
+            var castE = config.Item("useElc").GetValue<bool>();
+            var eMinions = config.Item("useElcMinions").GetValue<Slider>().Value; 
+            var eMana = config.Item("useElcMana").GetValue<Slider>().Value;
+
+            var minionCount = MinionManager.GetMinions(Player.Position, q.Range, MinionTypes.All, MinionTeam.NotAlly);
+
+            if (minionCount.Count > 0 && castQ && Player.ManaPercent >= qMana)
+            {
+                foreach (var minion in minionCount.Where(minion => minion.Health <= Player.GetSpellDamage(minion, SpellSlot.Q)))
+                {
+                    q.CastOnUnit(minion);
+                    return;
+                }
+            }
+
+            if (minionCount.Count >= eMinions && castE && Player.ManaPercent >= eMana)
+            {
+                e.Cast();
+            }
+
+        }
+
         private static void KillSteal()
         {
-            if (Player.IsDead || !config.Item("Killsteal").GetValue<bool>())
+            if (Player.IsDead || !config.Item("killsteal").GetValue<bool>())
             {
                 return;
             }
@@ -220,10 +275,8 @@ namespace GangPlank
                         .FirstOrDefault(
                             enemy =>
                                 enemy.IsValidTarget(q.Range) && enemy.Health < Player.GetSpellDamage(enemy, SpellSlot.Q));
-                if (target.IsValidTarget(q.Range))
-                {
-                    q.CastOnUnit(target);
-                }
+
+                q.CastOnUnit(target);
             }
 
             if (config.Item("useRks").GetValue<bool>() && r.IsReady())
@@ -235,10 +288,19 @@ namespace GangPlank
                                 enemy.IsValidTarget() &&
                                 enemy.Health < (Player.GetSpellDamage(enemy, SpellSlot.R)) / 2);
 
-                if (target.IsValidTarget(r.Range))
-                {
-                    r.CastIfHitchanceEquals(target, HitChance.VeryHigh);
-                }
+                r.CastIfHitchanceEquals(target, HitChance.VeryHigh);
+            }
+
+            if (config.Item("useIks").GetValue<bool>() && ignite.Slot.IsReady() && ignite != null && ignite.Slot != SpellSlot.Unknown)
+            {
+                var target =
+                    ObjectManager.Get<Obj_AI_Hero>()
+                        .FirstOrDefault(
+                            enemy =>
+                                enemy.IsValidTarget(600) &&
+                                enemy.Health < Player.GetSummonerSpellDamage(enemy, Damage.SummonerSpell.Ignite));
+
+                Player.Spellbook.CastSpell(ignite.Slot, target);
             }
         }
 
@@ -259,7 +321,7 @@ namespace GangPlank
         {
             foreach (var buffType in DebuffsList)
             {
-                if (Player.HasBuffOfType(buffType) && config.Item(buffType.ToString().ToLower()).GetValue<bool>())
+                if (Player.HasBuffOfType(buffType) && config.Item(buffType.ToString().ToLowerInvariant()).GetValue<bool>())
                 {
                     return true;
                 }
