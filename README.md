@@ -9,15 +9,22 @@ Kennen
 - Auto R on X enemies in range
 - KillSteal with spells and ignite
 
-
 Dr. Mundo
 -----------
 - Q usage, selectable HitChance and auto usage/HP % options
 - W usage with selectable HP %
 - E usage OnAttack
-- R usage with selectable HP 5
+- R usage with selectable HP %
 - KillSteal
 - Q last hit
+
+Gangplank
+-----------
+- Spells usage with customization
+- KillSteal
+- Q last hit
+- Lane Clear
+- Debuffs removal with W
 
 Credits:
 LeagueSharp Developers :')
