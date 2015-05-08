@@ -44,6 +44,7 @@ namespace GangPlank
             e = new Spell(SpellSlot.E, 1150);
             r = new Spell(SpellSlot.R);
             r.SetSkillshot(0.7f, 200, float.MaxValue, false, SkillshotType.SkillshotCircle);
+            ignite = Player.Spellbook.GetSpell(Player.GetSpellSlot("summonerdot"));
 
             //Add Debuffs to debuffsList
             DebuffsList.Add(BuffType.Slow);
@@ -228,7 +229,6 @@ namespace GangPlank
                     return;
                 }
             }
-
         }
 
         private static void LaneClear()
@@ -259,7 +259,6 @@ namespace GangPlank
             {
                 e.Cast();
             }
-
         }
 
         private static void KillSteal()

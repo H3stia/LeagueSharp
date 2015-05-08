@@ -10,139 +10,139 @@ namespace Kennen
 {
     class Program
     {
-        //Spells
-        public static Spell Q, W, E, R;
+        //Champion
+        private const string Champion = "Kennen";
 
-        //Targets
-        public static Obj_AI_Hero Target;
+        //Player object
         private static Obj_AI_Hero Player { get { return ObjectManager.Player; } }
 
-        //Menu
-        public static Menu Config;
-        public static Orbwalking.Orbwalker Orbwalker;
+        //Menu and orbwalker declarations
+        private static Menu config;
+        private static Orbwalking.Orbwalker orbwalker;
 
-        //Ignite
-        public static SpellDataInst Ignite;
-
-        #region Main
+        //Spell declaration
+        private static Spell q, w, e, r;
+        private static SpellDataInst ignite;
 
         public static void Main(string[] args)
         {
             CustomEvents.Game.OnGameLoad += Game_OnGameLoad;
         }
 
-        #endregion
-
-        #region GameLoad
 
         private static void Game_OnGameLoad(EventArgs args)
         {
-            if (!Player.ChampionName.Equals("Kennen"))
+            if (Player.ChampionName != Champion)
+            {
                 return;
+            }
 
+            q = new Spell(SpellSlot.Q, 1050);
+            q.SetSkillshot(0.125f, 50, 1700, true, SkillshotType.SkillshotLine);
+            w = new Spell(SpellSlot.W, 800);
+            r = new Spell(SpellSlot.R, 550);
+            ignite = Player.Spellbook.GetSpell(Player.GetSpellSlot("summonerdot"));
 
-            #region Spell Data
+            config = new Menu("Kennen - The ThunderRat", "Kennen", true);
 
-            Q = new Spell(SpellSlot.Q, 1050);
-            Q.SetSkillshot(0.125f, 50, 1700, true, SkillshotType.SkillshotLine);
+            var orbwalkerMenu = config.AddSubMenu(new Menu("Orbwalker", "Orbwalker"));
+            orbwalker = new Orbwalking.Orbwalker(orbwalkerMenu);
 
-            W = new Spell(SpellSlot.W, 800);
+            var tsMenu = config.AddSubMenu(new Menu("Target Selector", "Target Selector"));
+            TargetSelector.AddToMenu(tsMenu);
 
-            R = new Spell(SpellSlot.R, 550);
-
-            Ignite = Player.Spellbook.GetSpell(Player.GetSpellSlot("summonerdot"));
-
-            #endregion
-
-
-            #region Config Menu
-
-            //Menu
-            Config = new Menu("Kennen - The ThunderRat", "Kennen", true);
-
-            //Orbwalker
-            Config.AddSubMenu(new Menu("Orbwalking", "Orbwalking"));
-            Orbwalker = new Orbwalking.Orbwalker(Config.SubMenu("Orbwalking"));
-
-            //Target Selector
-            var targetSelectorMenu = new Menu("Target Selector", "Target Selector");
-            TargetSelector.AddToMenu(targetSelectorMenu);
-            Config.AddSubMenu(targetSelectorMenu);
-
-            //Combo Menu
-            var combo = Config.AddSubMenu(new Menu("Combo Settings", "Combo"));
-
+            var combo = config.AddSubMenu(new Menu("Combo Settings", "Combo"));
             var comboQ = combo.AddSubMenu(new Menu("Q Settings", "Q"));
-            comboQ.AddItem(new MenuItem("UseQCombo", "Use Q").SetValue(true));
+            comboQ.AddItem(new MenuItem("useQ", "Use Q").SetValue(true));
             comboQ.AddItem(
                 new MenuItem("qHitchance", "Q Hitchance").SetValue(
                     new StringList(
                         new[] { HitChance.Low.ToString(), HitChance.Medium.ToString(), HitChance.High.ToString(), HitChance.VeryHigh.ToString() }, 2)));
-
             var comboW = combo.AddSubMenu(new Menu("W Settings", "W"));
-            comboW.AddItem(new MenuItem("UseWCombo", "Use W").SetValue(true));
+            comboW.AddItem(new MenuItem("useW", "Use W").SetValue(true));
             comboW.AddItem(
-                new MenuItem("UseWmodeC", "W Mode").SetValue(new StringList(new[] { "Always", "Only Stunnable" })));
-
+                new MenuItem("useWmodeCombo", "W Mode").SetValue(new StringList(new[] { "Always", "Only Stunnable" })));
             var comboR = combo.AddSubMenu(new Menu("R Settings", "R"));
-            comboR.AddItem(new MenuItem("UseRCombo", "Use smart R").SetValue(true));
+            comboR.AddItem(new MenuItem("useR", "Use smart R").SetValue(true));
 
-            combo.AddItem(new MenuItem("ComboActive", "Combo!").SetValue(new KeyBind(32, KeyBindType.Press)));
-
-            //Harass Menu
-            var harass = Config.AddSubMenu(new Menu("Harass Settings", "Harass"));
-
+            var harass = config.AddSubMenu(new Menu("Harass Settings", "Harass"));
             var harassQ = harass.AddSubMenu(new Menu("Q Settings", "Q"));
-            harassQ.AddItem(new MenuItem("UseQHarass", "Use Q").SetValue(true));
+            harassQ.AddItem(new MenuItem("useQHarass", "Use Q").SetValue(true));
             harassQ.AddItem(
                 new MenuItem("qHitchanceH", "Q Hitchance").SetValue(
                     new StringList(
                         new[] { HitChance.Low.ToString(), HitChance.Medium.ToString(), HitChance.High.ToString(), HitChance.VeryHigh.ToString() }, 2)));
-
             var harassW = harass.AddSubMenu(new Menu("W Settings", "W"));
-            harassW.AddItem(new MenuItem("UseWHarass", "Use W").SetValue(true));
+            harassW.AddItem(new MenuItem("useWHarass", "Use W").SetValue(true));
             harassW.AddItem(
-                new MenuItem("UseWmodeH", "W Mode").SetValue(new StringList(new[] { "Always", "Only Stunnable" })));
-            harass.AddItem(new MenuItem("HarassActive", "Harass!").SetValue(new KeyBind((byte) 'C', KeyBindType.Press)));
+                new MenuItem("useWmodeHarass", "W Mode").SetValue(new StringList(new[] { "Always", "Only Stunnable" })));
 
-            //Killsteal Menu
-            var killsteal = Config.AddSubMenu(new Menu("KillSteal Settings", "KillSteal"));
-            killsteal.AddItem(new MenuItem("Killsteal", "Activate KillSteal").SetValue(true));
-            killsteal.AddItem(new MenuItem("UseQKS", "Use Q to KillSteal").SetValue(true));
-            killsteal.AddItem(new MenuItem("UseWKS", "Use W to KillSteal").SetValue(true));
-            killsteal.AddItem(new MenuItem("UseIKS", "Use Ignite to KillSteal").SetValue(true));
-
-            //Misc Menu
-            var misc = Config.AddSubMenu(new Menu("Misc Settings", "Misc"));
+            var misc = config.AddSubMenu(new Menu("Misc Settings", "Misc"));
             misc.AddItem(new MenuItem("UseRmul", "Use R for multiple targets").SetValue(true));
-            misc.AddItem(new MenuItem("UseRmulti", "Use R on min X targets").SetValue(new Slider(2, 1, 5)));
+            misc.AddItem(new MenuItem("useRmulti", "Use R on min X targets").SetValue(new Slider(2, 1, 5)));
 
-            //Drawings Menu
-            var drawings = Config.AddSubMenu(new Menu("Drawings", "Drawings"));
-            drawings.AddItem(
-                new MenuItem("DrawQ", "Q range").SetValue(new Circle(true, Color.CornflowerBlue, Q.Range)));
-            drawings.AddItem(
-                new MenuItem("DrawW", "W range").SetValue(new Circle(false, Color.CornflowerBlue, W.Range)));
-            drawings.AddItem(
-                new MenuItem("DrawR", "R range").SetValue(new Circle(false, Color.CornflowerBlue, R.Range)));
+            var lastHitMenu = config.AddSubMenu(new Menu("LastHit", "LastHit"));
+            lastHitMenu.AddItem(new MenuItem("useQlh", "Use Q to Last Hit minions").SetValue(true));
 
-            Config.AddToMainMenu();
+            var laneClearMenu = config.AddSubMenu(new Menu("LaneClear", "LaneClear"));
+            laneClearMenu.AddItem(new MenuItem("useQlc", "Q to LH in lane clear").SetValue(true));
+            laneClearMenu.AddItem(new MenuItem("useWlc", "Use W in lane clear").SetValue(false));
 
-            #endregion
+            var killsteal = config.AddSubMenu(new Menu("KillSteal Settings", "KillSteal"));
+            killsteal.AddItem(new MenuItem("Killsteal", "Activate Killsteal").SetValue(true));
+            killsteal.AddItem(new MenuItem("useQks", "Use Q to KillSteal").SetValue(true));
+            killsteal.AddItem(new MenuItem("useWks", "Use W to KillSteal").SetValue(true));
+            killsteal.AddItem(new MenuItem("useIks", "Use Ignite to KillSteal").SetValue(true));
+
+            var drawingMenu = config.AddSubMenu(new Menu("Drawings", "Drawings"));
+            drawingMenu.AddItem(new MenuItem("disableDraw", "Disable all drawings").SetValue(false));
+            drawingMenu.AddItem(new MenuItem("drawQ", "Draw Q").SetValue(new Circle(true, Color.DarkOrange, q.Range)));
+            drawingMenu.AddItem(new MenuItem("drawW", "Draw W").SetValue(new Circle(true, Color.DarkOrange, w.Range)));
+            drawingMenu.AddItem(new MenuItem("drawR", "Draw R").SetValue(new Circle(true, Color.DarkOrange, r.Range)));
+            drawingMenu.AddItem(new MenuItem("width", "Drawings width").SetValue(new Slider(2, 1, 5)));
+
+            config.AddToMainMenu();
+
 
             Notifications.AddNotification("Kennen by Hestia loaded!", 5000);
             Drawing.OnDraw += Drawing_OnDraw;
             Game.OnUpdate += Game_OnUpdate;
         }
 
-        #endregion
+        private static void Game_OnUpdate(EventArgs args)
+        {
+            if (Player.IsDead)
+            {
+                return;
+            }
 
-        #region HitChance Selector
+            switch (orbwalker.ActiveMode)
+            {
+                case Orbwalking.OrbwalkingMode.Combo:
+                    ExecuteCombo();
+                    break;
 
-        //Hitchance
+                case Orbwalking.OrbwalkingMode.LastHit:
+                    LastHit();
+                    break;
+
+                case Orbwalking.OrbwalkingMode.Mixed:
+                    LastHit();
+                    ExecuteHarass();
+                    break;
+
+                case Orbwalking.OrbwalkingMode.LaneClear:
+                    LaneClear();
+                    break;
+            }
+
+            KillSteal();
+            CastRmulti();
+        }
+
         private static HitChance GetHitChance(string name)
         {
-            var hc = Config.Item(name).GetValue<StringList>();
+            var hc = config.Item(name).GetValue<StringList>();
             switch (hc.SList[hc.SelectedIndex])
             {
                 case "Low":
@@ -157,239 +157,256 @@ namespace Kennen
             return HitChance.High;
         }
 
-        #endregion
-
-        #region Combo
-
         private static void ExecuteCombo()
         {
-            if (!Config.Item("ComboActive").GetValue<KeyBind>().Active)
-                return;
+            var target = TargetSelector.GetTarget(e.Range, TargetSelector.DamageType.Magical);
 
-            if (Target.IsValidTarget(1300))
-                Combo();
-        }
-
-        //Combo
-        private static void Combo()
-        {
-            var castQ = Config.Item("UseQCombo").GetValue<bool>() && Q.IsReady();
-            var castW = Config.Item("UseWCombo").GetValue<bool>() && W.IsReady();
-            var castR = Config.Item("UseRCombo").GetValue<bool>() && R.IsReady();
-
-            if (castQ && Q.IsInRange(Target, 1000))
+            if (Player.IsDead || target == null || !target.IsValid)
             {
-                Q.CastIfHitchanceEquals(Target, GetHitChance("qHitchance"));
+                return;
             }
 
-            var modeW = Config.Item("UseWmodeC").GetValue<StringList>();
-            if (castW && W.IsInRange(Target, W.Range))
+            var castQ = config.Item("useQ").GetValue<bool>() && q.IsReady();
+            var castW = config.Item("useW").GetValue<bool>() && w.IsReady();
+            var castR = config.Item("useR").GetValue<bool>() && r.IsReady();
+            var modeW = config.Item("useWmodeCombo").GetValue<StringList>();
+
+            if (castQ && target.IsValidTarget(q.Range))
             {
-                if (modeW.SelectedIndex == 0)
-                    foreach (var buff in Target.Buffs)
-                    {
-                        if (buff.Name == "kennenmarkofstorm")
-                            W.Cast();
-                    }
-                else if (modeW.SelectedIndex == 1)
+                q.CastIfHitchanceEquals(target, GetHitChance("qHitchance"));
+            }
+
+            if (castW && target.IsValidTarget(w.Range))
+            {
+                switch (modeW.SelectedIndex)
                 {
-                    foreach (var buff in Target.Buffs)
-                    {
-                        if (buff.Name == "kennenmarkofstorm" && buff.Count == 2)
-                            W.Cast();
-                    }
+                    case 0:
+                        if (target.HasBuff("kennenmarkofstorm"))
+                        {
+                            w.Cast();
+                        }
+                        break;
+
+                    case 1:
+                        foreach (var buff in target.Buffs)
+                        {
+                            if (buff.Name == "kennenmarkofstorm" && buff.Count == 2)
+                            {
+                                w.Cast();
+                            }
+                        }
+                        break;
                 }
             }
 
-            if (castR && R.IsInRange(Target, R.Range))
+            if (castR && target.IsValidTarget(r.Range))
             {
-                CastSmartR();
+                if (target.Health < GetComboDamage(target))
+                {
+                    r.Cast();
+                }
             }
         }
 
-        //Ulti if killable
-        private static void CastSmartR()
+        private static void ExecuteHarass()
         {
-            if (Target.Health < GetComboDamage(Target) && Player.Distance(Target) < 500)
-                R.Cast();
+            var target = TargetSelector.GetTarget(e.Range, TargetSelector.DamageType.Magical);
+
+            if (Player.IsDead || target == null || !target.IsValid)
+            {
+                return;
+            }
+
+            var castQ = config.Item("useQHarass").GetValue<bool>() && q.IsReady();
+            var castW = config.Item("useWHarass").GetValue<bool>() && w.IsReady();
+            var modeW = config.Item("useWmodeHarass").GetValue<StringList>();
+
+            if (castQ && target.IsValidTarget(q.Range))
+            {
+                q.CastIfHitchanceEquals(target, GetHitChance("qHitchanceH"));
+            }
+
+            if (castW && target.IsValidTarget(w.Range))
+            {
+                switch (modeW.SelectedIndex)
+                {
+                    case 0:
+                        if (target.HasBuff("kennenmarkofstorm"))
+                        {
+                            w.Cast();
+                        }
+                        break;
+
+                    case 1:
+                        foreach (var buff in target.Buffs)
+                        {
+                            if (buff.Name == "kennenmarkofstorm" && buff.Count == 2)
+                            {
+                                w.Cast();
+                            }
+                        }
+                        break;
+                }
+            }
         }
 
-        //Calculate Combo Damage
+        private static void LastHit()
+        {
+            var castQ = config.Item("useQlh").GetValue<bool>();
+
+            if (!q.IsReady() || !castQ)
+            {
+                return;
+            }
+
+            var minionCount = MinionManager.GetMinions(Player.Position, q.Range, MinionTypes.All, MinionTeam.NotAlly);
+
+            if (minionCount.Count > 0)
+            {
+                foreach (var minion in minionCount.Where(minion => minion.Health <= Player.GetSpellDamage(minion, SpellSlot.Q)))
+                {
+                    q.Cast(minion);
+                    return;
+                }
+            }
+        }
+
+        private static void LaneClear()
+        {
+            if (Player.IsDead)
+            {
+                return;
+            }
+
+            var castQ = config.Item("useQlc").GetValue<bool>();
+            var castW = config.Item("useWlc").GetValue<bool>();
+
+            var minionCount = MinionManager.GetMinions(Player.Position, q.Range, MinionTypes.All, MinionTeam.NotAlly);
+
+            if (minionCount.Count > 0 && castQ)
+            {
+                foreach (var minion in minionCount.Where(minion => minion.Health <= Player.GetSpellDamage(minion, SpellSlot.Q)))
+                {
+                    q.Cast(minion);
+                    return;
+                }
+            }
+
+            if (minionCount.Count > 0 && castW)
+            {
+                foreach (var minion in minionCount.Where(minion => minion.Health <= Player.GetSpellDamage(minion, SpellSlot.W)))
+                {
+                    w.Cast(minion);
+                    return;
+                }
+            }
+        }
+
+        private static void KillSteal()
+        {
+            if (Player.IsDead || !config.Item("killsteal").GetValue<bool>())
+            {
+                return;
+            }
+
+            if (config.Item("useQks").GetValue<bool>() && q.IsReady())
+            {
+                var target =
+                    ObjectManager.Get<Obj_AI_Hero>()
+                        .FirstOrDefault(
+                            enemy =>
+                                enemy.IsValidTarget(q.Range) && enemy.Health < Player.GetSpellDamage(enemy, SpellSlot.Q));
+
+                q.Cast(target);
+            }
+
+            if (config.Item("useWks").GetValue<bool>() && w.IsReady())
+            {
+                var target =
+                    ObjectManager.Get<Obj_AI_Hero>()
+                        .FirstOrDefault(
+                            enemy =>
+                                enemy.IsValidTarget(w.Range) &&
+                                enemy.Health < (Player.GetSpellDamage(enemy, SpellSlot.W)));
+
+                w.Cast();
+            }
+
+            if (config.Item("useIks").GetValue<bool>() && ignite.Slot.IsReady() && ignite != null && ignite.Slot != SpellSlot.Unknown)
+            {
+                var target =
+                    ObjectManager.Get<Obj_AI_Hero>()
+                        .FirstOrDefault(
+                            enemy =>
+                                enemy.IsValidTarget(600) &&
+                                enemy.Health < Player.GetSummonerSpellDamage(enemy, Damage.SummonerSpell.Ignite));
+
+                Player.Spellbook.CastSpell(ignite.Slot, target);
+            }
+        }
+
+        private static void CastRmulti()
+        {
+            var castR = config.Item("useRmul").GetValue<bool>() && r.IsReady();
+            var minR = config.Item("useRmulti").GetValue<Slider>().Value;
+            var enemiesCount = Player.CountEnemiesInRange(r.Range);
+
+            if (Player.IsDead)
+            {
+                return;
+            }
+
+            if (castR && enemiesCount >= minR)
+            {
+                r.Cast();
+            }
+        }
+
         private static float GetComboDamage(Obj_AI_Base enemy)
         {
             var comboDamage = 0d;
 
-            if (Q.IsReady())
+            if (q.IsReady())
                 comboDamage += Player.GetSpellDamage(enemy, SpellSlot.Q);
 
-            if (W.IsReady())
+            if (w.IsReady())
                 comboDamage += Player.GetSpellDamage(enemy, SpellSlot.W);
 
-            if (R.IsReady())
+            if (r.IsReady())
                 comboDamage += Player.GetSpellDamage(enemy, SpellSlot.R);
 
-            if (Ignite.IsReady())
+            if (ignite.IsReady())
                 comboDamage += Player.GetSummonerSpellDamage(enemy, Damage.SummonerSpell.Ignite);
 
-            return (float) comboDamage;
-        }
-
-        #endregion
-
-        #region Harass
-
-        private static void ExecuteHarass()
-        {
-            if (!Config.Item("HarassActive").GetValue<KeyBind>().Active)
-                return;
-
-            if (Target.IsValidTarget(1300))
-                Harass();
-        }
-
-        //Harass
-        private static void Harass()
-        {
-            var castQ = Config.Item("UseQHarass").GetValue<bool>() && Q.IsReady();
-            var castW = Config.Item("UseWHarass").GetValue<bool>() && W.IsReady();
-
-            if (castQ && Q.IsInRange(Target, 1000))
-            {
-                Q.CastIfHitchanceEquals(Target, GetHitChance("qHitchanceH"));
-            }
-
-            var modeW = Config.Item("UseWmodeH").GetValue<StringList>();
-            if (castW && W.IsInRange(Target, W.Range))
-            {
-                if (modeW.SelectedIndex == 0)
-                    foreach (var buff in Target.Buffs)
-                    {
-                        if (buff.Name == "kennenmarkofstorm")
-                            W.Cast();
-                    }
-                else if (modeW.SelectedIndex == 1)
-                {
-                    foreach (var buff in Target.Buffs)
-                    {
-                        if (buff.Name == "kennenmarkofstorm" && buff.Count == 2)
-                            W.Cast();
-                    }
-                }
-            }
-        }
-
-        #endregion
-
-        #region KillSteal
-
-        //KillSteal
-        private static void KillSteal()
-        {
-            if (!Config.Item("Killsteal").GetValue<bool>())
-                return;
-
-            Qks();
-            Wks();
-            Iks();
-        }
-
-        //Q Killsteal
-        private static void Qks()
-        {
-            //Q killsteal
-            if (!Config.Item("UseQKS").GetValue<bool>())
-                return;
-
-            var unit = ObjectManager.Get<Obj_AI_Hero>().FirstOrDefault( obj => obj.IsValidTarget(Q.Range) && obj.Health < Player.GetSpellDamage(obj, SpellSlot.Q));
-
-            if (!unit.IsValidTarget(Q.Range))
-                return;
-
-            Q.Cast(unit);
-        }
-
-        //W Killsteal
-        private static void Wks()
-        {
-            //W killsteal
-            if (!Config.Item("UseWKS").GetValue<bool>())
-                return;
-
-            var unit = ObjectManager.Get<Obj_AI_Hero>().FirstOrDefault(obj => obj.IsValidTarget(W.Range) && obj.Health < Player.GetSpellDamage(obj, SpellSlot.W));
-
-            if (!unit.IsValidTarget(W.Range))
-                return;
-
-            W.Cast();
-        }
-
-        //Ignite killsteal
-        private static void Iks()
-        {
-            //Ignite
-            if (!Config.Item("UseIKS").GetValue<bool>() || Ignite == null || Ignite.Slot == SpellSlot.Unknown ||
-                !Ignite.Slot.IsReady())
-                return;
-
-            var unit =
-                ObjectManager.Get<Obj_AI_Hero>()
-                    .FirstOrDefault(
-                        obj =>
-                            obj.IsValidTarget(600) &&
-                            obj.Health < Player.GetSummonerSpellDamage(obj, Damage.SummonerSpell.Ignite));
-            if (unit.IsValidTarget(600))
-            {
-                Player.Spellbook.CastSpell(Ignite.Slot, unit);
-            }
-        }
-
-        #endregion
-
-        #region MultiR
-
-        //auto ult for X enemies in range
-        private static void CastRmulti()
-        {
-            if (!Config.Item("ComboActive").GetValue<bool>())
-                return;
-
-            var castR = Config.Item("UseRmul").GetValue<bool>() && R.IsReady();
-            var minR = Config.Item("UseRmulti").GetValue<Slider>().Value;
-            var hits = Player.CountEnemiesInRange(R.Range);
-            if (castR && R.IsInRange(Target, R.Range) && hits >= minR)
-                R.Cast();
-        }
-
-        #endregion
-
-        #region Events
-
-        private static void Game_OnUpdate(EventArgs args)
-        {
-            if (Player.IsDead)
-                return;
-
-            KillSteal();
-
-            Target = TargetSelector.GetTarget(1300, TargetSelector.DamageType.Magical);
-
-            if (!Target.IsValidTarget(1300))
-                return;
-
-            ExecuteCombo();
-            ExecuteHarass();
-            CastRmulti();
+            return (float)comboDamage;
         }
 
         private static void Drawing_OnDraw(EventArgs args)
         {
-            foreach (var circle in new List<string> { "Q", "W", "R" }.Select(spell => Config.Item("Draw" + spell).GetValue<Circle>()).Where(circle => circle.Active))
+            if (Player.IsDead || config.Item("disableDraw").GetValue<bool>())
             {
-                Render.Circle.DrawCircle(Player.Position, circle.Radius, circle.Color);
+                return;
+            }
+
+            var width = config.Item("width").GetValue<Slider>().Value;
+
+            if (config.Item("drawQ").GetValue<Circle>().Active && q.Level > 0)
+            {
+                var circle = config.Item("drawQ").GetValue<Circle>();
+                Render.Circle.DrawCircle(Player.Position, circle.Radius, circle.Color, width);
+            }
+
+            if (config.Item("drawW").GetValue<Circle>().Active && w.Level > 0)
+            {
+                var circle = config.Item("drawW").GetValue<Circle>();
+                Render.Circle.DrawCircle(Player.Position, circle.Radius, circle.Color, width);
+            }
+
+            if (config.Item("drawR").GetValue<Circle>().Active && r.Level > 0)
+            {
+                var circle = config.Item("drawR").GetValue<Circle>();
+                Render.Circle.DrawCircle(Player.Position, circle.Radius, circle.Color, width);
             }
         }
-
-        #endregion
-
     }
 }

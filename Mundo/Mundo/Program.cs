@@ -39,6 +39,7 @@ namespace Mundo
             w = new Spell(SpellSlot.W, 325);
             e = new Spell(SpellSlot.E);
             r = new Spell(SpellSlot.R);
+            ignite = Player.Spellbook.GetSpell(Player.GetSpellSlot("summonerdot"));
 
             //Menu
             config = new Menu(Player.ChampionName, Player.ChampionName, true);
@@ -342,7 +343,6 @@ namespace Mundo
                 var circle = config.Item("drawW").GetValue<Circle>();
                 Render.Circle.DrawCircle(Player.Position, circle.Radius, circle.Color, width);
             }
-
         }
     }
 }
