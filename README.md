@@ -7,7 +7,8 @@ Kennen
 - W usage (always/only if stunnable), selectable HitChance
 - Smart R usage in combo (if enemy killable by combo)
 - Auto R on X enemies in range
-- KillSteal with spells and ignite
+- KillSteal
+- Q last hit
 
 Dr. Mundo
 -----------
