@@ -17,7 +17,7 @@ namespace Mundo
         private static Spell q, w, e, r;
 
         //Player
-        private static Obj_AI_Hero Player => ObjectManager.Player;
+        private static Obj_AI_Hero Player { get { return ObjectManager.Player; } }
 
         //Menu
         private static Menu config;

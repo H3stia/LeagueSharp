@@ -14,7 +14,7 @@ namespace GangPlank
         private const string Champion = "GangPlank";
 
         //Player object
-        private static Obj_AI_Hero Player => ObjectManager.Player;
+        private static Obj_AI_Hero Player { get { return ObjectManager.Player; } }
 
         //Menu and orbwalker declarations
         private static Menu config;
