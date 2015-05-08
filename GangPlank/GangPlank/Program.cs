@@ -11,7 +11,7 @@ namespace GangPlank
     class Program
     {
         //Champion
-        private const string Champion = "GangPlank";
+        private const string Champion = "Gangplank";
 
         //Player object
         private static Obj_AI_Hero Player { get { return ObjectManager.Player; } }
@@ -33,6 +33,7 @@ namespace GangPlank
 
         private static void Game_OnGameLoad(EventArgs args)
         {
+            Console.WriteLine("GP LOADED");
             if (Player.ChampionName != Champion)
             {
                 return;
@@ -104,6 +105,7 @@ namespace GangPlank
 
             config.AddToMainMenu();
 
+            
             Notifications.AddNotification("GangPlank by Hestia loaded!", 5000);
             Game.OnUpdate += Game_OnGameUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
@@ -156,7 +158,7 @@ namespace GangPlank
                 e.Cast();
             }
 
-            if (castQ)
+            if (castQ && target.IsValidTarget(q.Range))
             {
                 q.CastOnUnit(target);
             }
@@ -177,8 +179,11 @@ namespace GangPlank
                 return;
             }
 
-            q.CastOnUnit(target);
-            
+            if(target.IsValidTarget(q.Range))
+            {
+                q.CastOnUnit(target);
+            }
+
         }
 
         private static void LastHit()
@@ -215,8 +220,10 @@ namespace GangPlank
                         .FirstOrDefault(
                             enemy =>
                                 enemy.IsValidTarget(q.Range) && enemy.Health < Player.GetSpellDamage(enemy, SpellSlot.Q));
-
-                q.CastOnUnit(target);
+                if (target.IsValidTarget(q.Range))
+                {
+                    q.CastOnUnit(target);
+                }
             }
 
             if (config.Item("useRks").GetValue<bool>() && r.IsReady())
@@ -228,7 +235,10 @@ namespace GangPlank
                                 enemy.IsValidTarget() &&
                                 enemy.Health < (Player.GetSpellDamage(enemy, SpellSlot.R)) / 2);
 
-                r.CastIfHitchanceEquals(target, HitChance.VeryHigh);
+                if (target.IsValidTarget(r.Range))
+                {
+                    r.CastIfHitchanceEquals(target, HitChance.VeryHigh);
+                }
             }
         }
 
@@ -239,8 +249,10 @@ namespace GangPlank
                 return;   
             }
 
-            w.Cast();
-
+            if (HasDebuff())
+            {
+                w.Cast();
+            }
         }
 
         private static bool HasDebuff()
