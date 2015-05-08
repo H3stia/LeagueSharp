@@ -196,9 +196,10 @@ namespace GangPlank
         private static void ExecuteHarass()
         {
             var target = TargetSelector.GetTarget(q.Range, TargetSelector.DamageType.Physical);
+            var castQ = config.Item("useQHarass").GetValue<bool>() && q.IsReady();
+            var qMana = config.Item("useQharassMana").GetValue<Slider>().Value;
 
-            if (Player.IsDead || target == null || !target.IsValid || Player.ManaPercent <= config.Item("useQharassMana").GetValue<Slider>().Value 
-                || !config.Item("UseQHarass").GetValue<bool>() || !q.IsReady())
+            if (Player.IsDead || target == null || !target.IsValid || Player.ManaPercent <= qMana || !castQ || !q.IsReady())
             {
                 return;
             }
