@@ -24,6 +24,7 @@ Gangplank
 - KillSteal
 - Q last hit
 - Lane Clear
+- Debuffs removal with W
 
 Credits:
 LeagueSharp Developers :')
