@@ -248,7 +248,7 @@ namespace Mundo
         {
             var castQ = config.Item("useQlh").GetValue<bool>() && q.IsReady();
             var qHealth = config.Item("useQlhHP").GetValue<Slider>().Value;
-
+            
             if (Player.IsDead || !Orbwalking.CanMove(40))
             {
                 return;
@@ -260,7 +260,10 @@ namespace Mundo
             {
                 foreach (var minion in minionCount)
                 {
-                    if (q.IsKillable(minion))
+                    if (
+                        HealthPrediction.GetHealthPrediction(
+                            minion, (int) (q.Delay + (minion.Distance(Player.Position) / q.Speed))) <
+                        Player.GetSpellDamage(minion, SpellSlot.Q))
                     {
                         q.Cast(minion);
                     }
@@ -286,10 +289,15 @@ namespace Mundo
             {
                 if (castQ && Player.HealthPercent >= qHealth)
                 {
-                    foreach (var minion in minionCount.Where(minion => minion.Health <= q.GetDamage(minion)))
+                    foreach (var minion in minionCount)
                     {
-                        q.Cast(minion);
-                        return;
+                        if (
+                            HealthPrediction.GetHealthPrediction(
+                                minion, (int)(q.Delay + (minion.Distance(Player.Position) / q.Speed))) <
+                            Player.GetSpellDamage(minion, SpellSlot.Q))
+                        {
+                            q.Cast(minion);
+                        }
                     }
                 }
 
