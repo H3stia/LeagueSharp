@@ -77,7 +77,7 @@ namespace Kennen
                 new MenuItem("useWmodeHarass", "W Mode").SetValue(new StringList(new[] { "Always", "Only Stunnable" })));
 
             var misc = config.AddSubMenu(new Menu("Misc Settings", "Misc"));
-            misc.AddItem(new MenuItem("UseRmul", "Use R for multiple targets").SetValue(true));
+            misc.AddItem(new MenuItem("useRmul", "Use R for multiple targets").SetValue(true));
             misc.AddItem(new MenuItem("useRmulti", "Use R on min X targets").SetValue(new Slider(2, 1, 5)));
 
             var lastHitMenu = config.AddSubMenu(new Menu("LastHit", "LastHit"));
@@ -99,9 +99,11 @@ namespace Kennen
             drawingMenu.AddItem(new MenuItem("drawW", "Draw W").SetValue(new Circle(true, Color.DarkOrange, w.Range)));
             drawingMenu.AddItem(new MenuItem("drawR", "Draw R").SetValue(new Circle(true, Color.DarkOrange, r.Range)));
             drawingMenu.AddItem(new MenuItem("width", "Drawings width").SetValue(new Slider(2, 1, 5)));
+            drawingMenu.AddItem(new MenuItem("drawDmg", "Draw damage on Healthbar").SetValue(true));
 
             config.AddToMainMenu();
 
+            Utility.HpBarDamageIndicator.DamageToUnit = GetComboDamage;
 
             Notifications.AddNotification("Kennen by Hestia loaded!", 5000);
             Drawing.OnDraw += Drawing_OnDraw;
@@ -114,6 +116,8 @@ namespace Kennen
             {
                 return;
             }
+
+            Utility.HpBarDamageIndicator.Enabled = config.Item("drawDmg").GetValue<bool>();
 
             switch (orbwalker.ActiveMode)
             {
@@ -303,7 +307,7 @@ namespace Kennen
 
             if (minionCount.Count > 0 && castW)
             {
-                foreach (var minion in minionCount.Where(minion => minion.Health <= Player.GetSpellDamage(minion, SpellSlot.W)))
+                foreach (var minion in minionCount.Where(minion => minion.Health <= Player.GetSpellDamage(minion, SpellSlot.W) && minion.HasBuff("kennenmarkofstorm")))
                 {
                     w.Cast(minion);
                     return;
@@ -339,7 +343,7 @@ namespace Kennen
                         .FirstOrDefault(
                             enemy =>
                                 enemy.IsValidTarget(w.Range) &&
-                                enemy.Health < (Player.GetSpellDamage(enemy, SpellSlot.W)));
+                                enemy.Health < (Player.GetSpellDamage(enemy, SpellSlot.W)) && enemy.HasBuff("kennenmarkofstorm"));
 
                 if (target.IsValidTarget(w.Range))
                 {
