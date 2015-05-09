@@ -246,17 +246,17 @@ namespace Mundo
 
         private static void LastHit()
         {
-            var castQ = config.Item("useQlh").GetValue<bool>() && w.IsReady();
+            var castQ = config.Item("useQlh").GetValue<bool>() && q.IsReady();
             var qHealth = config.Item("useQlhHP").GetValue<Slider>().Value;
 
-            if (Player.IsDead || !q.IsReady() || !castQ || Player.HealthPercent <= qHealth)
+            if (Player.IsDead)
             {
                 return;
             }
 
             var minionCount = MinionManager.GetMinions(Player.Position, q.Range, MinionTypes.All, MinionTeam.NotAlly);
 
-            if (minionCount.Count > 0)
+            if (minionCount.Count > 0 && castQ && Player.HealthPercent >= qHealth)
             {
                 foreach (var minion in minionCount.Where(minion => minion.Health <= Player.GetSpellDamage(minion, SpellSlot.Q)))
                 {
