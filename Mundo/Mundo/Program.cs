@@ -249,19 +249,21 @@ namespace Mundo
             var castQ = config.Item("useQlh").GetValue<bool>() && q.IsReady();
             var qHealth = config.Item("useQlhHP").GetValue<Slider>().Value;
 
-            if (Player.IsDead)
+            if (Player.IsDead || !Orbwalking.CanMove(40))
             {
                 return;
             }
 
-            var minionCount = MinionManager.GetMinions(Player.Position, q.Range, MinionTypes.All, MinionTeam.NotAlly);
+            var minionCount = MinionManager.GetMinions(Player.ServerPosition, q.Range, MinionTypes.All, MinionTeam.NotAlly);
 
             if (minionCount.Count > 0 && castQ && Player.HealthPercent >= qHealth)
             {
-                foreach (var minion in minionCount.Where(minion => minion.Health <= Player.GetSpellDamage(minion, SpellSlot.Q)))
+                foreach (var minion in minionCount)
                 {
-                    q.Cast(minion);
-                    return;
+                    if (q.IsKillable(minion))
+                    {
+                        q.Cast(minion);
+                    }
                 }
             }
         }
@@ -312,8 +314,10 @@ namespace Mundo
                         .FirstOrDefault(
                             enemy =>
                                 enemy.IsValidTarget(q.Range) && enemy.Health < Player.GetSpellDamage(enemy, SpellSlot.Q));
-
-                q.CastIfHitchanceEquals(target, HitChance.High);
+                if (target.IsValidTarget(q.Range))
+                {
+                    q.CastIfHitchanceEquals(target, HitChance.High);
+                }
             }
 
             if (config.Item("useIks").GetValue<bool>() && Ignite.Slot.IsReady())
@@ -325,7 +329,10 @@ namespace Mundo
                                 enemy.IsValidTarget(Ignite.Range) &&
                                 enemy.Health < Player.GetSummonerSpellDamage(enemy, Damage.SummonerSpell.Ignite) && Ignite.Slot != SpellSlot.Unknown);
 
-                Ignite.Cast(target);
+                if (target.IsValidTarget(Ignite.Range))
+                {
+                    Ignite.Cast(target);
+                }
             }
         }
 
