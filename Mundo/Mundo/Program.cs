@@ -22,7 +22,7 @@ namespace Mundo
 
         //Spell declaration
         private static Spell q, w, e, r;
-        private static SpellDataInst ignite;
+        public static Spell Ignite = new Spell(SpellSlot.Unknown, 600);
 
         static void Main(string[] args)
         {
@@ -39,7 +39,12 @@ namespace Mundo
             w = new Spell(SpellSlot.W, 325);
             e = new Spell(SpellSlot.E);
             r = new Spell(SpellSlot.R);
-            ignite = Player.Spellbook.GetSpell(Player.GetSpellSlot("summonerdot"));
+            var ignite = Player.Spellbook.Spells.FirstOrDefault(spell => spell.Name == "summonerdot");
+            if (ignite != null)
+            {
+                Ignite.Slot = ignite.Slot;
+            }
+                
 
             //Menu
             config = new Menu(Player.ChampionName, Player.ChampionName, true);
@@ -94,6 +99,10 @@ namespace Mundo
             var misc = config.AddSubMenu(new Menu("Misc Settings", "Misc"));
             misc.AddItem(new MenuItem("useQlh", "Use Q to last hit minions").SetValue(true));
             misc.AddItem(new MenuItem("useQlhHP", "Minimum HP% to use Q to lasthit").SetValue(new Slider(60, 1)));
+            misc.AddItem(new MenuItem("useQlc", "Use Q to last hit in laneclear").SetValue(true));
+            misc.AddItem(new MenuItem("useQlcHP", "Minimum HP% to use Q to laneclear").SetValue(new Slider(60, 1)));
+            misc.AddItem(new MenuItem("useWlc", "Use W in laneclear").SetValue(true));
+            misc.AddItem(new MenuItem("useWlcHP", "Minimum HP% to use W to laneclear").SetValue(new Slider(60, 1)));
             var miscR = misc.AddSubMenu(new Menu("R Settings", "R"));
             miscR.AddItem(new MenuItem("useR", "Use R").SetValue(true));
             miscR.AddItem(new MenuItem("RHealth", "Minimum HP% to use R").SetValue(new Slider(30, 1)));
@@ -163,6 +172,10 @@ namespace Mundo
 
                 case Orbwalking.OrbwalkingMode.LastHit:
                     LastHit();
+                    break;
+
+                case Orbwalking.OrbwalkingMode.LaneClear:
+                    LaneClear();
                     break;
             }
 
@@ -253,6 +266,38 @@ namespace Mundo
             }
         }
 
+        private static void LaneClear()
+        {
+            var castQ = config.Item("useQlc").GetValue<bool>() && q.IsReady();
+            var qHealth = config.Item("useQlcHP").GetValue<Slider>().Value;
+            var castW = config.Item("useWlc").GetValue<bool>() && w.IsReady();
+            var wHealth = config.Item("useWlcHP").GetValue<Slider>().Value;
+
+            if (Player.IsDead)
+            {
+                return;
+            }
+
+            var minionCount = MinionManager.GetMinions(Player.Position, q.Range, MinionTypes.All, MinionTeam.NotAlly);
+
+            if (minionCount.Count > 0)
+            {
+                if (castQ && Player.HealthPercent >= qHealth)
+                {
+                    foreach (var minion in minionCount.Where(minion => minion.Health <= q.GetDamage(minion)))
+                    {
+                        q.Cast(minion);
+                        return;
+                    }
+                }
+
+                if (castW && Player.HealthPercent >= wHealth && !IsBurning())
+                {
+                    w.Cast();
+                }
+            }
+        }
+
         private static void KillSteal()
         {
             if (Player.IsDead || !config.Item("killsteal").GetValue<bool>())
@@ -268,19 +313,19 @@ namespace Mundo
                             enemy =>
                                 enemy.IsValidTarget(q.Range) && enemy.Health < Player.GetSpellDamage(enemy, SpellSlot.Q));
 
-                q.Cast(target);
+                q.CastIfHitchanceEquals(target, HitChance.High);
             }
 
-            if (config.Item("useIks").GetValue<bool>() && ignite.Slot.IsReady() && ignite != null && ignite.Slot != SpellSlot.Unknown)
+            if (config.Item("useIks").GetValue<bool>() && Ignite.Slot.IsReady())
             {
                 var target =
                     ObjectManager.Get<Obj_AI_Hero>()
                         .FirstOrDefault(
                             enemy =>
-                                enemy.IsValidTarget(600) &&
-                                enemy.Health < Player.GetSummonerSpellDamage(enemy, Damage.SummonerSpell.Ignite));
+                                enemy.IsValidTarget(Ignite.Range) &&
+                                enemy.Health < Player.GetSummonerSpellDamage(enemy, Damage.SummonerSpell.Ignite) && Ignite.Slot != SpellSlot.Unknown);
 
-                Player.Spellbook.CastSpell(ignite.Slot, target);
+                Ignite.Cast(target);
             }
         }
 
@@ -297,7 +342,7 @@ namespace Mundo
         {
             var enemyCount = Utility.CountEnemiesInRange(w.Range * 2);
 
-            if (IsBurning() && enemyCount == 0)
+            if (IsBurning() && enemyCount == 0 && orbwalker.ActiveMode != Orbwalking.OrbwalkingMode.LaneClear)
             {
                 w.Cast();
             }
