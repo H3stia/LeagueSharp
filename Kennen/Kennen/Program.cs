@@ -4,7 +4,6 @@ using Color = System.Drawing.Color;
 using System.Linq;
 using LeagueSharp;
 using LeagueSharp.Common;
-using SharpDX;
 
 namespace Kennen
 {
@@ -43,7 +42,7 @@ namespace Kennen
             r = new Spell(SpellSlot.R, 550);
             ignite = Player.Spellbook.GetSpell(Player.GetSpellSlot("summonerdot"));
 
-            config = new Menu("Kennen - The ThunderRat", "Kennen", true);
+            config = new Menu(Player.ChampionName, Player.ChampionName, true);
 
             var orbwalkerMenu = config.AddSubMenu(new Menu("Orbwalker", "Orbwalker"));
             orbwalker = new Orbwalking.Orbwalker(orbwalkerMenu);
@@ -89,7 +88,7 @@ namespace Kennen
             laneClearMenu.AddItem(new MenuItem("useWlc", "Use W in lane clear").SetValue(false));
 
             var killsteal = config.AddSubMenu(new Menu("KillSteal Settings", "KillSteal"));
-            killsteal.AddItem(new MenuItem("Killsteal", "Activate Killsteal").SetValue(true));
+            killsteal.AddItem(new MenuItem("killsteal", "Activate Killsteal").SetValue(true));
             killsteal.AddItem(new MenuItem("useQks", "Use Q to KillSteal").SetValue(true));
             killsteal.AddItem(new MenuItem("useWks", "Use W to KillSteal").SetValue(true));
             killsteal.AddItem(new MenuItem("useIks", "Use Ignite to KillSteal").SetValue(true));
@@ -159,7 +158,7 @@ namespace Kennen
 
         private static void ExecuteCombo()
         {
-            var target = TargetSelector.GetTarget(e.Range, TargetSelector.DamageType.Magical);
+            var target = TargetSelector.GetTarget(q.Range, TargetSelector.DamageType.Magical);
 
             if (Player.IsDead || target == null || !target.IsValid)
             {
