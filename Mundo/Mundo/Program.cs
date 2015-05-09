@@ -274,7 +274,7 @@ namespace Mundo
             var castW = config.Item("useWlc").GetValue<bool>() && w.IsReady();
             var wHealth = config.Item("useWlcHP").GetValue<Slider>().Value;
 
-            if (Player.IsDead)
+            if (Player.IsDead || !Orbwalking.CanMove(40))
             {
                 return;
             }

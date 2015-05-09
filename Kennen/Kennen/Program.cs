@@ -252,28 +252,33 @@ namespace Kennen
 
         private static void LastHit()
         {
-            var castQ = config.Item("useQlh").GetValue<bool>();
+            var castQ = config.Item("useQlh").GetValue<bool>() && q.IsReady();
 
-            if (!q.IsReady() || !castQ)
+            if (!q.IsReady() || !Orbwalking.CanMove(40))
             {
                 return;
             }
 
             var minionCount = MinionManager.GetMinions(Player.Position, q.Range, MinionTypes.All, MinionTeam.NotAlly);
 
-            if (minionCount.Count > 0)
+            if (minionCount.Count > 0 && castQ)
             {
-                foreach (var minion in minionCount.Where(minion => minion.Health <= Player.GetSpellDamage(minion, SpellSlot.Q)))
+                foreach (var minion in minionCount)
                 {
-                    q.Cast(minion);
-                    return;
+                    if (
+                        HealthPrediction.GetHealthPrediction(
+                            minion, (int)(q.Delay + (minion.Distance(Player.Position) / q.Speed))) <
+                        Player.GetSpellDamage(minion, SpellSlot.Q))
+                    {
+                        q.Cast(minion);
+                    }
                 }
             }
         }
 
         private static void LaneClear()
         {
-            if (Player.IsDead)
+            if (Player.IsDead || !Orbwalking.CanMove(40))
             {
                 return;
             }
@@ -285,10 +290,15 @@ namespace Kennen
 
             if (minionCount.Count > 0 && castQ)
             {
-                foreach (var minion in minionCount.Where(minion => minion.Health <= Player.GetSpellDamage(minion, SpellSlot.Q)))
+                foreach (var minion in minionCount)
                 {
-                    q.Cast(minion);
-                    return;
+                    if (
+                        HealthPrediction.GetHealthPrediction(
+                            minion, (int)(q.Delay + (minion.Distance(Player.Position) / q.Speed))) <
+                        Player.GetSpellDamage(minion, SpellSlot.Q))
+                    {
+                        q.Cast(minion);
+                    }
                 }
             }
 
@@ -317,7 +327,10 @@ namespace Kennen
                             enemy =>
                                 enemy.IsValidTarget(q.Range) && enemy.Health < Player.GetSpellDamage(enemy, SpellSlot.Q));
 
-                q.Cast(target);
+                if (target.IsValidTarget(q.Range))
+                {
+                    q.CastIfHitchanceEquals(target, HitChance.High);
+                }
             }
 
             if (config.Item("useWks").GetValue<bool>() && w.IsReady())
@@ -329,7 +342,10 @@ namespace Kennen
                                 enemy.IsValidTarget(w.Range) &&
                                 enemy.Health < (Player.GetSpellDamage(enemy, SpellSlot.W)));
 
-                w.Cast();
+                if (target.IsValidTarget(w.Range))
+                {
+                    w.Cast();
+                }
             }
 
             if (config.Item("useIks").GetValue<bool>() && ignite.Slot.IsReady() && ignite != null && ignite.Slot != SpellSlot.Unknown)
@@ -341,7 +357,10 @@ namespace Kennen
                                 enemy.IsValidTarget(600) &&
                                 enemy.Health < Player.GetSummonerSpellDamage(enemy, Damage.SummonerSpell.Ignite));
 
-                Player.Spellbook.CastSpell(ignite.Slot, target);
+                if (target.IsValidTarget(600))
+                {
+                    Player.Spellbook.CastSpell(ignite.Slot, target);
+                }
             }
         }
 
