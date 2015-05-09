@@ -191,7 +191,7 @@ namespace Mundo
 
             var castQ = config.Item("useQ").GetValue<bool>() && q.IsReady();
             var castW = config.Item("useW").GetValue<bool>() && w.IsReady();
-            var castE = config.Item("useE").GetValue<bool>() && w.IsReady();
+            var castE = config.Item("useE").GetValue<bool>() && e.IsReady();
             var qHealth = config.Item("QHealthCombo").GetValue<Slider>().Value;
             var wHealth = config.Item("WHealthCombo").GetValue<Slider>().Value;
 
