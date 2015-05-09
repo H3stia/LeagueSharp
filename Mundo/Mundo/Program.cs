@@ -22,7 +22,7 @@ namespace Mundo
 
         //Spell declaration
         private static Spell q, w, e, r;
-        public static Spell Ignite = new Spell(SpellSlot.Unknown, 600);
+        private static SpellDataInst ignite;
 
         static void Main(string[] args)
         {
@@ -39,12 +39,8 @@ namespace Mundo
             w = new Spell(SpellSlot.W, 325);
             e = new Spell(SpellSlot.E);
             r = new Spell(SpellSlot.R);
-            var ignite = Player.Spellbook.Spells.FirstOrDefault(spell => spell.Name == "summonerdot");
-            if (ignite != null)
-            {
-                Ignite.Slot = ignite.Slot;
-            }
-                
+            ignite = Player.Spellbook.GetSpell(Player.GetSpellSlot("summonerdot"));
+
 
             //Menu
             config = new Menu(Player.ChampionName, Player.ChampionName, true);
@@ -328,18 +324,18 @@ namespace Mundo
                 }
             }
 
-            if (config.Item("useIks").GetValue<bool>() && Ignite.Slot.IsReady())
+            if (config.Item("useIks").GetValue<bool>() && ignite.Slot.IsReady() && ignite != null && ignite.Slot != SpellSlot.Unknown)
             {
                 var target =
                     ObjectManager.Get<Obj_AI_Hero>()
                         .FirstOrDefault(
                             enemy =>
-                                enemy.IsValidTarget(Ignite.Range) &&
-                                enemy.Health < Player.GetSummonerSpellDamage(enemy, Damage.SummonerSpell.Ignite) && Ignite.Slot != SpellSlot.Unknown);
+                                enemy.IsValidTarget(600) &&
+                                enemy.Health < Player.GetSummonerSpellDamage(enemy, Damage.SummonerSpell.Ignite));
 
-                if (target.IsValidTarget(Ignite.Range))
+                if (target.IsValidTarget(600))
                 {
-                    Ignite.Cast(target);
+                    Player.Spellbook.CastSpell(ignite.Slot, target);
                 }
             }
         }
