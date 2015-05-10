@@ -93,7 +93,6 @@ namespace Mundo
             killsteal.AddItem(new MenuItem("killsteal", "Activate KillSteal").SetValue(true));
             killsteal.AddItem(new MenuItem("useQks", "Use Q to KillSteal").SetValue(true));
             killsteal.AddItem(new MenuItem("useIks", "Use Ignite to KillSteal").SetValue(true));
-            killsteal.AddItem(new MenuItem("useSks", "Use Smite to KillSteal").SetValue(true));
 
             var misc = config.AddSubMenu(new Menu("Misc Settings", "Misc"));
             var miscQ = misc.AddSubMenu(new Menu("Q Settings", "Q"));
