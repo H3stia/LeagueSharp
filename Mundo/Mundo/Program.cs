@@ -24,6 +24,8 @@ namespace Mundo
         private static Spell q, w, e, r;
         private static SpellDataInst ignite;
 
+        private static GameObject akaliShroud;
+
         static void Main(string[] args)
         {
             CustomEvents.Game.OnGameLoad += Game_OnGameLoad;
@@ -32,7 +34,9 @@ namespace Mundo
         private static void Game_OnGameLoad(EventArgs args)
         {
             if (Player.ChampionName != Champion)
+            {
                 return;
+            }
 
             q = new Spell(SpellSlot.Q, 1050);
             q.SetSkillshot(0.25f, 75, 1500, true, SkillshotType.SkillshotLine);
@@ -40,9 +44,7 @@ namespace Mundo
             e = new Spell(SpellSlot.E);
             r = new Spell(SpellSlot.R);
             ignite = Player.Spellbook.GetSpell(Player.GetSpellSlot("summonerdot"));
-
-
-            //Menu
+            
             config = new Menu(Player.ChampionName, Player.ChampionName, true);
 
             var orbwalkerMenu = config.AddSubMenu(new Menu("Orbwalker", "Orbwalker"));
@@ -91,6 +93,7 @@ namespace Mundo
             killsteal.AddItem(new MenuItem("killsteal", "Activate KillSteal").SetValue(true));
             killsteal.AddItem(new MenuItem("useQks", "Use Q to KillSteal").SetValue(true));
             killsteal.AddItem(new MenuItem("useIks", "Use Ignite to KillSteal").SetValue(true));
+            killsteal.AddItem(new MenuItem("useSks", "Use Smite to KillSteal").SetValue(true));
 
             var misc = config.AddSubMenu(new Menu("Misc Settings", "Misc"));
             var miscQ = misc.AddSubMenu(new Menu("Q Settings", "Q"));
@@ -136,6 +139,8 @@ namespace Mundo
             Game.OnUpdate += Game_OnUpdate;
             Orbwalking.OnAttack += OrbwalkingOnAttack;
             Drawing.OnDraw += Drawing_OnDraw;
+            GameObject.OnCreate += GameObject_OnCreate;
+            GameObject.OnDelete += GameObject_OnDelete;
         }
 
         private static HitChance GetHitChance(string name)
@@ -375,6 +380,11 @@ namespace Mundo
         {
             var enemyCount = Utility.CountEnemiesInRange(w.Range * 2);
 
+            if (akaliShroud !=null && Player.Distance(akaliShroud.Position) < w.Range * 2)
+            {
+                return;
+            }
+
             if (IsBurning() && enemyCount == 0 && orbwalker.ActiveMode != Orbwalking.OrbwalkingMode.LaneClear)
             {
                 w.Cast();
@@ -424,6 +434,22 @@ namespace Mundo
             else if (!rEnemies && castR && Player.HealthPercent <= rHealth && !Player.InFountain())
             {
                 r.Cast();
+            }
+        }
+
+        private static void GameObject_OnCreate(GameObject obj, EventArgs args)
+        {
+            if (obj.Name == "akali_smoke_bomb_tar_team_red.troy")
+            {
+                akaliShroud = obj;
+            }
+        }
+
+        private static void GameObject_OnDelete(GameObject obj, EventArgs args)
+        {
+            if (obj.Name == "akali_smoke_bomb_tar_team_red.troy")
+            {
+                akaliShroud = null;
             }
         }
 
