@@ -35,7 +35,7 @@ namespace Mundo
                 return;
 
             q = new Spell(SpellSlot.Q, 1050);
-            q.SetSkillshot(0.25f, 60, 2000, true, SkillshotType.SkillshotLine);
+            q.SetSkillshot(0.25f, 75, 1500, true, SkillshotType.SkillshotLine);
             w = new Spell(SpellSlot.W, 325);
             e = new Spell(SpellSlot.E);
             r = new Spell(SpellSlot.R);
@@ -50,7 +50,7 @@ namespace Mundo
 
             var ts = config.AddSubMenu(new Menu("Target Selector", "Target Selector")); ;
             TargetSelector.AddToMenu(ts);
-
+            
             var combo = config.AddSubMenu(new Menu("Combo Settings", "Combo"));
             var comboQ = combo.AddSubMenu(new Menu("Q Settings", "Q"));
             comboQ.AddItem(new MenuItem("useQ", "Use Q").SetValue(true));
@@ -93,22 +93,42 @@ namespace Mundo
             killsteal.AddItem(new MenuItem("useIks", "Use Ignite to KillSteal").SetValue(true));
 
             var misc = config.AddSubMenu(new Menu("Misc Settings", "Misc"));
-            misc.AddItem(new MenuItem("useQlh", "Use Q to last hit minions").SetValue(true));
-            misc.AddItem(new MenuItem("useQlhHP", "Minimum HP% to use Q to lasthit").SetValue(new Slider(60, 1)));
-            misc.AddItem(new MenuItem("useQlc", "Use Q to last hit in laneclear").SetValue(true));
-            misc.AddItem(new MenuItem("useQlcHP", "Minimum HP% to use Q to laneclear").SetValue(new Slider(60, 1)));
-            misc.AddItem(new MenuItem("useWlc", "Use W in laneclear").SetValue(true));
-            misc.AddItem(new MenuItem("useWlcHP", "Minimum HP% to use W to laneclear").SetValue(new Slider(60, 1)));
+            var miscQ = misc.AddSubMenu(new Menu("Q Settings", "Q"));
+            miscQ.AddItem(
+                new MenuItem("autoQ", "Auto Q on enemies").SetValue(
+                    new KeyBind("J".ToCharArray()[0], KeyBindType.Toggle)));
+            miscQ.AddItem(
+                new MenuItem("qHitchanceAuto", "Q Hitchance").SetValue(
+                    new StringList(
+                        new[]
+                        {
+                            HitChance.Low.ToString(), HitChance.Medium.ToString(), HitChance.High.ToString(),
+                            HitChance.VeryHigh.ToString()
+                        }, 2)));
+            miscQ.AddItem(new MenuItem("autoQhp", "Minimum HP% to auto Q").SetValue(new Slider(50, 1)));
             var miscR = misc.AddSubMenu(new Menu("R Settings", "R"));
             miscR.AddItem(new MenuItem("useR", "Use R").SetValue(true));
             miscR.AddItem(new MenuItem("RHealth", "Minimum HP% to use R").SetValue(new Slider(30, 1)));
             miscR.AddItem(new MenuItem("RHealthEnemies", "If enemies nearby").SetValue(true));
+
+            var farming = config.AddSubMenu(new Menu("Farming Settings", "Farming"));
+            farming.AddItem(new MenuItem("useQlh", "Use Q to last hit minions").SetValue(true));
+            farming.AddItem(new MenuItem("useQlhHP", "Minimum HP% to use Q to lasthit").SetValue(new Slider(60, 1)));
+            farming.AddItem(new MenuItem("useQlc", "Use Q to last hit in laneclear").SetValue(true));
+            farming.AddItem(new MenuItem("useQlcHP", "Minimum HP% to use Q to laneclear").SetValue(new Slider(60, 1)));
+            farming.AddItem(new MenuItem("useWlc", "Use W in laneclear").SetValue(true));
+            farming.AddItem(new MenuItem("useWlcHP", "Minimum HP% to use W to laneclear").SetValue(new Slider(60, 1)));
 
             var drawingMenu = config.AddSubMenu(new Menu("Drawings", "Drawings"));
             drawingMenu.AddItem(new MenuItem("disableDraw", "Disable all drawings").SetValue(false));
             drawingMenu.AddItem(new MenuItem("drawQ", "Q range").SetValue(new Circle(true, Color.DarkOrange, q.Range)));
             drawingMenu.AddItem(new MenuItem("drawW", "W range").SetValue(new Circle(false, Color.DarkOrange, w.Range)));
             drawingMenu.AddItem(new MenuItem("width", "Drawings width").SetValue(new Slider(2, 1, 5)));
+            drawingMenu.AddItem(new MenuItem("drawAutoQ", "Draw AutoQ status").SetValue(true));
+
+            config.AddItem(new MenuItem("spacer", ""));
+            config.AddItem(new MenuItem("version", "Version: 1.0.0.2"));
+            config.AddItem(new MenuItem("author", "Author: Hestia"));
 
             config.AddToMainMenu();
 
@@ -163,6 +183,7 @@ namespace Mundo
                     break;
 
                 case Orbwalking.OrbwalkingMode.Mixed:
+                    LastHit();
                     ExecuteHarass();
                     break;
 
@@ -176,6 +197,7 @@ namespace Mundo
             }
 
             AutoR();
+            AutoQ();
             BurningDisabler();
             KillSteal();
         }
@@ -359,12 +381,38 @@ namespace Mundo
             }
         }
 
+        private static void AutoQ()
+        {
+            var autoQ = config.Item("autoQ").GetValue<KeyBind>().Active;
+            var qHealth = config.Item("autoQhp").GetValue<Slider>().Value;
+
+            if (Player.IsDead)
+            {
+                return;
+            }
+
+            if (autoQ && q.IsReady() && Player.HealthPercent >= qHealth)
+            {
+                var target = ObjectManager.Get<Obj_AI_Hero>().FirstOrDefault(enemy => enemy.IsValidTarget(q.Range));
+
+                if (target.IsValidTarget(q.Range))
+                {
+                    q.CastIfHitchanceEquals(target, GetHitChance("qHitchanceAuto"));
+                }
+            }
+        }
+
         private static void AutoR()
         {
             var castR = config.Item("useR").GetValue<bool>() && r.IsReady();
             var rHealth = config.Item("RHealth").GetValue<Slider>().Value;
             var rEnemies = config.Item("RHealthEnemies").GetValue<bool>();
             var enemyCount = Utility.CountEnemiesInRange(q.Range * 2);
+
+            if (Player.IsDead)
+            {
+                return;
+            }
 
             if (rEnemies && castR && Player.HealthPercent <= rHealth && !Player.InFountain())
             {
@@ -384,6 +432,16 @@ namespace Mundo
             if (Player.IsDead || config.Item("disableDraw").GetValue<bool>())
             {
                 return;
+            }
+
+            var heroPosition = Drawing.WorldToScreen(Player.Position);
+            var textDimension = Drawing.GetTextExtent("AutoQ: ON");
+            var drawQstatus = config.Item("drawAutoQ").GetValue<bool>();
+            var autoQ = config.Item("autoQ").GetValue<KeyBind>().Active;
+
+            if (drawQstatus && autoQ)
+            {
+                Drawing.DrawText(heroPosition.X - textDimension.Width, heroPosition.Y - textDimension.Height, Color.DarkOrange, "AutoQ: ON");
             }
 
             var width = config.Item("width").GetValue<Slider>().Value;
