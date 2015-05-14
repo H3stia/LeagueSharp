@@ -108,6 +108,9 @@ namespace Mundo
                             HitChance.VeryHigh.ToString()
                         }, 2)));
             miscQ.AddItem(new MenuItem("autoQhp", "Minimum HP% to auto Q").SetValue(new Slider(50, 1)));
+            var miscW = misc.AddSubMenu(new Menu("Q Settings", "W"));
+            miscW.AddItem(
+                new MenuItem("wDisableRange", "Disable W if no enemies in range:").SetValue(new Slider(700, 250, 2500)));
             var miscR = misc.AddSubMenu(new Menu("R Settings", "R"));
             miscR.AddItem(new MenuItem("useR", "Use R").SetValue(true));
             miscR.AddItem(new MenuItem("RHealth", "Minimum HP% to use R").SetValue(new Slider(30, 1)));
@@ -116,6 +119,7 @@ namespace Mundo
             var farming = config.AddSubMenu(new Menu("Farming Settings", "Farming"));
             farming.AddItem(new MenuItem("useQlh", "Use Q to last hit minions").SetValue(true));
             farming.AddItem(new MenuItem("useQlhHP", "Minimum HP% to use Q to lasthit").SetValue(new Slider(60, 1)));
+            farming.AddItem(new MenuItem("qRange", "Only use Q if far from minions").SetValue(true));
             farming.AddItem(new MenuItem("useQlc", "Use Q to last hit in laneclear").SetValue(true));
             farming.AddItem(new MenuItem("useQlcHP", "Minimum HP% to use Q to laneclear").SetValue(new Slider(60, 1)));
             farming.AddItem(new MenuItem("useWlc", "Use W in laneclear").SetValue(true));
@@ -282,12 +286,25 @@ namespace Mundo
             {
                 foreach (var minion in minionCount)
                 {
-                    if (
-                        HealthPrediction.GetHealthPrediction(
-                            minion, (int) (q.Delay + (minion.Distance(Player.Position) / q.Speed))) <
-                        Player.GetSpellDamage(minion, SpellSlot.Q))
+                    if (config.Item("qRange").GetValue<bool>())
                     {
-                        q.Cast(minion);
+                        if (
+                        HealthPrediction.GetHealthPrediction(
+                            minion, (int)(q.Delay + (minion.Distance(Player.Position) / q.Speed))) <
+                        Player.GetSpellDamage(minion, SpellSlot.Q) && Player.Distance(minion) > Player.AttackRange * 2)
+                        {
+                            q.Cast(minion);
+                        }
+                    }
+                    else
+                    {
+                        if (
+                        HealthPrediction.GetHealthPrediction(
+                            minion, (int)(q.Delay + (minion.Distance(Player.Position) / q.Speed))) <
+                        Player.GetSpellDamage(minion, SpellSlot.Q))
+                        {
+                            q.Cast(minion);
+                        }
                     }
                 }
             }
@@ -377,9 +394,9 @@ namespace Mundo
 
         private static void BurningDisabler()
         {
-            var enemyCount = Utility.CountEnemiesInRange(w.Range * 2);
+            var enemyCount = Utility.CountEnemiesInRange(config.Item("wDisableRange").GetValue<Slider>().Value);
 
-            if (akaliShroud !=null && Player.Distance(akaliShroud.Position) < w.Range * 2)
+            if (akaliShroud !=null && Player.Distance(akaliShroud.Position) < w.Range * 3)
             {
                 return;
             }
