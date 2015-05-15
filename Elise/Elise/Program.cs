@@ -91,7 +91,7 @@ namespace Elise
             comboE.AddItem(new MenuItem("useEs", "Use E spider to engage").SetValue(true));
             var comboR = combo.AddSubMenu(new Menu("R Settings", "R"));
             comboR.AddItem(new MenuItem("useR", "Use R to switch forms").SetValue(true));
-            /*
+            
             var harass = config.AddSubMenu(new Menu("Harass Settings", "Harass"));
             var harassQ = harass.AddSubMenu(new Menu("Q Settings", "Q"));
             harassQ.AddItem(new MenuItem("useQHarassH", "Use Q human").SetValue(true));
@@ -100,7 +100,9 @@ namespace Elise
             harassW.AddItem(new MenuItem("useWHarassH", "Use W human").SetValue(true));
             var harassE = combo.AddSubMenu(new Menu("E Settings", "E"));
             harassE.AddItem(new MenuItem("useEHarassH", "Use E").SetValue(true));
-            */
+            var harassR = combo.AddSubMenu(new Menu("R Settings", "R"));
+            harassR.AddItem(new MenuItem("useRHarass", "Use R to switch forms").SetValue(true));
+
             var killsteal = config.AddSubMenu(new Menu("KillSteal Settings", "KillSteal"));
             killsteal.AddItem(new MenuItem("killsteal", "Activate KillSteal").SetValue(true));
             killsteal.AddItem(new MenuItem("useQksH", "Use Q human to KillSteal").SetValue(true));
@@ -246,7 +248,7 @@ namespace Elise
 
                 case Orbwalking.OrbwalkingMode.Mixed:
                     LastHit();
-                    //ExecuteHarass();
+                    ExecuteHarass();
                     break;
 
                 case Orbwalking.OrbwalkingMode.LastHit:
@@ -299,7 +301,7 @@ namespace Elise
                     qSpider.CastOnUnit(target);
                 }
 
-                if (r.IsReady() && useR && (eHumanCD == 0 || HumanDamage(target) > target.Health))
+                if (r.IsReady() && useR && (eHumanCD == 0 || HumanDamage(target) > SpiderDamage(target)))
                 {
                     r.Cast();
                 }
@@ -334,6 +336,59 @@ namespace Elise
                 }
                 
                 if (r.IsReady() && useR && qSpiderCD == 0)
+                {
+                    r.Cast();
+                }
+            }
+        }
+
+        private static void ExecuteHarass()
+        {
+            var target = TargetSelector.GetTarget(eSpider.Range, TargetSelector.DamageType.Magical);
+
+            if (Player.IsDead || target == null || !target.IsValid)
+            {
+                return;
+            }
+
+            var useQh = config.Item("useQHarassH").GetValue<bool>();
+            var useQs = config.Item("useQHarassS").GetValue<bool>();
+            var useWh = config.Item("useWHarassH").GetValue<bool>();
+            var useEh = config.Item("useEHarassH").GetValue<bool>();
+            var useR = config.Item("useRHarass").GetValue<bool>();
+
+            //spider harass
+            if (SpiderForm())
+            {
+                if (useQs && qSpider.IsReady() && target.IsValidTarget(qSpider.Range))
+                {
+                    qSpider.CastOnUnit(target);
+                }
+
+                if (useR && r.IsReady() && (qHumanCD == 0 || eHumanCD == 0 || wHumanCD == 0))
+                {
+                    r.Cast();
+                }
+            }
+
+            //human harass
+            if (!SpiderForm())
+            {
+                if (useEh && eHuman.IsReady() && target.IsValidTarget(eHuman.Range))
+                {
+                    eHuman.CastIfHitchanceEquals(target, GetHitChance("eHitchanceH"));
+                }
+                if (useQh && qHuman.IsReady() && target.IsValidTarget(qHuman.Range))
+                {
+                    qHuman.CastOnUnit(target);
+                }
+
+                if (useWh && wHuman.IsReady() && target.IsValidTarget(wHuman.Range))
+                {
+                    wHuman.Cast(target);
+                }
+
+                if (useR && r.IsReady() && qSpiderCD == 0)
                 {
                     r.Cast();
                 }
