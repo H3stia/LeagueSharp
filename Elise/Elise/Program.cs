@@ -12,7 +12,13 @@ namespace Elise
         private const string Champion = "Elise";
 
         //Player object
-        private static Obj_AI_Hero Player { get { return ObjectManager.Player; } }
+        private static Obj_AI_Hero Player
+        {
+            get
+            {
+                return ObjectManager.Player;
+            }
+        }
 
         //Menu and orbwalker declarations
         private static Menu config;
@@ -21,6 +27,15 @@ namespace Elise
         //Spell declaration
         private static Spell qHuman, wHuman, eHuman, qSpider, wSpider, eSpider, r;
         private static SpellDataInst ignite;
+        private static Spell smite;
+        private static SpellSlot smiteSlot = SpellSlot.Unknown;
+
+        //Smite types
+        //Credits to Kurisu
+        private static readonly int[] SmitePurple = { 3713, 3726, 3725, 3726, 3723 };
+        private static readonly int[] SmiteGrey = { 3711, 3722, 3721, 3720, 3719 };
+        private static readonly int[] SmiteRed = { 3715, 3718, 3717, 3716, 3714 };
+        private static readonly int[] SmiteBlue = { 3706, 3710, 3709, 3708, 3707 };
 
         static void Main(string[] args)
         {
@@ -33,6 +48,8 @@ namespace Elise
             {
                 return;
             }
+
+            SetSmiteSlot();
 
             qHuman = new Spell(SpellSlot.Q, 625);
             wHuman = new Spell(SpellSlot.W, 950);
@@ -70,6 +87,7 @@ namespace Elise
                             HitChance.Low.ToString(), HitChance.Medium.ToString(), HitChance.High.ToString(),
                             HitChance.VeryHigh.ToString()
                         }, 2)));
+            comboE.AddItem(new MenuItem("smiteE", "Use Smite to hit E").SetValue(true));
             comboE.AddItem(new MenuItem("useEs", "Use E spider to engage").SetValue(true));
             var comboR = combo.AddSubMenu(new Menu("R Settings", "R"));
             comboR.AddItem(new MenuItem("useR", "Use R to switch forms").SetValue(true));
@@ -88,14 +106,19 @@ namespace Elise
             killsteal.AddItem(new MenuItem("useQksH", "Use Q human to KillSteal").SetValue(true));
             killsteal.AddItem(new MenuItem("useQksS", "Use Q spider to KillSteal").SetValue(true));
             killsteal.AddItem(new MenuItem("useWksH", "Use W human to KillSteal").SetValue(true));
+            killsteal.AddItem(new MenuItem("useSks", "Use Smite to KillSteal").SetValue(true));
             killsteal.AddItem(new MenuItem("useIks", "Use Ignite to KillSteal").SetValue(true));
 
             var misc = config.AddSubMenu(new Menu("Misc Settings", "Misc"));
+            misc.AddItem(new MenuItem("smiteC", "Use Smite in combo").SetValue(false));
             var miscQ = misc.AddSubMenu(new Menu("Q Settings", "Q"));
             miscQ.AddItem(
                 new MenuItem("autoQ", "Auto Q human on enemies").SetValue(
                     new KeyBind("J".ToCharArray()[0], KeyBindType.Toggle)));
             miscQ.AddItem(new MenuItem("autoQmp", "Minimum MP% to auto Q").SetValue(new Slider(50, 1)));
+            var miscE = misc.AddSubMenu(new Menu("E Settings", "E"));
+            miscE.AddItem(new MenuItem("useEinterrupt", "Use E human to interrupt spells").SetValue(true));
+            miscE.AddItem(new MenuItem("useEgapcloser", "Use E human on gapclosers").SetValue(true));
             var miscR = misc.AddSubMenu(new Menu("R Settings", "R"));
             miscR.AddItem(new MenuItem("toSpiderBase", "Use R to spider when recalled").SetValue(true));
 
@@ -128,6 +151,8 @@ namespace Elise
             Drawing.OnDraw += Drawing_OnDraw;
             Orbwalking.AfterAttack += OrbwalkingAfterAttack;
             Obj_AI_Base.OnProcessSpellCast += OnProcessSpell;
+            Interrupter2.OnInterruptableTarget += OnInterruptableTarget;
+            AntiGapcloser.OnEnemyGapcloser += OnEnemyGapcloser;
         }
 
         private static void OrbwalkingAfterAttack(AttackableUnit unit, AttackableUnit target)
@@ -148,6 +173,42 @@ namespace Elise
                 {
                     wSpider.Cast();
                 }
+            }
+        }
+
+        private static void OnInterruptableTarget(Obj_AI_Hero target, Interrupter2.InterruptableTargetEventArgs spell)
+        {
+            if (Player.IsDead || !config.Item("useEinterrupt").GetValue<bool>())
+            {
+                return;
+            }
+
+            if (SpiderForm() && r.IsReady() && eHumanCD == 0)
+            {
+                r.Cast();
+            }
+
+            if (!SpiderForm() && eHuman.IsReady() && target.IsValidTarget(eHuman.Range))
+            {
+                eHuman.Cast(target);
+            }
+        }
+
+        private static void OnEnemyGapcloser(ActiveGapcloser gapcloser)
+        {
+            if (Player.IsDead || !config.Item("useEgapcloser").GetValue<bool>())
+            {
+                return;
+            }
+
+            if (SpiderForm() && r.IsReady() && eHumanCD == 0)
+            {
+                r.Cast();
+            }
+
+            if (!SpiderForm() && eHuman.IsReady() && gapcloser.Sender.IsValidTarget(eHuman.Range))
+            {
+                eHuman.Cast(gapcloser.Sender);
             }
         }
 
@@ -214,18 +275,23 @@ namespace Elise
             var useQh = config.Item("useQh").GetValue<bool>();
             var useQs = config.Item("useQs").GetValue<bool>();
             var useWh = config.Item("useWh").GetValue<bool>();
-            //W after attack
-            //var useWs = config.Item("useWs").GetValue<bool>();
             var useEh = config.Item("useEh").GetValue<bool>();
             var useEs = config.Item("useEs").GetValue<bool>();
             var useR = config.Item("useR").GetValue<bool>();
-
+            var useSmite = config.Item("smiteC").GetValue<bool>();
+            var smiteE = config.Item("smiteE").GetValue<bool>();
+            
             //spider combo
             if (SpiderForm())
             {
                 if (useEs && target.IsValidTarget(eSpider.Range) && eSpider.IsReady())
                 {
                     eSpider.CastOnUnit(target);
+                }
+
+                if (useSmite && target.IsValidTarget(smite.Range) && smite.IsReady())
+                {
+                    Smite(target);
                 }
 
                 if (useQs && target.IsValidTarget(qSpider.Range))
@@ -238,13 +304,23 @@ namespace Elise
                     r.Cast();
                 }
             }
-
+            
             //human combo
             if (!SpiderForm())
             {
-                if (useEh && target.IsValidTarget(eHuman.Range) && eHuman.IsReady())
+                if (smiteE && smite.IsReady() && eHuman.GetPrediction(target).CollisionObjects.Count == 1)
+                {
+                    Collision(target);
+                    eHuman.CastIfHitchanceEquals(target, GetHitChance("eHitchanceH"));
+                }
+                else if (useEh && target.IsValidTarget(eHuman.Range) && eHuman.IsReady())
                 {
                     eHuman.CastIfHitchanceEquals(target, GetHitChance("eHitchanceH"));
+                }
+
+                if (useSmite && target.IsValidTarget(smite.Range) && smite.IsReady())
+                {
+                    Smite(target);
                 }
 
                 if (useWh && target.IsValidTarget(wHuman.Range) && wHuman.IsReady())
@@ -256,7 +332,7 @@ namespace Elise
                 {
                     qHuman.CastOnUnit(target);
                 }
-
+                
                 if (r.IsReady() && useR && qSpiderCD == 0)
                 {
                     r.Cast();
@@ -349,7 +425,7 @@ namespace Elise
                     ObjectManager.Get<Obj_AI_Hero>()
                         .FirstOrDefault(
                             enemy =>
-                                enemy.IsValidTarget(qSpider.Range) && enemy.Health < Player.GetSpellDamage(enemy, SpellSlot.Q, 1));
+                                enemy.IsValidTarget(qSpider.Range) && enemy.Health < SpiderDamage(enemy));
 
                 if (!SpiderForm() && qSpiderCD == 0 && Player.Distance(target) < qSpider.Range)
                 {
@@ -393,6 +469,19 @@ namespace Elise
                 if (target.IsValidTarget(600))
                 {
                     Player.Spellbook.CastSpell(ignite.Slot, target);
+                }
+            }
+
+            if (config.Item("useSks").GetValue<bool>() && Player.GetSpell(smiteSlot).Name == "S5_SummonerSmitePlayerGanker")
+            {
+                var target =
+                    ObjectManager.Get<Obj_AI_Hero>()
+                        .FirstOrDefault(
+                            enemy => enemy.IsValidTarget(smite.Range) && enemy.Health <= (20 + 8 * Player.Level));
+
+                if (target.IsValidTarget(smite.Range))
+                {
+                    Smite(target);
                 }
             }
         }
@@ -451,6 +540,90 @@ namespace Elise
             {
                 r.Cast();
             }
+        }
+
+        private static string SmiteType()
+        {
+            if (SmiteBlue.Any(id => Items.HasItem(id)))
+            {
+                return "s5_summonersmiteplayerganker";
+            }
+            if (SmiteRed.Any(id => Items.HasItem(id)))
+            {
+                return "s5_summonersmiteduel";
+            }
+            if (SmiteGrey.Any(id => Items.HasItem(id)))
+            {
+                return "s5_summonersmitequick";
+            }
+            if (SmitePurple.Any(id => Items.HasItem(id)))
+            {
+                return "itemsmiteaoe";
+            }
+            return "summonersmite";
+        }
+
+        private static void SetSmiteSlot()
+        {
+            foreach (
+                var spell in
+                    ObjectManager.Player.Spellbook.Spells.Where(
+                        spell => String.Equals(spell.Name, SmiteType(), StringComparison.CurrentCultureIgnoreCase)))
+            {
+                smiteSlot = spell.Slot;
+                smite = new Spell(smiteSlot, 500);
+                return;
+            }
+        }
+
+        private static void Smite(Obj_AI_Base target)
+        {
+            if (Player.IsDead)
+            {
+                return;
+            }
+
+            var smiteCheck = SmiteBlue.Any(i => Items.HasItem(i)) || SmiteRed.Any(i => Items.HasItem(i));
+
+            if (smiteCheck && Player.Spellbook.CanUseSpell(smiteSlot) == SpellState.Ready && Player.Distance(target) < smite.Range)
+            {
+                Player.Spellbook.CastSpell(smiteSlot, target);
+            }
+        }
+
+        //Credits to Brian for the Smite-spell
+        private static void Collision(Obj_AI_Base target)
+        {
+            foreach (var minion in MinionManager.GetMinions(Player.Position, 1000, MinionTypes.All, MinionTeam.NotAlly))
+            {
+                var segment = minion.ServerPosition.To2D().ProjectOn(Player.ServerPosition.To2D(), minion.Position.To2D());
+
+                if (segment.IsOnSegment && target.ServerPosition.To2D().Distance(segment.SegmentPoint) <= GetHitBox(minion) + 40)
+                {
+                    if (minion.Distance(Player.Position) < smite.Range && minion.Health < Player.GetSummonerSpellDamage(minion, Damage.SummonerSpell.Smite))
+                    {
+                        Player.Spellbook.CastSpell(smiteSlot, minion);
+                    }
+                }
+            }
+        }
+
+        static float GetHitBox(Obj_AI_Base minion)
+        {
+            var nameMinion = minion.Name.ToLower();
+
+            if (nameMinion.Contains("mech"))
+                return 65;
+            if (nameMinion.Contains("wizard") || nameMinion.Contains("basic"))
+                return 48;
+            if (nameMinion.Contains("wolf") || nameMinion.Contains("wraith"))
+                return 50;
+            if (nameMinion.Contains("golem") || nameMinion.Contains("lizard"))
+                return 80;
+            if (nameMinion.Contains("dragon") || nameMinion.Contains("worm"))
+                return 100;
+
+            return 50;
         }
 
         //Cooldown Tracking. Thanks detuks and Kurisu for the help
