@@ -166,12 +166,17 @@ namespace Elise
                 return;
             }
 
-            if (t != null && (orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo || orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear) && unit.IsMe)
+            if (t != null && unit.IsMe)
             {
-                var useWs = config.Item("useWs").GetValue<bool>() && wSpider.IsReady();
-                var useWsLc = config.Item("useWlcS").GetValue<bool>() && wSpider.IsReady();
+                var useWs = config.Item("useWs").GetValue<bool>() && wSpider.IsReady() && orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo;
+                var useWsLc = config.Item("useWlcS").GetValue<bool>() && wSpider.IsReady() && orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear;
 
-                if (useWs || useWsLc)
+                if (useWs)
+                {
+                    wSpider.Cast();
+                }
+
+                if (useWsLc)
                 {
                     wSpider.Cast();
                 }
@@ -286,7 +291,7 @@ namespace Elise
             //spider combo
             if (SpiderForm())
             {
-                if (useEs && target.IsValidTarget(eSpider.Range) && eSpider.IsReady())
+                if (useEs && target.IsValidTarget(eSpider.Range) && eSpider.IsReady() && Player.Distance(target) >= 450)
                 {
                     eSpider.CastOnUnit(target);
                 }
@@ -301,7 +306,7 @@ namespace Elise
                     qSpider.CastOnUnit(target);
                 }
 
-                if (r.IsReady() && useR && (eHumanCD == 0 || HumanDamage(target) > SpiderDamage(target)))
+                if (r.IsReady() && useR && (wSpiderCD < 3) && (eHumanCD == 0 || HumanDamage(target) > SpiderDamage(target)))
                 {
                     r.Cast();
                 }
@@ -461,9 +466,10 @@ namespace Elise
                     ObjectManager.Get<Obj_AI_Hero>()
                         .FirstOrDefault(
                             enemy =>
-                                enemy.IsValidTarget(qHuman.Range) && enemy.Health < Player.GetSpellDamage(enemy, SpellSlot.Q));
+                                enemy.IsValidTarget(qHuman.Range) &&
+                                enemy.Health < Player.GetSpellDamage(enemy, SpellSlot.Q));
 
-                if (SpiderForm() && qHumanCD == 0 && Player.Distance(target) < qHuman.Range)
+                if (SpiderForm() && qHumanCD == 0 && Player.Distance(target) < qHuman.Range && target != null)
                 {
                     r.Cast();
                 }
@@ -473,16 +479,16 @@ namespace Elise
                     qHuman.CastOnUnit(target);
                 }
             }
-
+            
             if (config.Item("useQksS").GetValue<bool>() && qSpider.IsReady())
             {
                 var target =
                     ObjectManager.Get<Obj_AI_Hero>()
                         .FirstOrDefault(
                             enemy =>
-                                enemy.IsValidTarget(qSpider.Range) && enemy.Health < SpiderDamage(enemy));
+                                enemy.IsValidTarget(qSpider.Range) && enemy.Health < Player.GetSpellDamage(enemy, SpellSlot.Q, 1));
 
-                if (!SpiderForm() && qSpiderCD == 0 && Player.Distance(target) < qSpider.Range)
+                if (!SpiderForm() && qSpiderCD == 0 && Player.Distance(target) < qSpider.Range && target != null)
                 {
                     r.Cast();
                 }
@@ -501,7 +507,7 @@ namespace Elise
                             enemy =>
                                 enemy.IsValidTarget(wHuman.Range) && enemy.Health < Player.GetSpellDamage(enemy, SpellSlot.W));
 
-                if (SpiderForm() && wHumanCD == 0 && Player.Distance(target) < wHuman.Range)
+                if (SpiderForm() && wHumanCD == 0 && Player.Distance(target) < wHuman.Range && target != null)
                 {
                     r.Cast();
                 }
@@ -521,7 +527,7 @@ namespace Elise
                                 enemy.IsValidTarget(600) &&
                                 enemy.Health < Player.GetSummonerSpellDamage(enemy, Damage.SummonerSpell.Ignite));
 
-                if (target.IsValidTarget(600))
+                if (target.IsValidTarget(600) && target != null)
                 {
                     Player.Spellbook.CastSpell(ignite.Slot, target);
                 }
@@ -534,7 +540,7 @@ namespace Elise
                         .FirstOrDefault(
                             enemy => enemy.IsValidTarget(smite.Range) && enemy.Health <= (20 + 8 * Player.Level));
 
-                if (target.IsValidTarget(smite.Range))
+                if (target.IsValidTarget(smite.Range) && target != null)
                 {
                     Smite(target);
                 }
