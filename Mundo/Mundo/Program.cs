@@ -395,8 +395,14 @@ namespace Mundo
         private static void BurningDisabler()
         {
             var enemyCount = Utility.CountEnemiesInRange(config.Item("wDisableRange").GetValue<Slider>().Value);
+            var minionCount = MinionManager.GetMinions(Player.Position, w.Range * 2, MinionTypes.All, MinionTeam.Neutral);
 
-            if (akaliShroud !=null && Player.Distance(akaliShroud.Position) < w.Range * 3)
+            if (IsBurning() && akaliShroud !=null && Player.Distance(akaliShroud.Position) < w.Range * 3)
+            {
+                return;
+            }
+
+            if (IsBurning() && minionCount.Count > 0)
             {
                 return;
             }
