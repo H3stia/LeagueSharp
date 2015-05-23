@@ -27,5 +27,17 @@ Gangplank
 - Lane Clear
 - Debuffs removal with W
 
+Elise
+-----------
+- Spells usage with customization
+- Smite usage in combo
+- Harass options
+- Last hit options
+- Lane Clear options
+- Spell CDs drawing for different form
+- Automatically switch to spider in base
+- Stuns gapclosers and interrupt spells with human E if ready
+- Option to smite-E enemies (happens rarely, really situational)
+
 Credits:
 LeagueSharp Developers :')
