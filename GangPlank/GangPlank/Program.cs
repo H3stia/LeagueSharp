@@ -115,9 +115,9 @@ namespace GangPlank
             Notifications.AddNotification("GangPlank by Hestia loaded!", 5000);
             Game.OnUpdate += Game_OnGameUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
-            Orbwalking.AfterAttack += OrbwalkingAfterAttack;
+            //Orbwalking.AfterAttack += OrbwalkingAfterAttack;
         }
-
+        /*
         private static void OrbwalkingAfterAttack(AttackableUnit unit, AttackableUnit target)
         {
             var t = target as Obj_AI_Hero;
@@ -131,7 +131,7 @@ namespace GangPlank
                 }
             }
         }
-
+        */
         private static void Game_OnGameUpdate(EventArgs args)
         {
             if (Player.IsDead)
