@@ -85,7 +85,8 @@ namespace Kennen
 
             var laneClearMenu = config.AddSubMenu(new Menu("LaneClear", "LaneClear"));
             laneClearMenu.AddItem(new MenuItem("useQlc", "Q to LH in lane clear").SetValue(true));
-            laneClearMenu.AddItem(new MenuItem("useWlc", "Use W in lane clear").SetValue(false));
+            laneClearMenu.AddItem(new MenuItem("useQlcH", "Q to harass in lane clear").SetValue(true));
+            laneClearMenu.AddItem(new MenuItem("useWlc", "Use W to harass in lane clear").SetValue(false));
 
             var killsteal = config.AddSubMenu(new Menu("KillSteal Settings", "KillSteal"));
             killsteal.AddItem(new MenuItem("killsteal", "Activate Killsteal").SetValue(true));
@@ -288,6 +289,7 @@ namespace Kennen
 
             var castQ = config.Item("useQlc").GetValue<bool>();
             var castW = config.Item("useWlc").GetValue<bool>();
+            var castQh = config.Item("useQlcH").GetValue<bool>();
 
             var minionCount = MinionManager.GetMinions(Player.Position, q.Range, MinionTypes.All, MinionTeam.NotAlly);
             var qEnemies = Utility.CountEnemiesInRange(q.Range);
@@ -308,7 +310,7 @@ namespace Kennen
                 }
             }
 
-            if (minionCount.Count > 0 && castQ && qEnemies > 0 && qPred.Hitchance == HitChance.Collision)
+            if (minionCount.Count > 0 && castQ && castQh && qEnemies > 0 && qPred.Hitchance == HitChance.Collision)
             {
                 foreach (var minion in minionCount)
                 {
@@ -322,7 +324,7 @@ namespace Kennen
                 }
             }
 
-            if (castQ && qEnemies > 0 && qPred.Hitchance == HitChance.VeryHigh)
+            if (castQh && qEnemies > 0 && qPred.Hitchance == HitChance.VeryHigh)
             {
                 q.Cast(qTarget);
             }
