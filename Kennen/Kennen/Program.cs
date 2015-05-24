@@ -213,7 +213,7 @@ namespace Kennen
 
         private static void ExecuteHarass()
         {
-            var target = TargetSelector.GetTarget(e.Range, TargetSelector.DamageType.Magical);
+            var target = TargetSelector.GetTarget(q.Range, TargetSelector.DamageType.Magical);
 
             if (Player.IsDead || target == null || !target.IsValid)
             {
