@@ -290,11 +290,11 @@ namespace Kennen
             var castW = config.Item("useWlc").GetValue<bool>();
 
             var minionCount = MinionManager.GetMinions(Player.Position, q.Range, MinionTypes.All, MinionTeam.NotAlly);
-            var enemies = Utility.CountEnemiesInRange(q.Range);
-            var target = TargetSelector.GetTarget(q.Range, TargetSelector.DamageType.Magical);
-            var qPred = q.GetPrediction(target);
+            var qEnemies = Utility.CountEnemiesInRange(q.Range);
+            var qTarget = TargetSelector.GetTarget(q.Range, TargetSelector.DamageType.Magical);
+            var qPred = q.GetPrediction(qTarget);
 
-            if (minionCount.Count > 0 && castQ && enemies == 0)
+            if (minionCount.Count > 0 && castQ && qEnemies == 0)
             {
                 foreach (var minion in minionCount)
                 {
@@ -308,7 +308,7 @@ namespace Kennen
                 }
             }
 
-            if (minionCount.Count > 0 && castQ && enemies > 0 && qPred.Hitchance == HitChance.Collision)
+            if (minionCount.Count > 0 && castQ && qEnemies > 0 && qPred.Hitchance == HitChance.Collision)
             {
                 foreach (var minion in minionCount)
                 {
@@ -322,17 +322,20 @@ namespace Kennen
                 }
             }
 
-            if (castQ && enemies > 0 && qPred.Hitchance == HitChance.VeryHigh)
+            if (castQ && qEnemies > 0 && qPred.Hitchance == HitChance.VeryHigh)
             {
-                q.Cast(target);
+                q.Cast(qTarget);
             }
 
-            if (minionCount.Count > 0 && castW)
+            if (castW)
             {
-                foreach (var minion in minionCount.Where(minion => minion.Health <= Player.GetSpellDamage(minion, SpellSlot.W) && minion.HasBuff("kennenmarkofstorm")))
+                var target =
+                    ObjectManager.Get<Obj_AI_Hero>()
+                        .FirstOrDefault(enemy => enemy.IsValidTarget(w.Range) && enemy.HasBuff("kennenmarkofstorm"));
+
+                if (target.IsValidTarget(w.Range))
                 {
-                    w.Cast(minion);
-                    return;
+                    w.Cast(target);
                 }
             }
         }
