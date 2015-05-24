@@ -290,8 +290,11 @@ namespace Kennen
             var castW = config.Item("useWlc").GetValue<bool>();
 
             var minionCount = MinionManager.GetMinions(Player.Position, q.Range, MinionTypes.All, MinionTeam.NotAlly);
+            var enemies = Utility.CountEnemiesInRange(q.Range);
+            var target = TargetSelector.GetTarget(q.Range, TargetSelector.DamageType.Magical);
+            var qPred = q.GetPrediction(target);
 
-            if (minionCount.Count > 0 && castQ)
+            if (minionCount.Count > 0 && castQ && enemies == 0)
             {
                 foreach (var minion in minionCount)
                 {
@@ -303,6 +306,25 @@ namespace Kennen
                         q.Cast(minion);
                     }
                 }
+            }
+
+            if (minionCount.Count > 0 && castQ && enemies > 0 && qPred.Hitchance == HitChance.Collision)
+            {
+                foreach (var minion in minionCount)
+                {
+                    if (
+                        HealthPrediction.GetHealthPrediction(
+                            minion, (int)(q.Delay + (minion.Distance(Player.Position) / q.Speed))) <
+                        Player.GetSpellDamage(minion, SpellSlot.Q))
+                    {
+                        q.Cast(minion);
+                    }
+                }
+            }
+
+            if (castQ && enemies > 0 && qPred.Hitchance == HitChance.VeryHigh)
+            {
+                q.Cast(target);
             }
 
             if (minionCount.Count > 0 && castW)
