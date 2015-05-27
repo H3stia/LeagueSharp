@@ -115,23 +115,8 @@ namespace GangPlank
             Notifications.AddNotification("GangPlank by Hestia loaded!", 5000);
             Game.OnUpdate += Game_OnGameUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
-            //Orbwalking.AfterAttack += OrbwalkingAfterAttack;
         }
-        /*
-        private static void OrbwalkingAfterAttack(AttackableUnit unit, AttackableUnit target)
-        {
-            var t = target as Obj_AI_Hero;
-            if (t != null && (orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo || orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed) && unit.IsMe)
-            {
-                var castQ = config.Item("useQ").GetValue<bool>() && q.IsReady();
 
-                if (castQ)
-                {
-                    q.CastOnUnit(t);
-                }
-            }
-        }
-        */
         private static void Game_OnGameUpdate(EventArgs args)
         {
             if (Player.IsDead)
@@ -150,7 +135,6 @@ namespace GangPlank
                     break;
 
                 case Orbwalking.OrbwalkingMode.Mixed:
-                    LastHit();
                     ExecuteHarass();
                     break;
 
@@ -197,15 +181,16 @@ namespace GangPlank
         private static void ExecuteHarass()
         {
             var target = TargetSelector.GetTarget(q.Range, TargetSelector.DamageType.Physical);
+
             var castQ = config.Item("useQHarass").GetValue<bool>() && q.IsReady();
             var qMana = config.Item("useQharassMana").GetValue<Slider>().Value;
 
-            if (Player.IsDead || target == null || !target.IsValid || Player.ManaPercent <= qMana || !castQ || !q.IsReady())
+            if (Player.IsDead || target == null || !target.IsValid)
             {
                 return;
             }
 
-            if(target.IsValidTarget(q.Range))
+            if( castQ && target.IsValidTarget(q.Range) && Player.ManaPercent >= qMana)
             {
                 q.CastOnUnit(target);
             }
