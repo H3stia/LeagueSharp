@@ -88,6 +88,12 @@ namespace Kennen
             laneClearMenu.AddItem(new MenuItem("useQlcH", "Q to harass in lane clear").SetValue(true));
             laneClearMenu.AddItem(new MenuItem("useWlc", "Use W to harass in lane clear").SetValue(false));
 
+            var jungleClearMenu = config.AddSubMenu(new Menu("JungleClear", "JungleClear"));
+            jungleClearMenu.AddItem(new MenuItem("useQj", "Q in jungle clear").SetValue(true));
+            jungleClearMenu.AddItem(new MenuItem("useWj", "Use W in jungle clear").SetValue(true));
+            jungleClearMenu.AddItem(
+                new MenuItem("jungleActive", "Jungle Clear!").SetValue(new KeyBind("V".ToCharArray()[0], KeyBindType.Press)));
+
             var killsteal = config.AddSubMenu(new Menu("KillSteal Settings", "KillSteal"));
             killsteal.AddItem(new MenuItem("killsteal", "Activate Killsteal").SetValue(true));
             killsteal.AddItem(new MenuItem("useQks", "Use Q to KillSteal").SetValue(true));
@@ -138,6 +144,11 @@ namespace Kennen
                 case Orbwalking.OrbwalkingMode.LaneClear:
                     LaneClear();
                     break;
+            }
+
+            if (config.Item("jungleActive").GetValue<KeyBind>().Active)
+            {
+                JungleClear();
             }
 
             KillSteal();
@@ -263,7 +274,7 @@ namespace Kennen
                 return;
             }
 
-            var minionCount = MinionManager.GetMinions(Player.Position, q.Range, MinionTypes.All, MinionTeam.NotAlly);
+            var minionCount = MinionManager.GetMinions(Player.Position, q.Range, MinionTypes.All, MinionTeam.NotAlly, MinionOrderTypes.MaxHealth);
 
             if (minionCount.Count > 0 && castQ)
             {
@@ -272,7 +283,7 @@ namespace Kennen
                     if (
                         HealthPrediction.GetHealthPrediction(
                             minion, (int)(q.Delay + (minion.Distance(Player.Position) / q.Speed))) <
-                        Player.GetSpellDamage(minion, SpellSlot.Q))
+                        Player.GetSpellDamage(minion, SpellSlot.Q) && minion.Health > Player.BaseAttackDamage)
                     {
                         q.Cast(minion);
                     }
@@ -291,7 +302,7 @@ namespace Kennen
             var castW = config.Item("useWlc").GetValue<bool>();
             var castQh = config.Item("useQlcH").GetValue<bool>();
 
-            var minionCount = MinionManager.GetMinions(Player.Position, q.Range, MinionTypes.All, MinionTeam.NotAlly);
+            var minionCount = MinionManager.GetMinions(Player.Position, q.Range, MinionTypes.All, MinionTeam.NotAlly, MinionOrderTypes.MaxHealth);
             var qEnemies = Utility.CountEnemiesInRange(q.Range);
             var qTarget = TargetSelector.GetTarget(q.Range, TargetSelector.DamageType.Magical);
             var qPred = q.GetPrediction(qTarget);
@@ -303,7 +314,7 @@ namespace Kennen
                     if (
                         HealthPrediction.GetHealthPrediction(
                             minion, (int)(q.Delay + (minion.Distance(Player.Position) / q.Speed))) <
-                        Player.GetSpellDamage(minion, SpellSlot.Q))
+                        Player.GetSpellDamage(minion, SpellSlot.Q) && minion.Health > Player.BaseAttackDamage)
                     {
                         q.Cast(minion);
                     }
@@ -317,7 +328,7 @@ namespace Kennen
                     if (
                         HealthPrediction.GetHealthPrediction(
                             minion, (int)(q.Delay + (minion.Distance(Player.Position) / q.Speed))) <
-                        Player.GetSpellDamage(minion, SpellSlot.Q))
+                        Player.GetSpellDamage(minion, SpellSlot.Q) && minion.Health > Player.BaseAttackDamage)
                     {
                         q.Cast(minion);
                     }
@@ -338,6 +349,28 @@ namespace Kennen
                 if (target.IsValidTarget(w.Range))
                 {
                     w.Cast(target);
+                }
+            }
+        }
+
+        private static void JungleClear()
+        {
+            var minionCount = MinionManager.GetMinions(Player.Position, q.Range, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+            var castQ = config.Item("useQj").GetValue<bool>();
+            var castW = config.Item("useWj").GetValue<bool>();
+
+            if (minionCount.Count > 0)
+            {
+                var minion = minionCount[0];
+
+                if (castQ)
+                {
+                    q.Cast(minion);
+                }
+
+                if (castW && minion.HasBuff("kennenmarkofstorm"))
+                {
+                    w.Cast(minion);
                 }
             }
         }
@@ -424,7 +457,7 @@ namespace Kennen
             if (r.IsReady())
                 comboDamage += Player.GetSpellDamage(enemy, SpellSlot.R);
 
-            if (ignite.IsReady())
+            if (ignite.IsReady() && enemy.Health < Player.GetSummonerSpellDamage(enemy, Damage.SummonerSpell.Ignite) + comboDamage)
                 comboDamage += Player.GetSummonerSpellDamage(enemy, Damage.SummonerSpell.Ignite);
 
             return (float)comboDamage;
