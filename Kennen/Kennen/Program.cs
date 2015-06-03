@@ -280,10 +280,13 @@ namespace Kennen
             {
                 foreach (var minion in minionCount)
                 {
-                    if (
-                        HealthPrediction.GetHealthPrediction(
+                    if (Player.Distance(minion) <= Player.AttackRange)
+                    {
+                        return;
+                    }   
+                    if (HealthPrediction.GetHealthPrediction(
                             minion, (int)(q.Delay + (minion.Distance(Player.Position) / q.Speed))) <
-                        Player.GetSpellDamage(minion, SpellSlot.Q) && minion.Health > Player.BaseAttackDamage)
+                        Player.GetSpellDamage(minion, SpellSlot.Q))
                     {
                         q.Cast(minion);
                     }
@@ -311,10 +314,13 @@ namespace Kennen
             {
                 foreach (var minion in minionCount)
                 {
-                    if (
-                        HealthPrediction.GetHealthPrediction(
+                    if (Player.Distance(minion) <= Player.AttackRange)
+                    {
+                        return;
+                    }
+                    if (HealthPrediction.GetHealthPrediction(
                             minion, (int)(q.Delay + (minion.Distance(Player.Position) / q.Speed))) <
-                        Player.GetSpellDamage(minion, SpellSlot.Q) && minion.Health > Player.BaseAttackDamage)
+                        Player.GetSpellDamage(minion, SpellSlot.Q))
                     {
                         q.Cast(minion);
                     }
@@ -325,10 +331,13 @@ namespace Kennen
             {
                 foreach (var minion in minionCount)
                 {
-                    if (
-                        HealthPrediction.GetHealthPrediction(
+                    if (Player.Distance(minion) <= Player.AttackRange)
+                    {
+                        return;
+                    }
+                    if (HealthPrediction.GetHealthPrediction(
                             minion, (int)(q.Delay + (minion.Distance(Player.Position) / q.Speed))) <
-                        Player.GetSpellDamage(minion, SpellSlot.Q) && minion.Health > Player.BaseAttackDamage)
+                        Player.GetSpellDamage(minion, SpellSlot.Q))
                     {
                         q.Cast(minion);
                     }
