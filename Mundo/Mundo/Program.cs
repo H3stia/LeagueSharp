@@ -108,7 +108,9 @@ namespace Mundo
                             HitChance.VeryHigh.ToString()
                         }, 2)));
             miscQ.AddItem(new MenuItem("autoQhp", "Minimum HP% to auto Q").SetValue(new Slider(50, 1)));
-            var miscW = misc.AddSubMenu(new Menu("Q Settings", "W"));
+            var miscW = misc.AddSubMenu(new Menu("W Settings", "W"));
+            miscW.AddItem(new MenuItem("wHandler", "Use automatic W handler").SetValue(
+                    new KeyBind("W".ToCharArray()[0], KeyBindType.Toggle)));
             miscW.AddItem(
                 new MenuItem("wDisableRange", "Disable W if no enemies in range:").SetValue(new Slider(700, 250, 2500)));
             var miscR = misc.AddSubMenu(new Menu("R Settings", "R"));
@@ -124,6 +126,15 @@ namespace Mundo
             farming.AddItem(new MenuItem("useQlcHP", "Minimum HP% to use Q to laneclear").SetValue(new Slider(60, 1)));
             farming.AddItem(new MenuItem("useWlc", "Use W in laneclear").SetValue(true));
             farming.AddItem(new MenuItem("useWlcHP", "Minimum HP% to use W to laneclear").SetValue(new Slider(60, 1)));
+
+            var jungleFarming = config.AddSubMenu(new Menu("Jungle Settings", "Jungle"));
+            jungleFarming.AddItem(new MenuItem("useQj", "Use Q to jungle").SetValue(true));
+            jungleFarming.AddItem(new MenuItem("useQjHP", "Minimum HP% to use Q in jungle").SetValue(new Slider(20, 1)));
+            jungleFarming.AddItem(new MenuItem("useWj", "Use W to jungle").SetValue(true));
+            jungleFarming.AddItem(new MenuItem("useEj", "Use E to jungle").SetValue(true));
+            jungleFarming.AddItem(
+                new MenuItem("jungleActive", "Jungle Clear!").SetValue(
+                    new KeyBind("V".ToCharArray()[0], KeyBindType.Press)));
 
             var drawingMenu = config.AddSubMenu(new Menu("Drawings", "Drawings"));
             drawingMenu.AddItem(new MenuItem("disableDraw", "Disable all drawings").SetValue(false));
@@ -202,6 +213,11 @@ namespace Mundo
                 case Orbwalking.OrbwalkingMode.LaneClear:
                     LaneClear();
                     break;
+            }
+
+            if (config.Item("jungleActive").GetValue<KeyBind>().Active)
+            {
+                JungleClear();
             }
 
             AutoR();
@@ -322,7 +338,7 @@ namespace Mundo
                 return;
             }
 
-            var minionCount = MinionManager.GetMinions(Player.Position, q.Range, MinionTypes.All, MinionTeam.NotAlly);
+            var minionCount = MinionManager.GetMinions(Player.Position, q.Range);
 
             if (minionCount.Count > 0)
             {
@@ -341,6 +357,41 @@ namespace Mundo
                 }
 
                 if (castW && Player.HealthPercent >= wHealth && !IsBurning())
+                {
+                    w.Cast();
+                }
+            }
+        }
+
+        private static void JungleClear()
+        {
+            var castQ = config.Item("useQj").GetValue<bool>() && q.IsReady();
+            var qHealth = config.Item("useQjHP").GetValue<Slider>().Value;
+            var castW = config.Item("useWj").GetValue<bool>() && w.IsReady();
+            var castE = config.Item("useEj").GetValue<bool>() && e.IsReady();
+
+            if (Player.IsDead || !Orbwalking.CanMove(40))
+            {
+                return;
+            }
+
+            var minionCount = MinionManager.GetMinions(Player.Position, q.Range, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+
+            if (minionCount.Count > 0)
+            {
+                var minion = minionCount[0];
+
+                if (castQ && Player.HealthPercent >= qHealth)
+                {
+                    q.Cast(minion);
+                }
+
+                if (castE && Player.Distance(minion) < (q.Range / 2))
+                {
+                    e.Cast();
+                }
+
+                if (castW  && !IsBurning())
                 {
                     w.Cast();
                 }
@@ -394,6 +445,11 @@ namespace Mundo
 
         private static void BurningDisabler()
         {
+            if (!config.Item("wHandler").GetValue<KeyBind>().Active)
+            {
+                return;
+            }
+
             var enemyCount = Utility.CountEnemiesInRange(config.Item("wDisableRange").GetValue<Slider>().Value);
             var minionCount = MinionManager.GetMinions(Player.Position, w.Range * 2, MinionTypes.All, MinionTeam.Neutral);
 
