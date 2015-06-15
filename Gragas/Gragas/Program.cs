@@ -135,7 +135,7 @@ namespace Gragas
             laneClear.AddItem(new MenuItem("useElc", "Use E to lane clear").SetValue(false));
             laneClear.AddItem(new MenuItem("eLaneClearMP", "Minimum mana % to use E").SetValue(new Slider(60)));
 
-            var jungleClear = config.AddSubMenu(new Menu("Jungle Settings", "Farm"));
+            var jungleClear = config.AddSubMenu(new Menu("Jungle Settings", "Jungle"));
             jungleClear.AddItem(new MenuItem("useQj", "Use Q").SetValue(true));
             jungleClear.AddItem(new MenuItem("qJungleMP", "Minimum mana % to use Q").SetValue(new Slider(15)));
             jungleClear.AddItem(new MenuItem("useWj", "Use W").SetValue(true));
