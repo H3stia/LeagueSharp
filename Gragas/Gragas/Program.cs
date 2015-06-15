@@ -265,6 +265,8 @@ namespace Gragas
 
             target = TargetSelector.GetTarget(1500, TargetSelector.DamageType.Magical);
 
+            CastSecondQ();
+
             if (config.Item("insec").GetValue<KeyBind>().Active)
             {
                 Insec(target);
@@ -309,9 +311,9 @@ namespace Gragas
                 w.Cast();
             }
 
-            if (useQ && target.IsValidTarget(q.Range))
+            if (useQ && target.IsValidTarget(q.Range) && barrel == null)
             {
-                CastQ(target);
+                q.Cast(target);
             }
 
             if (useE && target.IsValidTarget(e.Range))
@@ -327,9 +329,9 @@ namespace Gragas
         {
             var useQ = config.Item("useQh").GetValue<bool>();
 
-            if (useQ && target.IsValidTarget(q.Range))
+            if (useQ && target.IsValidTarget(q.Range) && barrel == null)
             {
-                CastQ(target);
+                q.Cast(target);
             }
         }
 
@@ -411,26 +413,21 @@ namespace Gragas
         }
 
         /// <summary>
-        ///     Cast Q.
+        ///     Cast the second Q.
         /// </summary>
-        /// <param name="qTarget">
-        ///     The target
-        /// </param>
-        private static void CastQ(Obj_AI_Base qTarget)
+        private static void CastSecondQ()
         {
             if (!q.IsReady())
             {
                 return;
             }
 
-            if (barrel == null)
+            if (barrel != null)
             {
-                q.Cast(qTarget);
-            }
-
-            if (barrel != null && qTarget.Distance(barrel.Position) >= 200)
-            {
-                q.Cast();
+                foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Distance(barrel.Position) >= 180 && enemy.Distance(barrel.Position) <= 300))
+                {
+                    q.Cast(enemy);
+                }
             }
         }
 
