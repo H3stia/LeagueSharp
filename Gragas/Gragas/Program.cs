@@ -424,7 +424,7 @@ namespace Gragas
 
             if (barrel != null)
             {
-                foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Distance(barrel.Position) >= 180 && enemy.Distance(barrel.Position) <= 300))
+                foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Distance(barrel.Position) >= 250 && enemy.Distance(barrel.Position) <= 350))
                 {
                     q.Cast(enemy);
                 }
