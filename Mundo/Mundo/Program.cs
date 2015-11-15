@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using Color = System.Drawing.Color;
 using LeagueSharp;
@@ -50,7 +49,7 @@ namespace Mundo
             var orbwalkerMenu = config.AddSubMenu(new Menu("Orbwalker", "Orbwalker"));
             orbwalker = new Orbwalking.Orbwalker(orbwalkerMenu);
 
-            var ts = config.AddSubMenu(new Menu("Target Selector", "Target Selector")); ;
+            var ts = config.AddSubMenu(new Menu("Target Selector", "Target Selector"));
             TargetSelector.AddToMenu(ts);
             
             var combo = config.AddSubMenu(new Menu("Combo Settings", "Combo"));
@@ -64,7 +63,7 @@ namespace Mundo
                         {
                             HitChance.Low.ToString(), HitChance.Medium.ToString(), HitChance.High.ToString(),
                             HitChance.VeryHigh.ToString()
-                        }, 2)));
+                        }, 3)));
             var comboW = combo.AddSubMenu(new Menu("W Settings", "W"));
             comboW.AddItem(new MenuItem("useW", "Use W").SetValue(true));
             comboW.AddItem(new MenuItem("WHealthCombo", "Minimum HP% to use W").SetValue(new Slider(50, 1)));
@@ -82,7 +81,7 @@ namespace Mundo
                         {
                             HitChance.Low.ToString(), HitChance.Medium.ToString(), HitChance.High.ToString(),
                             HitChance.VeryHigh.ToString()
-                        }, 2)));
+                        }, 3)));
             var harassW = harass.AddSubMenu(new Menu("W Settings", "W"));
             harassW.AddItem(new MenuItem("useWHarass", "Use W").SetValue(true));
             harassW.AddItem(new MenuItem("WHealthHarass", "Minimum HP% to use W").SetValue(new Slider(50, 1)));
@@ -106,7 +105,7 @@ namespace Mundo
                         {
                             HitChance.Low.ToString(), HitChance.Medium.ToString(), HitChance.High.ToString(),
                             HitChance.VeryHigh.ToString()
-                        }, 2)));
+                        }, 3)));
             miscQ.AddItem(new MenuItem("autoQhp", "Minimum HP% to auto Q").SetValue(new Slider(50, 1)));
             var miscW = misc.AddSubMenu(new Menu("W Settings", "W"));
             miscW.AddItem(new MenuItem("wHandler", "Use automatic W handler").SetValue(
@@ -171,7 +170,7 @@ namespace Mundo
                 case "Very High":
                     return HitChance.VeryHigh;
             }
-            return HitChance.High;
+            return HitChance.VeryHigh;
         }
 
         private static void OrbwalkingOnAttack(AttackableUnit unit, AttackableUnit target)
