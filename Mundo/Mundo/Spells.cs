@@ -14,12 +14,12 @@ namespace Mundo
         {
             try
             {
-                q = new Spell(SpellSlot.Q, 1050);
+                q = new Spell(SpellSlot.Q, 1000);
                 w = new Spell(SpellSlot.W, 325);
-                e = new Spell(SpellSlot.E, Orbwalking.GetRealAutoAttackRange(CommonUtilities.Player));
+                e = new Spell(SpellSlot.E, 150);
                 r = new Spell(SpellSlot.R);
 
-                q.SetSkillshot(0.25f, 60, 2000, true, SkillshotType.SkillshotLine);
+                q.SetSkillshot(0.25f, 60, 1850, true, SkillshotType.SkillshotLine);
 
                 ignite = CommonUtilities.Player.Spellbook.GetSpell(CommonUtilities.Player.GetSpellSlot("summonerdot"));
             }

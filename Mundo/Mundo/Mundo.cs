@@ -101,6 +101,9 @@ namespace Mundo
                     LaneClear();
                     JungleClear();
                     break;
+                case Orbwalking.OrbwalkingMode.None:
+                    BurningManager();
+                    break;
             }
 
             AutoR();
@@ -115,8 +118,6 @@ namespace Mundo
             if (target == null || !target.IsValid)
                 return;
 
-            var enemyCount = Utility.CountEnemiesInRange(q.Range);
-
             var castQ = ConfigMenu.config.Item("useQ").GetValue<bool>() && q.IsReady();
             var castW = ConfigMenu.config.Item("useW").GetValue<bool>() && w.IsReady();
 
@@ -128,11 +129,11 @@ namespace Mundo
                 q.SPredictionCast(target, HitChance.High);
             }
 
-            if (castW && CommonUtilities.Player.HealthPercent >= wHealth && !IsBurning() && target.IsValidTarget(w.Range * 2))
+            if (castW && CommonUtilities.Player.HealthPercent >= wHealth && !IsBurning() && target.IsValidTarget(500))
             {
                 w.Cast();
             }
-            else if (castW && IsBurning() && enemyCount == 0)
+            else if (castW && IsBurning() && !FoundEnemies(500))
             {
                 w.Cast();
             }
@@ -172,20 +173,14 @@ namespace Mundo
                 {
                     if (ConfigMenu.config.Item("qRange").GetValue<bool>())
                     {
-                        if (
-                        HealthPrediction.GetHealthPrediction(
-                            minion, (int)(q.Delay + (minion.Distance(CommonUtilities.Player.Position) / q.Speed))) <
-                        CommonUtilities.Player.GetSpellDamage(minion, SpellSlot.Q) && CommonUtilities.Player.Distance(minion) > CommonUtilities.Player.AttackRange * 2)
+                        if (HealthPrediction.GetHealthPrediction(minion, (int) (q.Delay + (minion.Distance(CommonUtilities.Player.Position)/q.Speed))) < CommonUtilities.Player.GetSpellDamage(minion, SpellSlot.Q) && CommonUtilities.Player.Distance(minion) > CommonUtilities.Player.AttackRange*2)
                         {
                             q.Cast(minion);
                         }
                     }
                     else
                     {
-                        if (
-                        HealthPrediction.GetHealthPrediction(
-                            minion, (int)(q.Delay + (minion.Distance(CommonUtilities.Player.Position) / q.Speed))) <
-                        CommonUtilities.Player.GetSpellDamage(minion, SpellSlot.Q))
+                        if (HealthPrediction.GetHealthPrediction(minion, (int) (q.Delay + (minion.Distance(CommonUtilities.Player.Position)/q.Speed))) < CommonUtilities.Player.GetSpellDamage(minion, SpellSlot.Q))
                         {
                             q.Cast(minion);
                         }
@@ -213,10 +208,7 @@ namespace Mundo
                 {
                     foreach (var minion in minions)
                     {
-                        if (
-                            HealthPrediction.GetHealthPrediction(
-                                minion, (int)(q.Delay + (minion.Distance(CommonUtilities.Player.Position) / q.Speed))) <
-                            CommonUtilities.Player.GetSpellDamage(minion, SpellSlot.Q))
+                        if (HealthPrediction.GetHealthPrediction(minion, (int) (q.Delay + (minion.Distance(CommonUtilities.Player.Position)/q.Speed))) < CommonUtilities.Player.GetSpellDamage(minion, SpellSlot.Q))
                         {
                             q.Cast(minion);
                         }
@@ -227,7 +219,7 @@ namespace Mundo
                 {
                     w.Cast();
                 }
-                else if (castW && IsBurning() && minions.Count == 0)
+                else if (castW && IsBurning() && minions.Count < 1)
                 {
                     w.Cast();
                 }
@@ -260,7 +252,7 @@ namespace Mundo
                 {
                     w.Cast();
                 }
-                else if (castW && IsBurning() && minionCount.Count == 0)
+                else if (castW && IsBurning() && minionCount.Count < 1)
                 {
                     w.Cast();
                 }
@@ -274,7 +266,6 @@ namespace Mundo
 
             if (ConfigMenu.config.Item("useQks").GetValue<bool>() && q.IsReady())
             {
-
                 foreach (var target in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(q.Range) && !enemy.HasBuffOfType(BuffType.Invulnerability)).Where(target => target.Health < CommonUtilities.Player.GetSpellDamage(target, SpellSlot.Q)))
                 {
                     q.SPredictionCast(target, HitChance.High);
@@ -283,17 +274,11 @@ namespace Mundo
 
             if (ConfigMenu.config.Item("useIks").GetValue<bool>() && ignite.Slot.IsReady() && ignite != null && ignite.Slot != SpellSlot.Unknown)
             {
-
                 foreach (var target in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(ignite.SData.CastRange) && !enemy.HasBuffOfType(BuffType.Invulnerability)).Where(target => target.Health < CommonUtilities.Player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite)))
                 {
                     CommonUtilities.Player.Spellbook.CastSpell(ignite.Slot, target);
                 }
             }
-        }
-
-        private static bool IsBurning()
-        {
-            return CommonUtilities.Player.HasBuff("BurningAgony");
         }
 
         private static void AutoQ()
@@ -323,11 +308,9 @@ namespace Mundo
             var rHealth = ConfigMenu.config.Item("RHealth").GetValue<Slider>().Value;
             var rEnemies = ConfigMenu.config.Item("RHealthEnemies").GetValue<bool>();
 
-            var enemyCount = Utility.CountEnemiesInRange(q.Range * 2);
-
             if (rEnemies && castR && CommonUtilities.Player.HealthPercent <= rHealth && !CommonUtilities.Player.InFountain())
             {
-                if (enemyCount > 0)
+                if (FoundEnemies(q.Range))
                 {
                     r.Cast();
                 }
@@ -335,6 +318,24 @@ namespace Mundo
             else if (!rEnemies && castR && CommonUtilities.Player.HealthPercent <= rHealth && !CommonUtilities.Player.InFountain())
             {
                 r.Cast();
+            }
+        }
+
+        private static bool IsBurning()
+        {
+            return CommonUtilities.Player.HasBuff("BurningAgony");
+        }
+
+        private static bool FoundEnemies(float range)
+        {
+            return HeroManager.Enemies.Any(enemy => enemy.IsValidTarget(range));
+        }
+
+        private static void BurningManager()
+        {
+            if (IsBurning() && w.IsReady())
+            {
+                w.Cast();
             }
         }
     }
