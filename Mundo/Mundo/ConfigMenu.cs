@@ -68,10 +68,13 @@ namespace Mundo
                 lasthit.AddItem(new MenuItem("qRange", "Only use Q if far from minions").SetValue(true));
 
                 var clear = config.AddSubMenu(new Menu("Clear Settings", "Clear"));
+                clear.AddItem(new MenuItem("spacerLC", "-- Lane Clear --"));
                 clear.AddItem(new MenuItem("useQlc", "Use Q to last hit in laneclear").SetValue(true));
                 clear.AddItem(new MenuItem("useQlcHP", "Minimum HP% to use Q to laneclear").SetValue(new Slider(40, 1)));
                 clear.AddItem(new MenuItem("useWlc", "Use W in laneclear").SetValue(true));
                 clear.AddItem(new MenuItem("useWlcHP", "Minimum HP% to use W to laneclear").SetValue(new Slider(40, 1)));
+                clear.AddItem(new MenuItem("useWlcMinions", "Minimum minions to W in laneclear").SetValue(new Slider(3, 1, 10)));
+                clear.AddItem(new MenuItem("spacerJC", "-- Jungle Clear --"));
                 clear.AddItem(new MenuItem("useQj", "Use Q to jungle").SetValue(true));
                 clear.AddItem(new MenuItem("useQjHP", "Minimum HP% to use Q in jungle").SetValue(new Slider(20, 1)));
                 clear.AddItem(new MenuItem("useWj", "Use W to jungle").SetValue(true));

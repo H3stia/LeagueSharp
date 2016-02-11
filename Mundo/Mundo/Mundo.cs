@@ -129,11 +129,11 @@ namespace Mundo
                 q.SPredictionCast(target, HitChance.High);
             }
 
-            if (castW && CommonUtilities.Player.HealthPercent >= wHealth && !IsBurning() && target.IsValidTarget(500))
+            if (castW && CommonUtilities.Player.HealthPercent >= wHealth && !IsBurning() && target.IsValidTarget(400))
             {
                 w.Cast();
             }
-            else if (castW && IsBurning() && !FoundEnemies(500))
+            else if (castW && IsBurning() && !FoundEnemies(450))
             {
                 w.Cast();
             }
@@ -196,11 +196,13 @@ namespace Mundo
 
             var qHealth = ConfigMenu.config.Item("useQlcHP").GetValue<Slider>().Value;
             var wHealth = ConfigMenu.config.Item("useWlcHP").GetValue<Slider>().Value;
+            var wMinions = ConfigMenu.config.Item("useWlcMinions").GetValue<Slider>().Value;
 
             if (!Orbwalking.CanMove(40))
                 return;
 
             var minions = MinionManager.GetMinions(CommonUtilities.Player.ServerPosition, q.Range);
+            var minionsW = MinionManager.GetMinions(CommonUtilities.Player.ServerPosition, 400);
 
             if (minions.Count > 0)
             {
@@ -214,12 +216,15 @@ namespace Mundo
                         }
                     }
                 }
+            }
 
+            if (minionsW.Count >= wMinions)
+            {
                 if (castW && CommonUtilities.Player.HealthPercent >= wHealth && !IsBurning())
                 {
                     w.Cast();
                 }
-                else if (castW && IsBurning() && minions.Count < 1)
+                else if (castW && IsBurning() && minions.Count < wMinions)
                 {
                     w.Cast();
                 }
@@ -237,26 +242,31 @@ namespace Mundo
             if (!Orbwalking.CanMove(40))
                 return;
 
-            var minionCount = MinionManager.GetMinions(CommonUtilities.Player.ServerPosition, q.Range, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+            var minions = MinionManager.GetMinions(CommonUtilities.Player.ServerPosition, q.Range, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+            var minionsW = MinionManager.GetMinions(CommonUtilities.Player.ServerPosition, 400, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
 
-            if (minionCount.Count > 0)
+            if (minions.Count > 0)
             {
-                var minion = minionCount[0];
+                var minion = minions[0];
 
                 if (castQ && CommonUtilities.Player.HealthPercent >= qHealth)
                 {
                     q.Cast(minion);
                 }
+            }
 
+            if (minionsW.Count > 0)
+            {
                 if (castW && CommonUtilities.Player.HealthPercent >= wHealth && !IsBurning())
                 {
                     w.Cast();
                 }
-                else if (castW && IsBurning() && minionCount.Count < 1)
+                else if (castW && IsBurning() && minionsW.Count < 1)
                 {
                     w.Cast();
                 }
             }
+            
         }
 
         private static void KillSteal()
