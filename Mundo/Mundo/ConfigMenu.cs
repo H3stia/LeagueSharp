@@ -58,6 +58,8 @@ namespace Mundo
                                 HitChance.Low.ToString(), HitChance.Medium.ToString(), HitChance.High.ToString(),
                                 HitChance.VeryHigh.ToString()
                             }, 3)));
+                var miscW = misc.AddSubMenu(new Menu("W Settings", "W"));
+                miscW.AddItem(new MenuItem("handleW", "Automatically handle W").SetValue(true));
                 var miscR = misc.AddSubMenu(new Menu("R Settings", "R"));
                 miscR.AddItem(new MenuItem("useR", "Use R").SetValue(true));
                 miscR.AddItem(new MenuItem("RHealth", "Minimum HP% to use R").SetValue(new Slider(20, 1)));

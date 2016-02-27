@@ -340,6 +340,9 @@ namespace Mundo
 
         private static void BurningManager()
         {
+            if (!ConfigMenu.config.Item("handleW").GetValue<bool>())
+                return;
+            
             if (IsBurning() && w.IsReady())
             {
                 w.Cast();
