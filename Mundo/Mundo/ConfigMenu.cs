@@ -50,6 +50,14 @@ namespace Mundo
                     new MenuItem("autoQ", "Auto Q on enemies").SetValue(
                         new KeyBind("J".ToCharArray()[0], KeyBindType.Toggle)));
                 miscQ.AddItem(new MenuItem("autoQhp", "Minimum HP% to auto Q").SetValue(new Slider(50, 1)));
+                miscQ.AddItem(
+                    new MenuItem("hitchanceQ", "Global Q Hitchance").SetValue(
+                        new StringList(
+                            new[]
+                            {
+                                HitChance.Low.ToString(), HitChance.Medium.ToString(), HitChance.High.ToString(),
+                                HitChance.VeryHigh.ToString()
+                            }, 3)));
                 var miscR = misc.AddSubMenu(new Menu("R Settings", "R"));
                 miscR.AddItem(new MenuItem("useR", "Use R").SetValue(true));
                 miscR.AddItem(new MenuItem("RHealth", "Minimum HP% to use R").SetValue(new Slider(20, 1)));

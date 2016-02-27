@@ -19,7 +19,7 @@ namespace Mundo
                 e = new Spell(SpellSlot.E, 150);
                 r = new Spell(SpellSlot.R);
 
-                q.SetSkillshot(0.25f, 60, 1850, true, SkillshotType.SkillshotLine);
+                q.SetSkillshot(0.275f, 60, 2000, true, SkillshotType.SkillshotLine);
 
                 ignite = CommonUtilities.Player.Spellbook.GetSpell(CommonUtilities.Player.GetSpellSlot("summonerdot"));
             }

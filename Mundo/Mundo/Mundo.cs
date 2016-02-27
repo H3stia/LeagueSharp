@@ -2,7 +2,6 @@
 using System.Linq;
 using LeagueSharp;
 using LeagueSharp.Common;
-using SPrediction;
 
 namespace Mundo
 {
@@ -25,8 +24,6 @@ namespace Mundo
             Game.OnUpdate += OnUpdate;
             Orbwalking.AfterAttack += AfterAttack;
             Drawing.OnDraw += Drawings.OnDraw;
-
-            SPrediction.Prediction.Initialize(ConfigMenu.config);
 
             Notifications.AddNotification("Dr.Mundo by Hestia loaded!", 5000);
         }
@@ -126,7 +123,7 @@ namespace Mundo
 
             if (castQ && CommonUtilities.Player.HealthPercent >= qHealth && target.IsValidTarget(q.Range))
             {
-                q.SPredictionCast(target, HitChance.High);
+                q.CastIfHitchanceEquals(target, CommonUtilities.GetHitChance("hitchanceQ"));
             }
 
             if (castW && CommonUtilities.Player.HealthPercent >= wHealth && !IsBurning() && target.IsValidTarget(400))
@@ -152,7 +149,7 @@ namespace Mundo
 
             if (castQ && CommonUtilities.Player.HealthPercent >= qHealth && target.IsValidTarget(q.Range))
             {
-                q.SPredictionCast(target, HitChance.High);
+                q.CastIfHitchanceEquals(target, CommonUtilities.GetHitChance("hitchanceQ"));
             }
         }
 
@@ -278,7 +275,7 @@ namespace Mundo
             {
                 foreach (var target in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(q.Range) && !enemy.HasBuffOfType(BuffType.Invulnerability)).Where(target => target.Health < CommonUtilities.Player.GetSpellDamage(target, SpellSlot.Q)))
                 {
-                    q.SPredictionCast(target, HitChance.High);
+                    q.CastIfHitchanceEquals(target, CommonUtilities.GetHitChance("hitchanceQ"));
                 }
             }
 
@@ -304,7 +301,7 @@ namespace Mundo
 
             if (autoQ && CommonUtilities.Player.HealthPercent >= qHealth && target.IsValidTarget(q.Range))
             {
-                q.SPredictionCast(target, HitChance.High);
+                q.CastIfHitchanceEquals(target, CommonUtilities.GetHitChance("hitchanceQ"));
             }
         }
 
