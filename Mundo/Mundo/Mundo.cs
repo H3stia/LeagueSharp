@@ -290,9 +290,6 @@ namespace Mundo
 
         private static void AutoQ()
         {
-            if (CommonUtilities.Player.IsDead)
-                return;
-
             var autoQ = ConfigMenu.config.Item("autoQ").GetValue<KeyBind>().Active && q.IsReady();
 
             var qHealth = ConfigMenu.config.Item("autoQhp").GetValue<Slider>().Value;
@@ -307,9 +304,6 @@ namespace Mundo
 
         private static void AutoR()
         {
-            if (CommonUtilities.Player.IsDead)
-                return;
-
             var castR = ConfigMenu.config.Item("useR").GetValue<bool>() && r.IsReady();
 
             var rHealth = ConfigMenu.config.Item("RHealth").GetValue<Slider>().Value;
