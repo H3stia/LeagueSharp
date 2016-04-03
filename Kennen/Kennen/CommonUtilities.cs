@@ -29,15 +29,15 @@ namespace Kennen
             return HitChance.VeryHigh;
         }
 
-        public static bool CheckItem()
+        public static bool CheckZhonya()
         {
             return ItemData.Wooglets_Witchcap.GetItem().IsReady() ||
                    ItemData.Zhonyas_Hourglass.GetItem().IsReady();
         }
 
-        public static void UseItem()
+        public static void UseZhonya()
         {
-            if (!CheckItem())
+            if (!CheckZhonya())
                 return;
 
             if (ItemData.Wooglets_Witchcap.GetItem().IsOwned(Player))

@@ -72,6 +72,9 @@ namespace Kennen
             var modeW = ConfigMenu.config.Item("useWmodeCombo").GetValue<StringList>();
             var castR = ConfigMenu.config.Item("useR").GetValue<bool>() && r.IsReady();
 
+            var useZhonya = ConfigMenu.config.Item("useZhonya").GetValue<bool>() && CommonUtilities.CheckZhonya();
+            var zhonyaHp = ConfigMenu.config.Item("useZhonyaHp").GetValue<Slider>().Value;
+
 
             if (castQ && target.IsValidTarget(q.Range))
             {
@@ -103,6 +106,12 @@ namespace Kennen
                 if (target.Health < CommonUtilities.GetComboDamage(target))
                 {
                     r.Cast();
+
+                    if (HasR() && useZhonya && CommonUtilities.Player.HealthPercent < zhonyaHp &&
+                        CommonUtilities.Player.CountEnemiesInRange(r.Range) > 0)
+                    {
+                        CommonUtilities.UseZhonya();
+                    }
                 }
             }
         }
@@ -291,6 +300,11 @@ namespace Kennen
         private static bool HasMark(Obj_AI_Base target)
         {
             return target.HasBuff("KennenMarkOfStorm");
+        }
+
+        private static bool HasR()
+        {
+            return CommonUtilities.Player.HasBuff("KennenShurikenStorm");
         }
 
         private static bool CanStun(Obj_AI_Base target)

@@ -58,6 +58,8 @@ namespace Kennen
                 var miscR = misc.AddSubMenu(new Menu("R Settings", "R"));
                 miscR.AddItem(new MenuItem("useRmul", "Use R for multiple targets").SetValue(true));
                 miscR.AddItem(new MenuItem("useRmulti", "Use R on min X targets").SetValue(new Slider(2, 1, 5)));
+                miscR.AddItem(new MenuItem("useZhonya", "Use Zhonya/wooglet with R").SetValue(false));
+                miscR.AddItem(new MenuItem("useZhonyaHp", "Use Zhonya/wooglet if HP <").SetValue(new Slider(60, 1)));
 
                 var lastHitMenu = config.AddSubMenu(new Menu("LastHit", "LastHit"));
                 lastHitMenu.AddItem(new MenuItem("useQlh", "Use Q to Last Hit minions").SetValue(true));
