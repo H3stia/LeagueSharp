@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Mundo")]
 [assembly: AssemblyDescription("Plays Mundo")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Hestia Assemblies")]
+[assembly: AssemblyCompany("Hestia")]
 [assembly: AssemblyProduct("Mundo")]
 [assembly: AssemblyCopyright("Copyright ©  2015")]
 [assembly: AssemblyTrademark("")]
@@ -31,5 +31,5 @@ using System.Runtime.InteropServices;
 // È possibile specificare tutti i valori oppure impostare valori predefiniti per i numeri relativi alla revisione e alla build 
 // utilizzando l'asterisco (*) come descritto di seguito:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("6.6.0.0")]
-[assembly: AssemblyFileVersion("6.6.0.0")]
+[assembly: AssemblyVersion("6.6.0.1")]
+[assembly: AssemblyFileVersion("6.6.0.1")]

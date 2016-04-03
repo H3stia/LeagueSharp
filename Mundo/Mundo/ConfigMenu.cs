@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using Color = System.Drawing.Color;
 using LeagueSharp.Common;
 
@@ -24,6 +25,7 @@ namespace Mundo
                 TargetSelector.AddToMenu(tsMenu);
 
                 var combo = config.AddSubMenu(new Menu("Combo Settings", "Combo"));
+
                 var comboQ = combo.AddSubMenu(new Menu("Q Settings", "Q"));
                 comboQ.AddItem(new MenuItem("useQ", "Use Q").SetValue(true));
                 comboQ.AddItem(new MenuItem("QHealthCombo", "Minimum HP% to use Q").SetValue(new Slider(20, 1)));
@@ -31,10 +33,12 @@ namespace Mundo
                 var comboW = combo.AddSubMenu(new Menu("W Settings", "W"));
                 comboW.AddItem(new MenuItem("useW", "Use W").SetValue(true));
                 comboW.AddItem(new MenuItem("WHealthCombo", "Minimum HP% to use W").SetValue(new Slider(20, 1)));
+
                 var comboE = combo.AddSubMenu(new Menu("E Settings", "E"));
                 comboE.AddItem(new MenuItem("useE", "Use E").SetValue(true));
 
                 var harass = config.AddSubMenu(new Menu("Harass Settings", "Harass"));
+
                 var harassQ = harass.AddSubMenu(new Menu("Q Settings", "Q"));
                 harassQ.AddItem(new MenuItem("useQHarass", "Use Q").SetValue(true));
                 harassQ.AddItem(new MenuItem("useQHarassHP", "Minimum HP% to use Q").SetValue(new Slider(60, 1)));
@@ -45,6 +49,7 @@ namespace Mundo
                 killsteal.AddItem(new MenuItem("useIks", "Use Ignite to KillSteal").SetValue(true));
 
                 var misc = config.AddSubMenu(new Menu("Misc Settings", "Misc"));
+
                 var miscQ = misc.AddSubMenu(new Menu("Q Settings", "Q"));
                 miscQ.AddItem(
                     new MenuItem("autoQ", "Auto Q on enemies").SetValue(
@@ -60,10 +65,12 @@ namespace Mundo
                             }, 3)));
                 var miscW = misc.AddSubMenu(new Menu("W Settings", "W"));
                 miscW.AddItem(new MenuItem("handleW", "Automatically handle W").SetValue(true));
+
                 var miscR = misc.AddSubMenu(new Menu("R Settings", "R"));
                 miscR.AddItem(new MenuItem("useR", "Use R").SetValue(true));
                 miscR.AddItem(new MenuItem("RHealth", "Minimum HP% to use R").SetValue(new Slider(20, 1)));
                 miscR.AddItem(new MenuItem("RHealthEnemies", "If enemies nearby").SetValue(true));
+
                 var miscItems = misc.AddSubMenu(new Menu("Items settings", "Items"));
                 miscItems.AddItem(new MenuItem("titanicC", "Use titanic Hydra in combo").SetValue(true));
                 miscItems.AddItem(new MenuItem("tiamatC", "Use Tiamat in combo").SetValue(true));
@@ -99,7 +106,7 @@ namespace Mundo
                 drawingMenu.AddItem(new MenuItem("drawAutoQ", "Draw AutoQ status").SetValue(false));
 
                 config.AddItem(new MenuItem("spacer", ""));
-                config.AddItem(new MenuItem("version", "Version: 6.2.0.0"));
+                config.AddItem(new MenuItem("version", "Version: " + Assembly.GetEntryAssembly().GetName().Version));
                 config.AddItem(new MenuItem("author", "Author: Hestia"));
 
                 config.AddToMainMenu();
