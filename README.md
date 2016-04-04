@@ -10,7 +10,7 @@ Dr. Mundo
 - KillSteal
 - Q last hit
 
-Kennen [OUTDATED]
+Kennen
 -----------
 - Q usage, selectable HitChance
 - W usage (always/only if stunnable), selectable HitChance
@@ -18,6 +18,16 @@ Kennen [OUTDATED]
 - Auto R on X enemies in range
 - KillSteal
 - Q last hit
+
+Nautilus
+-----------
+- Q usage, selectable HitChance
+- W usage
+- E usage
+- R usage in combo (can black list targets)
+- KillSteal
+- Lane/junlgle clear
+- More to come!
 
 Gangplank [OUTDATED]
 -----------
