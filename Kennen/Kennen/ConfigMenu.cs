@@ -19,10 +19,6 @@ namespace Kennen
                 var orbwalkerMenu = config.AddSubMenu(new Menu("Orbwalker", "Orbwalker"));
                 orbwalker = new Orbwalking.Orbwalker(orbwalkerMenu);
 
-                //Adds the TS to the main menu
-                var tsMenu = config.AddSubMenu(new Menu("Target Selector", "TargetSelector"));
-                TargetSelector.AddToMenu(tsMenu);
-
                 var combo = config.AddSubMenu(new Menu("Combo Settings", "Combo"));
                 var comboQ = combo.AddSubMenu(new Menu("Q Settings", "Q"));
                 comboQ.AddItem(new MenuItem("useQ", "Use Q").SetValue(true));
@@ -57,9 +53,9 @@ namespace Kennen
                             }, 3)));
                 var miscR = misc.AddSubMenu(new Menu("R Settings", "R"));
                 miscR.AddItem(new MenuItem("useRmul", "Use R for multiple targets").SetValue(true));
-                miscR.AddItem(new MenuItem("useRmulti", "Use R on min X targets").SetValue(new Slider(2, 1, 5)));
+                miscR.AddItem(new MenuItem("useRmulti", "Use R on min X targets").SetValue(new Slider(3, 1, 5)));
                 miscR.AddItem(new MenuItem("useZhonya", "Use Zhonya/wooglet with R").SetValue(false));
-                miscR.AddItem(new MenuItem("useZhonyaHp", "Use Zhonya/wooglet if HP <").SetValue(new Slider(60, 1)));
+                miscR.AddItem(new MenuItem("useZhonyaHp", "Use Zhonya/wooglet if HP <").SetValue(new Slider(20, 1)));
 
                 var lastHitMenu = config.AddSubMenu(new Menu("LastHit", "LastHit"));
                 lastHitMenu.AddItem(new MenuItem("useQlh", "Use Q to Last Hit minions").SetValue(true));
