@@ -22,10 +22,6 @@ namespace Nautilus
                 var orbwalkerMenu = config.AddSubMenu(new Menu("Orbwalker", "Orbwalker"));
                 orbwalker = new Orbwalking.Orbwalker(orbwalkerMenu);
 
-                //Adds the TS to the main menu
-                var tsMenu = config.AddSubMenu(new Menu("Target Selector", "TargetSelector"));
-                TargetSelector.AddToMenu(tsMenu);
-
                 var combo = config.AddSubMenu(new Menu("Combo Settings", "Combo"));
 
                 var comboQ = combo.AddSubMenu(new Menu("Q Settings", "Q"));
@@ -33,7 +29,7 @@ namespace Nautilus
                 
                 var comboW = combo.AddSubMenu(new Menu("W Settings", "W"));
                 comboW.AddItem(new MenuItem("useW", "Use W").SetValue(true));
-                //comboW.AddItem(new MenuItem("WHealthCombo", "Minimum HP% to use W").SetValue(new Slider(85, 1)));
+                comboW.AddItem(new MenuItem("WHealthCombo", "Use W only if HP% < (0 disabled)").SetValue(new Slider(85)));
 
                 var comboE = combo.AddSubMenu(new Menu("E Settings", "E"));
                 comboE.AddItem(new MenuItem("useE", "Use E").SetValue(true));
@@ -68,7 +64,7 @@ namespace Nautilus
 
                 var jungle = config.AddSubMenu(new Menu("Jungle Settings", "Jungle"));
                 jungle.AddItem(new MenuItem("useEj", "Use E to jungle clear").SetValue(true));
-                jungle.AddItem(new MenuItem("useEjMana", "Minimum mana to use E").SetValue(new Slider(20, 1)));
+                jungle.AddItem(new MenuItem("useEjMana", "Minimum mana to use E").SetValue(new Slider(50, 1)));
                 jungle.AddItem(new MenuItem("useWj", "Use W to jungle clear").SetValue(true));
                 jungle.AddItem(new MenuItem("useWjMana", "Minimum mana to use W").SetValue(new Slider(20, 1)));
 

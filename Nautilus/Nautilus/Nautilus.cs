@@ -92,17 +92,25 @@ namespace Nautilus
             var castE = ConfigMenu.config.Item("useE").GetValue<bool>() && e.IsReady();
             var castR = ConfigMenu.config.Item("useR").GetValue<bool>() && r.IsReady();
 
-            //var wHealth = ConfigMenu.config.Item("WHealthCombo").GetValue<Slider>().Value;
+            var wHealth = ConfigMenu.config.Item("WHealthCombo").GetValue<Slider>().Value;
 
             if (castQ && target.IsValidTarget(q.Range))
             {
                 q.CastIfHitchanceEquals(target, CommonUtilities.GetHitChance("qHitchance"));
             }
 
-            if (castW && target.IsValidTarget(e.Range))
+            if (wHealth == 0 && castW && target.IsValidTarget(e.Range))
             {
                 w.Cast();
             }
+            else
+            {
+                if (CommonUtilities.Player.HealthPercent <= wHealth && castW && target.IsValidTarget(e.Range))
+                {
+                    w.Cast();
+                }
+            }
+
 
             if (castE && target.IsValidTarget(e.Range))
             {
