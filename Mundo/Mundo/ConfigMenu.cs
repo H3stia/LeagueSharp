@@ -20,19 +20,15 @@ namespace Mundo
                 var orbwalkerMenu = config.AddSubMenu(new Menu("Orbwalker", "Orbwalker"));
                 orbwalker = new Orbwalking.Orbwalker(orbwalkerMenu);
 
-                //Adds the TS to the main menu
-                var tsMenu = config.AddSubMenu(new Menu("Target Selector", "TargetSelector"));
-                TargetSelector.AddToMenu(tsMenu);
-
                 var combo = config.AddSubMenu(new Menu("Combo Settings", "Combo"));
 
                 var comboQ = combo.AddSubMenu(new Menu("Q Settings", "Q"));
                 comboQ.AddItem(new MenuItem("useQ", "Use Q").SetValue(true));
-                comboQ.AddItem(new MenuItem("QHealthCombo", "Minimum HP% to use Q").SetValue(new Slider(20, 1)));
+                comboQ.AddItem(new MenuItem("QHealthCombo", "Minimum HP% to use Q").SetValue(new Slider(10, 1)));
 
                 var comboW = combo.AddSubMenu(new Menu("W Settings", "W"));
                 comboW.AddItem(new MenuItem("useW", "Use W").SetValue(true));
-                comboW.AddItem(new MenuItem("WHealthCombo", "Minimum HP% to use W").SetValue(new Slider(20, 1)));
+                comboW.AddItem(new MenuItem("WHealthCombo", "Minimum HP% to use W").SetValue(new Slider(25, 1)));
 
                 var comboE = combo.AddSubMenu(new Menu("E Settings", "E"));
                 comboE.AddItem(new MenuItem("useE", "Use E").SetValue(true));
@@ -41,7 +37,7 @@ namespace Mundo
 
                 var harassQ = harass.AddSubMenu(new Menu("Q Settings", "Q"));
                 harassQ.AddItem(new MenuItem("useQHarass", "Use Q").SetValue(true));
-                harassQ.AddItem(new MenuItem("useQHarassHP", "Minimum HP% to use Q").SetValue(new Slider(60, 1)));
+                harassQ.AddItem(new MenuItem("useQHarassHP", "Minimum HP% to use Q").SetValue(new Slider(50, 1)));
 
                 var killsteal = config.AddSubMenu(new Menu("KillSteal Settings", "KillSteal"));
                 killsteal.AddItem(new MenuItem("killsteal", "Activate KillSteal").SetValue(true));
@@ -81,15 +77,15 @@ namespace Mundo
 
                 var lasthit = config.AddSubMenu(new Menu("Last Hit Settings", "LastHit"));
                 lasthit.AddItem(new MenuItem("useQlh", "Use Q to last hit minions").SetValue(true));
-                lasthit.AddItem(new MenuItem("useQlhHP", "Minimum HP% to use Q to lasthit").SetValue(new Slider(50, 1)));
+                lasthit.AddItem(new MenuItem("useQlhHP", "Minimum HP% to use Q to lasthit").SetValue(new Slider(40, 1)));
                 lasthit.AddItem(new MenuItem("qRange", "Only use Q if far from minions").SetValue(true));
 
                 var clear = config.AddSubMenu(new Menu("Clear Settings", "Clear"));
                 clear.AddItem(new MenuItem("spacerLC", "-- Lane Clear --"));
                 clear.AddItem(new MenuItem("useQlc", "Use Q to last hit in laneclear").SetValue(true));
-                clear.AddItem(new MenuItem("useQlcHP", "Minimum HP% to use Q to laneclear").SetValue(new Slider(40, 1)));
+                clear.AddItem(new MenuItem("useQlcHP", "Minimum HP% to use Q to laneclear").SetValue(new Slider(50, 1)));
                 clear.AddItem(new MenuItem("useWlc", "Use W in laneclear").SetValue(true));
-                clear.AddItem(new MenuItem("useWlcHP", "Minimum HP% to use W to laneclear").SetValue(new Slider(40, 1)));
+                clear.AddItem(new MenuItem("useWlcHP", "Minimum HP% to use W to laneclear").SetValue(new Slider(60, 1)));
                 clear.AddItem(new MenuItem("useWlcMinions", "Minimum minions to W in laneclear").SetValue(new Slider(3, 1, 10)));
                 clear.AddItem(new MenuItem("spacerJC", "-- Jungle Clear --"));
                 clear.AddItem(new MenuItem("useQj", "Use Q to jungle").SetValue(true));
