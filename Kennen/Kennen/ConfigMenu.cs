@@ -33,10 +33,12 @@ namespace Kennen
                 var harass = config.AddSubMenu(new Menu("Harass Settings", "Harass"));
                 var harassQ = harass.AddSubMenu(new Menu("Q Settings", "Q"));
                 harassQ.AddItem(new MenuItem("useQHarass", "Use Q").SetValue(true));
+                harassQ.AddItem(new MenuItem("useQHarassMana", "Min energy to use Q:").SetValue(new Slider(30, 1)));
                 var harassW = harass.AddSubMenu(new Menu("W Settings", "W"));
                 harassW.AddItem(new MenuItem("useWHarass", "Use W").SetValue(true));
                 harassW.AddItem(
                     new MenuItem("useWmodeHarass", "W Mode").SetValue(new StringList(new[] { "Always", "Only Stunnable" })));
+                harassW.AddItem(new MenuItem("useWHarassMana", "Min energy to use W:").SetValue(new Slider(30, 1)));
 
                 var misc = config.AddSubMenu(new Menu("Misc Settings", "Misc"));
                 var miscQ = misc.AddSubMenu(new Menu("Q Settings", "Q"));
@@ -60,9 +62,11 @@ namespace Kennen
                 var lastHitMenu = config.AddSubMenu(new Menu("LastHit", "LastHit"));
                 lastHitMenu.AddItem(new MenuItem("useQlh", "Use Q to Last Hit minions").SetValue(true));
                 lastHitMenu.AddItem(new MenuItem("qRange", "Only use Q if far from minions").SetValue(true));
+                lastHitMenu.AddItem(new MenuItem("useQlhMana", "Min energy to use Q:").SetValue(new Slider(30, 1)));
 
                 var laneClearMenu = config.AddSubMenu(new Menu("LaneClear", "LaneClear"));
                 laneClearMenu.AddItem(new MenuItem("useQlc", "Q to LH in lane clear").SetValue(true));
+                laneClearMenu.AddItem(new MenuItem("useQlcMana", "Min energy to use Q:").SetValue(new Slider(30, 1)));
 
                 var jungleClearMenu = config.AddSubMenu(new Menu("JungleClear", "JungleClear"));
                 jungleClearMenu.AddItem(new MenuItem("useQj", "Q in jungle clear").SetValue(true));

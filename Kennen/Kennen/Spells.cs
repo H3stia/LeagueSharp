@@ -15,7 +15,7 @@ namespace Kennen
             try
             {
                 q = new Spell(SpellSlot.Q, 1050);
-                w = new Spell(SpellSlot.W, 800);
+                w = new Spell(SpellSlot.W, 750);
                 e = new Spell(SpellSlot.E);
                 r = new Spell(SpellSlot.R, 550);
 

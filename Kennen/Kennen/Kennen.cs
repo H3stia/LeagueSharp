@@ -128,12 +128,12 @@ namespace Kennen
             var modeW = ConfigMenu.config.Item("useWmodeHarass").GetValue<StringList>();
 
 
-            if (castQ && target.IsValidTarget(q.Range))
+            if (castQ && target.IsValidTarget(q.Range) && CommonUtilities.Player.ManaPercent >= ConfigMenu.config.Item("useQHarassMana").GetValue<Slider>().Value)
             {
                 q.CastIfHitchanceEquals(target, CommonUtilities.GetHitChance("hitchanceQ"));
             }
 
-            if (castW && target.IsValidTarget(w.Range))
+            if (castW && target.IsValidTarget(w.Range) && CommonUtilities.Player.ManaPercent >= ConfigMenu.config.Item("useWHarassMana").GetValue<Slider>().Value)
             {
                 switch (modeW.SelectedIndex)
                 {
@@ -163,7 +163,7 @@ namespace Kennen
 
             var minions = MinionManager.GetMinions(CommonUtilities.Player.ServerPosition, q.Range, MinionTypes.All, MinionTeam.NotAlly);
 
-            if (minions.Count > 0 && castQ)
+            if (minions.Count > 0 && castQ && CommonUtilities.Player.ManaPercent >= ConfigMenu.config.Item("useQlhMana").GetValue<Slider>().Value)
             {
                 foreach (var minion in minions)
                 {
@@ -194,16 +194,13 @@ namespace Kennen
 
             var minions = MinionManager.GetMinions(CommonUtilities.Player.ServerPosition, q.Range);
 
-            if (minions.Count > 0)
+            if (minions.Count > 0 && castQ && CommonUtilities.Player.ManaPercent >= ConfigMenu.config.Item("useQlcMana").GetValue<Slider>().Value)
             {
-                if (castQ)
+                foreach (var minion in minions)
                 {
-                    foreach (var minion in minions)
+                    if (HealthPrediction.GetHealthPrediction(minion, (int)(q.Delay + (minion.Distance(CommonUtilities.Player.Position) / q.Speed))) < CommonUtilities.Player.GetSpellDamage(minion, SpellSlot.Q))
                     {
-                        if (HealthPrediction.GetHealthPrediction(minion, (int)(q.Delay + (minion.Distance(CommonUtilities.Player.Position) / q.Speed))) < CommonUtilities.Player.GetSpellDamage(minion, SpellSlot.Q))
-                        {
-                            q.Cast(minion);
-                        }
+                        q.Cast(minion);
                     }
                 }
             }
