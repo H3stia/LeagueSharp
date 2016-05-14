@@ -1,7 +1,7 @@
 ﻿using LeagueSharp;
-using LeagueSharp.SDK;
-using LeagueSharp.SDK.Enumerations;
-using LeagueSharp.SDK.Utils;
+using LeagueSharp.SDKEx;
+using LeagueSharp.SDKEx.Enumerations;
+using LeagueSharp.SDKEx.Utils;
 
 namespace BlitzcrankDK
 {

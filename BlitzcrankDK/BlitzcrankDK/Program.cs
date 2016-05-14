@@ -1,5 +1,5 @@
 ﻿using System;
-using LeagueSharp.SDK;
+using LeagueSharp.SDKEx;
 
 namespace BlitzcrankDK
 {

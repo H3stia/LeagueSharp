@@ -1,8 +1,8 @@
 ﻿using System;
 using Color = System.Drawing.Color;
 using LeagueSharp;
-using LeagueSharp.SDK.UI;
-using LeagueSharp.SDK.Utils;
+using LeagueSharp.SDKEx.UI;
+using LeagueSharp.SDKEx.Utils;
 
 namespace BlitzcrankDK
 {

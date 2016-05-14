@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
 using LeagueSharp;
-using LeagueSharp.SDK;
-using LeagueSharp.SDK.Enumerations;
-using LeagueSharp.SDK.UI;
-using Menu = LeagueSharp.SDK.UI.Menu;
+using LeagueSharp.SDKEx;
+using LeagueSharp.SDKEx.Enumerations;
+using LeagueSharp.SDKEx.UI;
+using SharpDX;
 
 namespace BlitzcrankDK
 {
@@ -21,6 +21,13 @@ namespace BlitzcrankDK
             Events.OnInterruptableTarget += EventsOnOnInterruptableTarget;
             Game.OnUpdate += GameOnOnUpdate;
             Drawing.OnDraw += Drawings.OnDraw;
+
+            Notifications.Add(new Notification("Hestia", "BlitzcrankDK loaded!")
+            {
+                HeaderTextColor = Color.Chartreuse,
+                BodyTextColor = Color.White,
+                Icon = NotificationIconType.Check,
+            });
         }
 
         private void EventsOnOnGapCloser(object sender, Events.GapCloserEventArgs gapCloserEventArgs)
