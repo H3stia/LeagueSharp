@@ -1,5 +1,5 @@
 ﻿using System;
-using LeagueSharp.SDKEx;
+using LeagueSharp.SDK;
 
 namespace BlitzcrankDK
 {
@@ -7,6 +7,7 @@ namespace BlitzcrankDK
     {
         private static void Main(string[] args)
         {
+            Bootstrap.Init();
             Events.OnLoad += EventsOnOnLoad;
         }
 
