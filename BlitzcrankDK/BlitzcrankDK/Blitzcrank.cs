@@ -21,6 +21,7 @@ namespace BlitzcrankDK
             Events.OnInterruptableTarget += EventsOnOnInterruptableTarget;
             Game.OnUpdate += GameOnOnUpdate;
             Drawing.OnDraw += Drawings.OnDraw;
+			Events.OnDash += EventsOnDash;
 
             Notifications.Add(new Notification("Hestia", "BlitzcrankDK loaded!")
             {
@@ -29,6 +30,11 @@ namespace BlitzcrankDK
                 Icon = NotificationIconType.Check,
             });
         }
+
+		private void EventsOnDash()
+		{
+			//TODO - Add support for Q on dashing champions.
+		}
 
         private void EventsOnOnGapCloser(object sender, Events.GapCloserEventArgs gapCloserEventArgs)
         {
@@ -75,17 +81,24 @@ namespace BlitzcrankDK
         {
             var qTarget = q.GetTarget(0, true);
 
-            if (qTarget != null && ConfigMenu.Menu["blacklist.settings"]["block" + qTarget.ChampionName].GetValue<MenuBool>())
-            {
-                return;
-            }
+			if (qTarget == null) 
+			{
+				return;
+			}
 
-            if (ConfigMenu.Menu["combo.settings"]["combo.q"].GetValue<MenuBool>())
+			if (ConfigMenu.Menu["combo.settings"]["combo.q"].GetValue<MenuBool>() && !ConfigMenu.Menu["blacklist.settings"]["block" + qTarget.ChampionName].GetValue<MenuBool>())
             {
                 var predictedPos = q.GetPrediction(qTarget);
                 if (predictedPos.Hitchance >= HitChance.High && !predictedPos.CollisionObjects.Any())
                 {
-                    q.Cast(predictedPos.UnitPosition);
+					if (ConfigMenu.Menu["combo.settings"]["combo.q.distance"].GetValue<MenuSliderButton>() && ObjectManager.Player.Distance(qTarget) >= ConfigMenu.Menu["combo.settings"]["combo.q.distance"].GetValue<MenuSliderButton>().MinValue) 
+					{
+						q.Cast(predictedPos.UnitPosition);
+					} 
+					else 
+					{
+						q.Cast(predictedPos.UnitPosition);
+					}
                 }
             }
 
@@ -93,6 +106,8 @@ namespace BlitzcrankDK
             {
                 e.Cast();
             }
+
+
         }
 
         private void AutoQ()
