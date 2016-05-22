@@ -31,9 +31,16 @@ namespace BlitzcrankDK
             });
         }
 
-		private void EventsOnDash()
+		private void EventsOnDash(object sender, Events.DashArgs onDashEventArgs)
 		{
-			//TODO - Add support for Q on dashing champions.
+		    if (ConfigMenu.Menu["misc.settings"]["misc.dash"].GetValue<MenuBool>() && onDashEventArgs.Unit.IsEnemy && onDashEventArgs.Unit.Distance(ObjectManager.Player) < q.Range)
+		    {
+                var prediction = q.GetPrediction(onDashEventArgs.Unit);
+		        if (prediction.Hitchance == HitChance.Dashing && !prediction.CollisionObjects.Any())
+		        {
+                    q.Cast(onDashEventArgs.EndPos);
+                }
+		    }
 		}
 
         private void EventsOnOnGapCloser(object sender, Events.GapCloserEventArgs gapCloserEventArgs)
@@ -102,7 +109,7 @@ namespace BlitzcrankDK
                 }
             }
 
-            if (ConfigMenu.Menu["combo.settings"]["combo.e"].GetValue<MenuBool>() && e.IsReady() && qTarget != null && qTarget.HasBuff("rocketgrab2"))
+            if (ConfigMenu.Menu["combo.settings"]["combo.e"].GetValue<MenuBool>() && e.IsReady() && qTarget.HasBuff("rocketgrab2"))
             {
                 e.Cast();
             }

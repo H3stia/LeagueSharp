@@ -13,7 +13,7 @@ namespace BlitzcrankDK
            
             var combo = Menu.Add(new Menu("combo.settings", "Combo Settings"));
             combo.Add(new MenuBool("combo.q", "Use Q", true));
-			combo.Add(new MenuSliderButton("combo.q.distance", "Minimum distance to use Q", 0, 0, 950, false); 
+			combo.Add(new MenuSliderButton("combo.q.distance", "Minimum distance to use Q", 0, 0, 950, false)); 
             //combo.Add(new MenuBool("combo.w", "Use W", true));
             combo.Add(new MenuBool("combo.e", "Use E", true));
             //combo.Add(new MenuBool("combo.r", "Use R", true));
@@ -35,6 +35,7 @@ namespace BlitzcrankDK
             var misc = Menu.Add(new Menu("misc.settings", "Misc Settings"));
             misc.Add(new MenuBool("misc.antigap", "Use R on gap-closers"));
             misc.Add(new MenuBool("misc.interrupt", "Use R on to interrupt", true));
+            misc.Add(new MenuBool("misc.dash", "Use Q on dashign enemies"));
 
             var killsteal = Menu.Add(new Menu("killsteal.settings", "Killsteal Settings"));
             killsteal.Add(new MenuBool("killsteal.q", "Use Q to killsteal", true));
