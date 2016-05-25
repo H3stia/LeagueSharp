@@ -83,6 +83,7 @@ namespace Kennen
                 drawingMenu.AddItem(new MenuItem("drawQ", "Draw Q").SetValue(new Circle(false, Color.DarkOrange, q.Range)));
                 drawingMenu.AddItem(new MenuItem("drawW", "Draw W").SetValue(new Circle(false, Color.DarkOrange, w.Range)));
                 drawingMenu.AddItem(new MenuItem("drawR", "Draw R").SetValue(new Circle(false, Color.DarkOrange, r.Range)));
+                drawingMenu.AddItem(new MenuItem("drawAutoQ", "Draw auto Q status").SetValue(new Circle(false, Color.DarkOrange, q.Range)));
                 drawingMenu.AddItem(new MenuItem("width", "Drawings width").SetValue(new Slider(2, 1, 5)));
                 drawingMenu.AddItem(new MenuItem("drawDmg", "Draw damage on Healthbar").SetValue(false));
 
