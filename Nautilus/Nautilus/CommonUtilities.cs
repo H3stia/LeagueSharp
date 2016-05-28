@@ -1,16 +1,9 @@
-﻿using LeagueSharp;
-using LeagueSharp.Common;
+﻿using LeagueSharp.Common;
 
 namespace Nautilus
 {
     internal class CommonUtilities
     {
-        public static Obj_AI_Hero Player
-        {
-            get { return ObjectManager.Player; }
-        }
-
-
         public static HitChance GetHitChance(string name)
         {
             var hitChance = ConfigMenu.config.Item(name).GetValue<StringList>();

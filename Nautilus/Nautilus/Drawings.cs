@@ -1,4 +1,5 @@
 ﻿using System;
+using LeagueSharp;
 using LeagueSharp.Common;
 
 namespace Nautilus
@@ -7,7 +8,7 @@ namespace Nautilus
     {
         public static void OnDraw(EventArgs args)
         {
-            if (CommonUtilities.Player.IsDead || ConfigMenu.config.Item("disableDraw").GetValue<bool>())
+            if (ObjectManager.Player.IsDead || ConfigMenu.config.Item("disableDraw").GetValue<bool>())
                 return;
 
             var width = ConfigMenu.config.Item("width").GetValue<Slider>().Value;
@@ -15,19 +16,19 @@ namespace Nautilus
             if (ConfigMenu.config.Item("drawQ").GetValue<Circle>().Active && q.Level > 0)
             {
                 var circle = ConfigMenu.config.Item("drawQ").GetValue<Circle>();
-                Render.Circle.DrawCircle(CommonUtilities.Player.Position, circle.Radius, circle.Color, width);
+                Render.Circle.DrawCircle(ObjectManager.Player.Position, circle.Radius, circle.Color, width);
             }
 
             if (ConfigMenu.config.Item("drawE").GetValue<Circle>().Active && e.Level > 0)
             {
                 var circle = ConfigMenu.config.Item("drawE").GetValue<Circle>();
-                Render.Circle.DrawCircle(CommonUtilities.Player.Position, circle.Radius, circle.Color, width);
+                Render.Circle.DrawCircle(ObjectManager.Player.Position, circle.Radius, circle.Color, width);
             }
 
             if (ConfigMenu.config.Item("drawR").GetValue<Circle>().Active && r.Level > 0)
             {
                 var circle = ConfigMenu.config.Item("drawR").GetValue<Circle>();
-                Render.Circle.DrawCircle(CommonUtilities.Player.Position, circle.Radius, circle.Color, width);
+                Render.Circle.DrawCircle(ObjectManager.Player.Position, circle.Radius, circle.Color, width);
             }
         }
     }

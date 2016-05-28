@@ -16,7 +16,7 @@ namespace Nautilus
         {
             try
             {
-                config = new Menu(CommonUtilities.Player.ChampionName, CommonUtilities.Player.ChampionName, true);
+                config = new Menu(ObjectManager.Player.ChampionName, ObjectManager.Player.ChampionName, true);
 
                 //Adds the Orbwalker to the main menu
                 var orbwalkerMenu = config.AddSubMenu(new Menu("Orbwalker", "Orbwalker"));

@@ -12,7 +12,7 @@ namespace Nautilus
             CustomEvents.Game.OnGameLoad += OnLoad;
         }
 
-        private static void OnLoad(EventArgs args)
+        private void OnLoad(EventArgs args)
         {
             if (ObjectManager.Player.ChampionName != "Nautilus")
                 return;
@@ -28,7 +28,7 @@ namespace Nautilus
             Notifications.AddNotification("Nautilus by Hestia loaded!", 5000);
         }
 
-        private static void OnInterruptable(Obj_AI_Hero sender, Interrupter2.InterruptableTargetEventArgs args)
+        private void OnInterruptable(Obj_AI_Hero sender, Interrupter2.InterruptableTargetEventArgs args)
         {
             if (!ConfigMenu.config.Item("useQinterrupt").GetValue<bool>())
                 return;
@@ -36,7 +36,7 @@ namespace Nautilus
             if (args.DangerLevel != Interrupter2.DangerLevel.High)
                 return;
 
-            if (sender.Distance(CommonUtilities.Player) <= q.Range && sender.IsEnemy && sender.IsValidTarget())
+            if (sender.Distance(ObjectManager.Player) <= q.Range && sender.IsEnemy && sender.IsValidTarget())
             {
                 var qPrediction =
                     q.GetPrediction(sender, false, 0,
@@ -50,16 +50,16 @@ namespace Nautilus
                 {
                     q.Cast(sender);
                 }
-                else if (qPrediction == HitChance.Impossible && sender.Distance(CommonUtilities.Player) <= r.Range && ConfigMenu.config.Item("useRinterrupt").GetValue<bool>())
+                else if (qPrediction == HitChance.Impossible && sender.Distance(ObjectManager.Player) <= r.Range && ConfigMenu.config.Item("useRinterrupt").GetValue<bool>())
                 {
                     r.CastOnUnit(sender);
                 }
             }
         }
 
-        private static void OnUpdate(EventArgs args)
+        private void OnUpdate(EventArgs args)
         {
-            if (CommonUtilities.Player.IsDead)
+            if (ObjectManager.Player.IsDead)
                 return;
 
             switch (ConfigMenu.orbwalker.ActiveMode)
@@ -80,7 +80,7 @@ namespace Nautilus
             KillSteal();
         }
 
-        private static void ExecuteCombo()
+        private void ExecuteCombo()
         {
             var target = TargetSelector.GetTarget(q.Range, TargetSelector.DamageType.Magical);
 
@@ -105,7 +105,7 @@ namespace Nautilus
             }
             else
             {
-                if (CommonUtilities.Player.HealthPercent <= wHealth && castW && target.IsValidTarget(e.Range))
+                if (ObjectManager.Player.HealthPercent <= wHealth && castW && target.IsValidTarget(e.Range))
                 {
                     w.Cast();
                 }
@@ -123,7 +123,7 @@ namespace Nautilus
             }
         }
 
-        private static void ExecuteHarass()
+        private void ExecuteHarass()
         {
             var target = TargetSelector.GetTarget(e.Range, TargetSelector.DamageType.Magical);
 
@@ -136,18 +136,18 @@ namespace Nautilus
             var eMana = ConfigMenu.config.Item("useEhMana").GetValue<Slider>().Value;
             var wMana = ConfigMenu.config.Item("useWhMana").GetValue<Slider>().Value;
 
-            if (castW && target.IsValidTarget(e.Range) && CommonUtilities.Player.ManaPercent > wMana)
+            if (castW && target.IsValidTarget(e.Range) && ObjectManager.Player.ManaPercent > wMana)
             {
                 w.Cast();
             }
 
-            if (castE && target.IsValidTarget(e.Range) && CommonUtilities.Player.ManaPercent > eMana)
+            if (castE && target.IsValidTarget(e.Range) && ObjectManager.Player.ManaPercent > eMana)
             {
                 e.Cast();
             }
         }
 
-        private static void LaneClear()
+        private void LaneClear()
         {
             var castE = ConfigMenu.config.Item("useElc").GetValue<bool>() && e.IsReady();
             var castW = ConfigMenu.config.Item("useWlc").GetValue<bool>() && w.IsReady();
@@ -161,20 +161,20 @@ namespace Nautilus
             if (!Orbwalking.CanMove(40))
                 return;
 
-            var minions = MinionManager.GetMinions(CommonUtilities.Player.Position, e.Range, MinionTypes.All, MinionTeam.NotAlly);
+            var minions = MinionManager.GetMinions(ObjectManager.Player.Position, e.Range, MinionTypes.All, MinionTeam.NotAlly);
 
-            if (castE && minions.Count > eMinions && CommonUtilities.Player.ManaPercent >= eMana)
+            if (castE && minions.Count > eMinions && ObjectManager.Player.ManaPercent >= eMana)
             {
                 e.Cast();
             }
 
-            if (castW && minions.Count > wMinions && CommonUtilities.Player.ManaPercent >= wMana)
+            if (castW && minions.Count > wMinions && ObjectManager.Player.ManaPercent >= wMana)
             {
                 w.Cast();
             }
         }
 
-        private static void JungleClear()
+        private void JungleClear()
         {
             var castE = ConfigMenu.config.Item("useEj").GetValue<bool>() && e.IsReady();
             var castW = ConfigMenu.config.Item("useWj").GetValue<bool>() && w.IsReady();
@@ -185,27 +185,27 @@ namespace Nautilus
             if (!Orbwalking.CanMove(40))
                 return;
 
-            var minions = MinionManager.GetMinions(CommonUtilities.Player.Position, e.Range, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+            var minions = MinionManager.GetMinions(ObjectManager.Player.Position, e.Range, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
 
-            if (castE && minions.Count > 0 && CommonUtilities.Player.ManaPercent >= eMana)
+            if (castE && minions.Count > 0 && ObjectManager.Player.ManaPercent >= eMana)
             {
                 e.Cast();
             }
 
-            if (castW && minions.Count > 0 && CommonUtilities.Player.ManaPercent >= wMana)
+            if (castW && minions.Count > 0 && ObjectManager.Player.ManaPercent >= wMana)
             {
                 w.Cast();
             }
         }
 
-        private static void KillSteal()
+        private void KillSteal()
         {
             if (!ConfigMenu.config.Item("killsteal").GetValue<bool>())
                 return;
 
             if (ConfigMenu.config.Item("useQks").GetValue<bool>() && q.IsReady())
             {
-                foreach (var target in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(q.Range) && !enemy.HasBuffOfType(BuffType.Invulnerability)).Where(target => target.Health < CommonUtilities.Player.GetSpellDamage(target, SpellSlot.Q)))
+                foreach (var target in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(q.Range) && !enemy.HasBuffOfType(BuffType.Invulnerability)).Where(target => target.Health < ObjectManager.Player.GetSpellDamage(target, SpellSlot.Q)))
                 {
                     q.CastIfHitchanceEquals(target, CommonUtilities.GetHitChance("hitchanceQ"));
                 }
@@ -213,7 +213,7 @@ namespace Nautilus
 
             if (ConfigMenu.config.Item("useEks").GetValue<bool>() && e.IsReady())
             {
-                foreach (var target in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(q.Range) && !enemy.HasBuffOfType(BuffType.Invulnerability)).Where(target => target.Health < CommonUtilities.Player.GetSpellDamage(target, SpellSlot.E)))
+                foreach (var target in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(q.Range) && !enemy.HasBuffOfType(BuffType.Invulnerability)).Where(target => target.Health < ObjectManager.Player.GetSpellDamage(target, SpellSlot.E)))
                 {
                     e.Cast(target);
                 }
@@ -221,7 +221,7 @@ namespace Nautilus
 
             if (ConfigMenu.config.Item("useRks").GetValue<bool>() && r.IsReady())
             {
-                foreach (var target in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(r.Range) && !enemy.HasBuffOfType(BuffType.Invulnerability)).Where(target => target.Health < CommonUtilities.Player.GetSpellDamage(target, SpellSlot.R)))
+                foreach (var target in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(r.Range) && !enemy.HasBuffOfType(BuffType.Invulnerability)).Where(target => target.Health < ObjectManager.Player.GetSpellDamage(target, SpellSlot.R)))
                 {
                     r.CastOnUnit(target);
                 }
@@ -229,9 +229,9 @@ namespace Nautilus
 
             if (ConfigMenu.config.Item("useIks").GetValue<bool>() && ignite.Slot.IsReady() && ignite != null && ignite.Slot != SpellSlot.Unknown)
             {
-                foreach (var target in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(ignite.SData.CastRange) && !enemy.HasBuffOfType(BuffType.Invulnerability)).Where(target => target.Health < CommonUtilities.Player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite)))
+                foreach (var target in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(ignite.SData.CastRange) && !enemy.HasBuffOfType(BuffType.Invulnerability)).Where(target => target.Health < ObjectManager.Player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite)))
                 {
-                    CommonUtilities.Player.Spellbook.CastSpell(ignite.Slot, target);
+                    ObjectManager.Player.Spellbook.CastSpell(ignite.Slot, target);
                 }
             }
         }

@@ -10,7 +10,7 @@ namespace Nautilus
 
         public static SpellDataInst ignite;
 
-        public static void InitializeSpells()
+        public void InitializeSpells()
         {
             try
             {
@@ -21,7 +21,7 @@ namespace Nautilus
 
                 q.SetSkillshot(0.25f, 90, 2000, true, SkillshotType.SkillshotLine);
 
-                ignite = CommonUtilities.Player.Spellbook.GetSpell(CommonUtilities.Player.GetSpellSlot("summonerdot"));
+                ignite = ObjectManager.Player.Spellbook.GetSpell(ObjectManager.Player.GetSpellSlot("summonerdot"));
             }
             catch (Exception exception)
             {
