@@ -49,17 +49,22 @@ namespace KarmaDK
 
         private static void Killsteal()
         {
-            if (!ConfigMenu.Menu["KarmaDK"]["killsteal.q"].GetValue<MenuBool>() || ConfigMenu.Menu["KarmaDK"]["killsteal.rq"].GetValue<MenuBool>())
+            if (!ConfigMenu.Menu["killsteal.settings"]["killsteal.q"].GetValue<MenuBool>() && !ConfigMenu.Menu["killsteal.settings"]["killsteal.rq"].GetValue<MenuBool>())
             {
                 return;
             }
 
-            if (ConfigMenu.Menu["KarmaDK"]["killsteal.q"].GetValue<MenuBool>() && q.IsReady())
+            if (ConfigMenu.Menu["killsteal.settings"]["killsteal.q"].GetValue<MenuBool>() && q.IsReady())
             {
                 foreach (var target in ObjectManager.Get<Obj_AI_Hero>().Where(target => target.IsValidTarget(980f) && !target.HasBuffOfType(BuffType.Invulnerability) && target.Health + target.MagicalShield < ObjectManager.Player.GetSpellDamage(target, SpellSlot.Q)))
                 {
                     q.Cast(target);
                 }
+            }
+
+            if (ConfigMenu.Menu["killsteal.settings"]["killsteal.rq"].GetValue<MenuBool>() && q.IsReady())
+            {
+                throw new NotImplementedException();
             }
         }
 
@@ -85,7 +90,7 @@ namespace KarmaDK
 
         private static void EventsOnOnGapCloser(object sender, Events.GapCloserEventArgs gapCloserEventArgs)
         {
-            if (ConfigMenu.Menu["KarmaDK"]["misc.antigap"].GetValue<MenuBool>() && gapCloserEventArgs.IsDirectedToPlayer && gapCloserEventArgs.Sender.Distance(ObjectManager.Player) < 350)
+            if (ConfigMenu.Menu["misc.settings"]["misc.antigap"].GetValue<MenuBool>() && gapCloserEventArgs.IsDirectedToPlayer && gapCloserEventArgs.Sender.Distance(ObjectManager.Player) < 350)
             {
                 e.CastOnUnit(ObjectManager.Player);
                 q.Cast(gapCloserEventArgs.Sender.ServerPosition);

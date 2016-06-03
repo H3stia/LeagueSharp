@@ -7,19 +7,22 @@ namespace KarmaDK
     {
         private static void Main(string[] args)
         {
-            Events.OnLoad += (sender, eventArgs) =>
+            Bootstrap.Init();
+            Events.OnLoad += EventsOnOnLoad;
+        }
+
+        private static void EventsOnOnLoad(object sender, EventArgs eventArgs)
+        {
+            try
             {
-                try
-                {
-                    // ReSharper disable once ObjectCreationAsStatement
-                    new Karma();
-                }
-                catch (Exception exception)
-                {
-                    Console.WriteLine("Could not load the assembly - {0}", exception);
-                    throw;
-                }
-            };
+                // ReSharper disable once ObjectCreationAsStatement
+                new Karma();
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine("Could not load the assembly - {0}", exception);
+                throw;
+            }
         }
     }
 }
