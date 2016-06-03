@@ -1,7 +1,7 @@
 ﻿using System;
 using LeagueSharp.SDK;
 
-namespace Karma
+namespace KarmaDK
 {
     internal class Program
     {

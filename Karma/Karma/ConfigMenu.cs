@@ -1,7 +1,7 @@
 ﻿using LeagueSharp.SDK.UI;
 using Menu = LeagueSharp.SDK.UI.Menu;
 
-namespace Karma
+namespace KarmaDK
 {
     internal class ConfigMenu
     {
@@ -23,6 +23,10 @@ namespace Karma
             var misc = Menu.Add(new Menu("misc.settings", "Misc Settings"));
             misc.Add(new MenuBool("misc.antigap", "Use E-Q on gap-closers", true));
             misc.Add(new MenuBool("misc.e", "Use E to shield incoming damage", true));
+
+            var killsteal = Menu.Add(new Menu("killsteal.settings", "Killsteal Settings"));
+            killsteal.Add(new MenuBool("killsteal.q", "Use Q to killsteal", true));
+            killsteal.Add(new MenuBool("killsteal.rq", "Use R-Q to killsteal", true));
 
             var drawing = Menu.Add(new Menu("drawing.settings", "Drawings Settings"));
             drawing.Add(new MenuBool("drawing.disable", "Disable all drawings", true));

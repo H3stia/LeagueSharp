@@ -2,7 +2,7 @@
 using LeagueSharp.SDK;
 using LeagueSharp.SDK.Enumerations;
 
-namespace Karma
+namespace KarmaDK
 {
     internal class Spells
     {

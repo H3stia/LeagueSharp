@@ -87,6 +87,10 @@ namespace Kennen
                 drawingMenu.AddItem(new MenuItem("width", "Drawings width").SetValue(new Slider(2, 1, 5)));
                 drawingMenu.AddItem(new MenuItem("drawDmg", "Draw damage on Healthbar").SetValue(false));
 
+                config.AddItem(new MenuItem("spacer", ""));
+                config.AddItem(new MenuItem("version", "Version: 6.10.0.0"));
+                config.AddItem(new MenuItem("author", "Author: Hestia"));
+
                 config.AddToMainMenu();
             }
             catch (Exception exception)

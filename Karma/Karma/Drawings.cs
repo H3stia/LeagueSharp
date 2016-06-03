@@ -4,7 +4,7 @@ using LeagueSharp;
 using LeagueSharp.SDK.UI;
 using LeagueSharp.SDK.Utils;
 
-namespace Karma
+namespace KarmaDK
 {
     internal class Drawings : Spells
     {

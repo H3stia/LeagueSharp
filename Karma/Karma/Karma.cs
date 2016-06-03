@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Linq;
 using LeagueSharp;
 using LeagueSharp.SDK;
 using LeagueSharp.SDK.Enumerations;
 using LeagueSharp.SDK.UI;
 
-namespace Karma
+namespace KarmaDK
 {
     internal class Karma : Spells
     {
@@ -48,7 +49,18 @@ namespace Karma
 
         private static void Killsteal()
         {
-            throw new NotImplementedException();
+            if (!ConfigMenu.Menu["KarmaDK"]["killsteal.q"].GetValue<MenuBool>() || ConfigMenu.Menu["KarmaDK"]["killsteal.rq"].GetValue<MenuBool>())
+            {
+                return;
+            }
+
+            if (ConfigMenu.Menu["KarmaDK"]["killsteal.q"].GetValue<MenuBool>() && q.IsReady())
+            {
+                foreach (var target in ObjectManager.Get<Obj_AI_Hero>().Where(target => target.IsValidTarget(980f) && !target.HasBuffOfType(BuffType.Invulnerability) && target.Health + target.MagicalShield < ObjectManager.Player.GetSpellDamage(target, SpellSlot.Q)))
+                {
+                    q.Cast(target);
+                }
+            }
         }
 
         private static void JungleClear()
