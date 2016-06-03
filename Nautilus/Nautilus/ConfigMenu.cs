@@ -97,8 +97,6 @@ namespace Nautilus
                 drawingMenu.AddItem(new MenuItem("drawR", "R range").SetValue(new Circle(true, Color.DarkOrange, r.Range)));
                 drawingMenu.AddItem(new MenuItem("width", "Drawings width").SetValue(new Slider(2, 1, 5)));
 
-                config.AddToMainMenu();
-
                 config.AddItem(new MenuItem("spacer", ""));
                 config.AddItem(new MenuItem("version", "Version: 6.10.0.0"));
                 config.AddItem(new MenuItem("author", "Author: Hestia"));
