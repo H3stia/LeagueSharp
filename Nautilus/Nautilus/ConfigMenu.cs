@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Reflection;
 using LeagueSharp;
 using Color = System.Drawing.Color;
 using LeagueSharp.Common;
@@ -101,7 +100,7 @@ namespace Nautilus
                 config.AddToMainMenu();
 
                 config.AddItem(new MenuItem("spacer", ""));
-                config.AddItem(new MenuItem("version", "Version: " + Assembly.GetEntryAssembly().GetName().Version));
+                config.AddItem(new MenuItem("version", "Version: 6.10.0.0"));
                 config.AddItem(new MenuItem("author", "Author: Hestia"));
 
                 config.AddToMainMenu();
