@@ -13,10 +13,9 @@ namespace BlitzcrankDK
            
             var combo = Menu.Add(new Menu("combo.settings", "Combo Settings"));
             combo.Add(new MenuBool("combo.q", "Use Q", true));
-			combo.Add(new MenuSliderButton("combo.q.distance", "Minimum distance to use Q", 0, 0, 950, false)); 
-            //combo.Add(new MenuBool("combo.w", "Use W", true));
+			combo.Add(new MenuSliderButton("combo.q.distance", "Minimum distance to use Q", 0, 0, 950)); 
             combo.Add(new MenuBool("combo.e", "Use E", true));
-            //combo.Add(new MenuBool("combo.r", "Use R", true));
+            combo.Add(new MenuBool("combo.r", "Use R if no KS", true));
 
             var auto = Menu.Add(new Menu("auto.settings", "Auto Settings"));
             auto.Add(new MenuSeparator("auto.q", "Automatic Q on:"));

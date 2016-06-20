@@ -114,7 +114,10 @@ namespace BlitzcrankDK
                 e.Cast();
             }
 
-
+            if (ConfigMenu.Menu["combo.settings"]["combo.r"].GetValue<MenuBool>() && r.IsReady() && qTarget.Health > r.GetDamage(qTarget))
+            {
+                e.Cast();
+            }
         }
 
         private void AutoQ()
