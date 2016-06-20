@@ -13,7 +13,7 @@ namespace Mundo
             CustomEvents.Game.OnGameLoad += OnLoad;
         }
 
-        private static void OnLoad(EventArgs args)
+        private void OnLoad(EventArgs args)
         {
             if (ObjectManager.Player.ChampionName != "DrMundo")
                 return;
@@ -28,7 +28,7 @@ namespace Mundo
             Notifications.AddNotification("Dr.Mundo by Hestia loaded!", 5000);
         }
 
-        private static void AfterAttack(AttackableUnit unit, AttackableUnit target)
+        private void AfterAttack(AttackableUnit unit, AttackableUnit target)
         {
             if ((ConfigMenu.orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo || ConfigMenu.orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed) && unit.IsMe)
             {
@@ -74,9 +74,9 @@ namespace Mundo
 
         }
 
-        private static void OnUpdate(EventArgs args)
+        private void OnUpdate(EventArgs args)
         {
-            if (CommonUtilities.Player.IsDead)
+            if (ObjectManager.Player.IsDead)
                 return;
 
             switch (ConfigMenu.orbwalker.ActiveMode)
@@ -101,6 +101,9 @@ namespace Mundo
                 case Orbwalking.OrbwalkingMode.None:
                     BurningManager();
                     break;
+                case Orbwalking.OrbwalkingMode.CustomMode:
+                    Flee();
+                    break;
             }
 
             AutoR();
@@ -108,7 +111,7 @@ namespace Mundo
             KillSteal();
         }
 
-        private static void ExecuteCombo()
+        private void ExecuteCombo()
         {
             var target = TargetSelector.GetTarget(q.Range, TargetSelector.DamageType.Magical);
 
@@ -121,12 +124,12 @@ namespace Mundo
             var qHealth = ConfigMenu.config.Item("QHealthCombo").GetValue<Slider>().Value;
             var wHealth = ConfigMenu.config.Item("WHealthCombo").GetValue<Slider>().Value;
 
-            if (castQ && CommonUtilities.Player.HealthPercent >= qHealth && target.IsValidTarget(q.Range))
+            if (castQ && ObjectManager.Player.HealthPercent >= qHealth && target.IsValidTarget(q.Range))
             {
                 q.CastIfHitchanceEquals(target, CommonUtilities.GetHitChance("hitchanceQ"));
             }
 
-            if (castW && CommonUtilities.Player.HealthPercent >= wHealth && !IsBurning() && target.IsValidTarget(400))
+            if (castW && ObjectManager.Player.HealthPercent >= wHealth && !IsBurning() && target.IsValidTarget(400))
             {
                 w.Cast();
             }
@@ -136,7 +139,7 @@ namespace Mundo
             }
         }
 
-        private static void ExecuteHarass()
+        private void ExecuteHarass()
         {
             var target = TargetSelector.GetTarget(q.Range, TargetSelector.DamageType.Magical);
 
@@ -147,13 +150,13 @@ namespace Mundo
 
             var qHealth = ConfigMenu.config.Item("useQHarassHP").GetValue<Slider>().Value;
 
-            if (castQ && CommonUtilities.Player.HealthPercent >= qHealth && target.IsValidTarget(q.Range))
+            if (castQ && ObjectManager.Player.HealthPercent >= qHealth && target.IsValidTarget(q.Range))
             {
                 q.CastIfHitchanceEquals(target, CommonUtilities.GetHitChance("hitchanceQ"));
             }
         }
 
-        private static void LastHit()
+        private void LastHit()
         {
             var castQ = ConfigMenu.config.Item("useQlh").GetValue<bool>() && q.IsReady();
 
@@ -162,22 +165,22 @@ namespace Mundo
             if (!Orbwalking.CanMove(40))
                 return;
 
-            var minions = MinionManager.GetMinions(CommonUtilities.Player.ServerPosition, q.Range, MinionTypes.All, MinionTeam.NotAlly);
+            var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, q.Range, MinionTypes.All, MinionTeam.NotAlly);
 
-            if (minions.Count > 0 && castQ && CommonUtilities.Player.HealthPercent >= qHealth)
+            if (minions.Count > 0 && castQ && ObjectManager.Player.HealthPercent >= qHealth)
             {
                 foreach (var minion in minions)
                 {
                     if (ConfigMenu.config.Item("qRange").GetValue<bool>())
                     {
-                        if (HealthPrediction.GetHealthPrediction(minion, (int) (q.Delay + (minion.Distance(CommonUtilities.Player.Position)/q.Speed))) < CommonUtilities.Player.GetSpellDamage(minion, SpellSlot.Q) && CommonUtilities.Player.Distance(minion) > CommonUtilities.Player.AttackRange*2)
+                        if (HealthPrediction.GetHealthPrediction(minion, (int) (q.Delay + (minion.Distance(ObjectManager.Player.Position)/q.Speed))) < ObjectManager.Player.GetSpellDamage(minion, SpellSlot.Q) && ObjectManager.Player.Distance(minion) > ObjectManager.Player.AttackRange*2)
                         {
                             q.Cast(minion);
                         }
                     }
                     else
                     {
-                        if (HealthPrediction.GetHealthPrediction(minion, (int) (q.Delay + (minion.Distance(CommonUtilities.Player.Position)/q.Speed))) < CommonUtilities.Player.GetSpellDamage(minion, SpellSlot.Q))
+                        if (HealthPrediction.GetHealthPrediction(minion, (int) (q.Delay + (minion.Distance(ObjectManager.Player.Position)/q.Speed))) < ObjectManager.Player.GetSpellDamage(minion, SpellSlot.Q))
                         {
                             q.Cast(minion);
                         }
@@ -186,7 +189,7 @@ namespace Mundo
             }
         }
 
-        private static void LaneClear()
+        private void LaneClear()
         {
             var castQ = ConfigMenu.config.Item("useQlc").GetValue<bool>() && q.IsReady();
             var castW = ConfigMenu.config.Item("useWlc").GetValue<bool>() && w.IsReady();
@@ -198,16 +201,16 @@ namespace Mundo
             if (!Orbwalking.CanMove(40))
                 return;
 
-            var minions = MinionManager.GetMinions(CommonUtilities.Player.ServerPosition, q.Range);
-            var minionsW = MinionManager.GetMinions(CommonUtilities.Player.ServerPosition, 400);
+            var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, q.Range);
+            var minionsW = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, 400);
 
             if (minions.Count > 0)
             {
-                if (castQ && CommonUtilities.Player.HealthPercent >= qHealth)
+                if (castQ && ObjectManager.Player.HealthPercent >= qHealth)
                 {
                     foreach (var minion in minions)
                     {
-                        if (HealthPrediction.GetHealthPrediction(minion, (int) (q.Delay + (minion.Distance(CommonUtilities.Player.Position)/q.Speed))) < CommonUtilities.Player.GetSpellDamage(minion, SpellSlot.Q))
+                        if (HealthPrediction.GetHealthPrediction(minion, (int) (q.Delay + (minion.Distance(ObjectManager.Player.Position)/q.Speed))) < ObjectManager.Player.GetSpellDamage(minion, SpellSlot.Q))
                         {
                             q.Cast(minion);
                         }
@@ -217,7 +220,7 @@ namespace Mundo
 
             if (minionsW.Count >= wMinions)
             {
-                if (castW && CommonUtilities.Player.HealthPercent >= wHealth && !IsBurning())
+                if (castW && ObjectManager.Player.HealthPercent >= wHealth && !IsBurning())
                 {
                     w.Cast();
                 }
@@ -228,7 +231,7 @@ namespace Mundo
             }
         }
 
-        private static void JungleClear()
+        private void JungleClear()
         {
             var castQ = ConfigMenu.config.Item("useQj").GetValue<bool>() && q.IsReady();
             var castW = ConfigMenu.config.Item("useWj").GetValue<bool>() && w.IsReady();
@@ -239,14 +242,14 @@ namespace Mundo
             if (!Orbwalking.CanMove(40))
                 return;
 
-            var minions = MinionManager.GetMinions(CommonUtilities.Player.ServerPosition, q.Range, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
-            var minionsW = MinionManager.GetMinions(CommonUtilities.Player.ServerPosition, 400, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+            var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, q.Range, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+            var minionsW = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, 400, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
 
             if (minions.Count > 0)
             {
                 var minion = minions[0];
 
-                if (castQ && CommonUtilities.Player.HealthPercent >= qHealth)
+                if (castQ && ObjectManager.Player.HealthPercent >= qHealth)
                 {
                     q.Cast(minion);
                 }
@@ -254,7 +257,7 @@ namespace Mundo
 
             if (minionsW.Count > 0)
             {
-                if (castW && CommonUtilities.Player.HealthPercent >= wHealth && !IsBurning())
+                if (castW && ObjectManager.Player.HealthPercent >= wHealth && !IsBurning())
                 {
                     w.Cast();
                 }
@@ -266,14 +269,14 @@ namespace Mundo
             
         }
 
-        private static void KillSteal()
+        private void KillSteal()
         {
             if (!ConfigMenu.config.Item("killsteal").GetValue<bool>())
                 return;
 
             if (ConfigMenu.config.Item("useQks").GetValue<bool>() && q.IsReady())
             {
-                foreach (var target in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(q.Range) && !enemy.HasBuffOfType(BuffType.Invulnerability)).Where(target => target.Health < CommonUtilities.Player.GetSpellDamage(target, SpellSlot.Q)))
+                foreach (var target in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(q.Range) && !enemy.HasBuffOfType(BuffType.Invulnerability)).Where(target => target.Health < ObjectManager.Player.GetSpellDamage(target, SpellSlot.Q)))
                 {
                     q.CastIfHitchanceEquals(target, CommonUtilities.GetHitChance("hitchanceQ"));
                 }
@@ -281,14 +284,14 @@ namespace Mundo
 
             if (ConfigMenu.config.Item("useIks").GetValue<bool>() && ignite.Slot.IsReady() && ignite != null && ignite.Slot != SpellSlot.Unknown)
             {
-                foreach (var target in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(ignite.SData.CastRange) && !enemy.HasBuffOfType(BuffType.Invulnerability)).Where(target => target.Health < CommonUtilities.Player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite)))
+                foreach (var target in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(ignite.SData.CastRange) && !enemy.HasBuffOfType(BuffType.Invulnerability)).Where(target => target.Health < ObjectManager.Player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite)))
                 {
-                    CommonUtilities.Player.Spellbook.CastSpell(ignite.Slot, target);
+                    ObjectManager.Player.Spellbook.CastSpell(ignite.Slot, target);
                 }
             }
         }
 
-        private static void AutoQ()
+        private void AutoQ()
         {
             var autoQ = ConfigMenu.config.Item("autoQ").GetValue<KeyBind>().Active && q.IsReady();
 
@@ -296,43 +299,61 @@ namespace Mundo
 
             var target = TargetSelector.GetTarget(q.Range, TargetSelector.DamageType.Magical);
 
-            if (autoQ && CommonUtilities.Player.HealthPercent >= qHealth && target.IsValidTarget(q.Range))
+            if (autoQ && ObjectManager.Player.HealthPercent >= qHealth && target.IsValidTarget(q.Range))
             {
                 q.CastIfHitchanceEquals(target, CommonUtilities.GetHitChance("hitchanceQ"));
             }
         }
 
-        private static void AutoR()
+        private void AutoR()
         {
             var castR = ConfigMenu.config.Item("useR").GetValue<bool>() && r.IsReady();
 
             var rHealth = ConfigMenu.config.Item("RHealth").GetValue<Slider>().Value;
             var rEnemies = ConfigMenu.config.Item("RHealthEnemies").GetValue<bool>();
 
-            if (rEnemies && castR && CommonUtilities.Player.HealthPercent <= rHealth && !CommonUtilities.Player.InFountain())
+            if (rEnemies && castR && ObjectManager.Player.HealthPercent <= rHealth && !ObjectManager.Player.InFountain())
             {
                 if (FoundEnemies(q.Range))
                 {
                     r.Cast();
                 }
             }
-            else if (!rEnemies && castR && CommonUtilities.Player.HealthPercent <= rHealth && !CommonUtilities.Player.InFountain())
+            else if (!rEnemies && castR && ObjectManager.Player.HealthPercent <= rHealth && !ObjectManager.Player.InFountain())
             {
                 r.Cast();
             }
         }
 
-        private static bool IsBurning()
+        private void Flee()
         {
-            return CommonUtilities.Player.HasBuff("BurningAgony");
+            var target = TargetSelector.GetTarget(q.Range, TargetSelector.DamageType.Magical);
+
+            var useQ = ConfigMenu.config.Item("qFlee").GetValue<bool>();
+            var useR = ConfigMenu.config.Item("rFlee").GetValue<bool>();
+
+            if (useQ)
+            {
+                q.Cast(target);
+            }
+
+            if (useR && FoundEnemies(q.Range*2))
+            {
+                r.Cast();
+            }
         }
 
-        private static bool FoundEnemies(float range)
+        public bool IsBurning()
+        {
+            return ObjectManager.Player.HasBuff("BurningAgony");
+        }
+
+        public bool FoundEnemies(float range)
         {
             return HeroManager.Enemies.Any(enemy => enemy.IsValidTarget(range));
         }
 
-        private static void BurningManager()
+        private void BurningManager()
         {
             if (!ConfigMenu.config.Item("handleW").GetValue<bool>())
                 return;

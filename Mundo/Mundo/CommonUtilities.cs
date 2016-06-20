@@ -6,11 +6,6 @@ namespace Mundo
 {
     internal class CommonUtilities
     {
-        public static Obj_AI_Hero Player
-        {
-            get { return ObjectManager.Player; }
-        }
-
         public static HitChance GetHitChance(string name)
         {
             var hitChance = ConfigMenu.config.Item(name).GetValue<StringList>();
@@ -41,15 +36,15 @@ namespace Mundo
             if (!CheckItem())
                 return;
 
-            if (ItemData.Tiamat_Melee_Only.GetItem().IsOwned(Player))
+            if (ItemData.Tiamat_Melee_Only.GetItem().IsOwned(ObjectManager.Player))
             {
                 ItemData.Tiamat_Melee_Only.GetItem().Cast();
             }
-            if (ItemData.Ravenous_Hydra_Melee_Only.GetItem().IsOwned(Player))
+            if (ItemData.Ravenous_Hydra_Melee_Only.GetItem().IsOwned(ObjectManager.Player))
             {
                 ItemData.Ravenous_Hydra_Melee_Only.GetItem().Cast();
             }
-            if (ItemData.Titanic_Hydra_Melee_Only.GetItem().IsOwned(Player))
+            if (ItemData.Titanic_Hydra_Melee_Only.GetItem().IsOwned(ObjectManager.Player))
             {
                 ItemData.Titanic_Hydra_Melee_Only.GetItem().Cast();
             }

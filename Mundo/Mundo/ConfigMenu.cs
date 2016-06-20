@@ -1,5 +1,6 @@
 ﻿using System;
 using Color = System.Drawing.Color;
+using LeagueSharp;
 using LeagueSharp.Common;
 
 namespace Mundo
@@ -13,11 +14,12 @@ namespace Mundo
         {
             try
             {
-                config = new Menu(CommonUtilities.Player.ChampionName, CommonUtilities.Player.ChampionName, true);
+                config = new Menu(ObjectManager.Player.ChampionName, ObjectManager.Player.ChampionName, true);
 
                 //Adds the Orbwalker to the main menu
                 var orbwalkerMenu = config.AddSubMenu(new Menu("Orbwalker", "Orbwalker"));
                 orbwalker = new Orbwalking.Orbwalker(orbwalkerMenu);
+                orbwalker.RegisterCustomMode("flee", "Flee", (uint) Keys.Z);
 
                 var combo = config.AddSubMenu(new Menu("Combo Settings", "Combo"));
 
@@ -93,6 +95,10 @@ namespace Mundo
                 clear.AddItem(new MenuItem("useWjHP", "Minimum HP% to use W to jungle").SetValue(new Slider(20, 1)));
                 clear.AddItem(new MenuItem("useEj", "Use E to jungle").SetValue(true));
 
+                var flee = config.AddSubMenu(new Menu("Flee Settings", "Flee"));
+                flee.AddItem(new MenuItem("qFlee", "Q while fleeing").SetValue(true));
+                flee.AddItem(new MenuItem("rFlee", "R to boost speed while fleeing").SetValue(false));
+
                 var drawingMenu = config.AddSubMenu(new Menu("Drawings", "Drawings"));
                 drawingMenu.AddItem(new MenuItem("disableDraw", "Disable all drawings").SetValue(true));
                 drawingMenu.AddItem(new MenuItem("drawQ", "Q range").SetValue(new Circle(false, Color.DarkOrange, q.Range)));
@@ -101,7 +107,7 @@ namespace Mundo
                 drawingMenu.AddItem(new MenuItem("drawAutoQ", "Draw AutoQ status").SetValue(false));
 
                 config.AddItem(new MenuItem("spacer", ""));
-                config.AddItem(new MenuItem("version", "Version: 6.10.0.0"));
+                config.AddItem(new MenuItem("version", "Version: 6.12.0.0"));
                 config.AddItem(new MenuItem("author", "Author: Hestia"));
 
                 config.AddToMainMenu();
