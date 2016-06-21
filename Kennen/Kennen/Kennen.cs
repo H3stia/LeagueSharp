@@ -297,7 +297,7 @@ namespace Kennen
             }
         }
 
-        private void Flee()
+        private static void Flee()
         {
             var target = TargetSelector.GetTarget(q.Range, TargetSelector.DamageType.Magical);
 
