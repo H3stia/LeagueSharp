@@ -6,11 +6,6 @@ namespace Kennen
 {
     internal class CommonUtilities : Spells
     {
-        public static Obj_AI_Hero Player
-        {
-            get { return ObjectManager.Player; }
-        }
-
         public static HitChance GetHitChance(string name)
         {
             var hitChance = ConfigMenu.config.Item(name).GetValue<StringList>();
