@@ -329,12 +329,12 @@ namespace Mundo
         {
             var target = TargetSelector.GetTarget(q.Range, TargetSelector.DamageType.Magical);
 
-            var useQ = ConfigMenu.config.Item("qFlee").GetValue<bool>();
-            var useR = ConfigMenu.config.Item("rFlee").GetValue<bool>();
+            var useQ = ConfigMenu.config.Item("qFlee").GetValue<bool>() && q.IsReady();
+            var useR = ConfigMenu.config.Item("rFlee").GetValue<bool>() && r.IsReady();
 
-            if (useQ)
+            if (useQ && target.IsValidTarget(q.Range))
             {
-                q.Cast(target);
+                q.CastIfHitchanceEquals(target, CommonUtilities.GetHitChance("hitchanceQ"));
             }
 
             if (useR && FoundEnemies(q.Range*2))

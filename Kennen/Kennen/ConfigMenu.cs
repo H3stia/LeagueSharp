@@ -1,5 +1,6 @@
 ﻿using System;
 using Color = System.Drawing.Color;
+using LeagueSharp;
 using LeagueSharp.Common;
 
 namespace Kennen
@@ -13,11 +14,12 @@ namespace Kennen
         {
             try
             {
-                config = new Menu(CommonUtilities.Player.ChampionName, CommonUtilities.Player.ChampionName, true);
+                config = new Menu(ObjectManager.Player.ChampionName, ObjectManager.Player.ChampionName, true);
 
                 //Adds the Orbwalker to the main menu
                 var orbwalkerMenu = config.AddSubMenu(new Menu("Orbwalker", "Orbwalker"));
                 orbwalker = new Orbwalking.Orbwalker(orbwalkerMenu);
+                orbwalker.RegisterCustomMode("flee", "Flee", (uint) Keys.Z);
 
                 var combo = config.AddSubMenu(new Menu("Combo Settings", "Combo"));
                 var comboQ = combo.AddSubMenu(new Menu("Q Settings", "Q"));
@@ -77,6 +79,10 @@ namespace Kennen
                 killsteal.AddItem(new MenuItem("useQks", "Use Q to KillSteal").SetValue(true));
                 killsteal.AddItem(new MenuItem("useWks", "Use W to KillSteal").SetValue(true));
                 killsteal.AddItem(new MenuItem("useIks", "Use Ignite to KillSteal").SetValue(true));
+
+                var flee = config.AddSubMenu(new Menu("Flee Settings", "Flee"));
+                flee.AddItem(new MenuItem("qFlee", "Q while fleeing").SetValue(true));
+                flee.AddItem(new MenuItem("eFlee", "E to flee").SetValue(true));
 
                 var drawingMenu = config.AddSubMenu(new Menu("Drawings", "Drawings"));
                 drawingMenu.AddItem(new MenuItem("disableDraw", "Disable all drawings").SetValue(true));

@@ -29,7 +29,7 @@ namespace Kennen
 
         private static void OnUpdate(EventArgs args)
         {
-            if (CommonUtilities.Player.IsDead)
+            if (ObjectManager.Player.IsDead)
                 return;
 
             Utility.HpBarDamageIndicator.Enabled = ConfigMenu.config.Item("drawDmg").GetValue<bool>();
@@ -52,6 +52,9 @@ namespace Kennen
                 case Orbwalking.OrbwalkingMode.LaneClear:
                     LaneClear();
                     JungleClear();
+                    break;
+                case Orbwalking.OrbwalkingMode.CustomMode:
+                    Flee();
                     break;
             }
 
@@ -107,8 +110,8 @@ namespace Kennen
                 {
                     r.Cast();
 
-                    if (HasR() && useZhonya && CommonUtilities.Player.HealthPercent < zhonyaHp &&
-                        CommonUtilities.Player.CountEnemiesInRange(r.Range) > 0)
+                    if (HasR() && useZhonya && ObjectManager.Player.HealthPercent < zhonyaHp &&
+                        ObjectManager.Player.CountEnemiesInRange(r.Range) > 0)
                     {
                         CommonUtilities.UseZhonya();
                     }
@@ -128,12 +131,12 @@ namespace Kennen
             var modeW = ConfigMenu.config.Item("useWmodeHarass").GetValue<StringList>();
 
 
-            if (castQ && target.IsValidTarget(q.Range) && CommonUtilities.Player.ManaPercent >= ConfigMenu.config.Item("useQHarassMana").GetValue<Slider>().Value)
+            if (castQ && target.IsValidTarget(q.Range) && ObjectManager.Player.ManaPercent >= ConfigMenu.config.Item("useQHarassMana").GetValue<Slider>().Value)
             {
                 q.CastIfHitchanceEquals(target, CommonUtilities.GetHitChance("hitchanceQ"));
             }
 
-            if (castW && target.IsValidTarget(w.Range) && CommonUtilities.Player.ManaPercent >= ConfigMenu.config.Item("useWHarassMana").GetValue<Slider>().Value)
+            if (castW && target.IsValidTarget(w.Range) && ObjectManager.Player.ManaPercent >= ConfigMenu.config.Item("useWHarassMana").GetValue<Slider>().Value)
             {
                 switch (modeW.SelectedIndex)
                 {
@@ -161,22 +164,22 @@ namespace Kennen
             if (!Orbwalking.CanMove(40))
                 return;
 
-            var minions = MinionManager.GetMinions(CommonUtilities.Player.ServerPosition, q.Range, MinionTypes.All, MinionTeam.NotAlly);
+            var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, q.Range, MinionTypes.All, MinionTeam.NotAlly);
 
-            if (minions.Count > 0 && castQ && CommonUtilities.Player.ManaPercent >= ConfigMenu.config.Item("useQlhMana").GetValue<Slider>().Value)
+            if (minions.Count > 0 && castQ && ObjectManager.Player.ManaPercent >= ConfigMenu.config.Item("useQlhMana").GetValue<Slider>().Value)
             {
                 foreach (var minion in minions)
                 {
                     if (ConfigMenu.config.Item("qRange").GetValue<bool>())
                     {
-                        if (HealthPrediction.GetHealthPrediction(minion, (int)(q.Delay + (minion.Distance(CommonUtilities.Player.Position) / q.Speed))) < CommonUtilities.Player.GetSpellDamage(minion, SpellSlot.Q) && CommonUtilities.Player.Distance(minion) > CommonUtilities.Player.AttackRange)
+                        if (HealthPrediction.GetHealthPrediction(minion, (int)(q.Delay + (minion.Distance(ObjectManager.Player.Position) / q.Speed))) < ObjectManager.Player.GetSpellDamage(minion, SpellSlot.Q) && ObjectManager.Player.Distance(minion) > ObjectManager.Player.AttackRange)
                         {
                             q.Cast(minion);
                         }
                     }
                     else
                     {
-                        if (HealthPrediction.GetHealthPrediction(minion, (int)(q.Delay + (minion.Distance(CommonUtilities.Player.Position) / q.Speed))) < CommonUtilities.Player.GetSpellDamage(minion, SpellSlot.Q))
+                        if (HealthPrediction.GetHealthPrediction(minion, (int)(q.Delay + (minion.Distance(ObjectManager.Player.Position) / q.Speed))) < ObjectManager.Player.GetSpellDamage(minion, SpellSlot.Q))
                         {
                             q.Cast(minion);
                         }
@@ -192,13 +195,13 @@ namespace Kennen
             if (!Orbwalking.CanMove(40))
                 return;
 
-            var minions = MinionManager.GetMinions(CommonUtilities.Player.ServerPosition, q.Range);
+            var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, q.Range);
 
-            if (minions.Count > 0 && castQ && CommonUtilities.Player.ManaPercent >= ConfigMenu.config.Item("useQlcMana").GetValue<Slider>().Value)
+            if (minions.Count > 0 && castQ && ObjectManager.Player.ManaPercent >= ConfigMenu.config.Item("useQlcMana").GetValue<Slider>().Value)
             {
                 foreach (var minion in minions)
                 {
-                    if (HealthPrediction.GetHealthPrediction(minion, (int)(q.Delay + (minion.Distance(CommonUtilities.Player.Position) / q.Speed))) < CommonUtilities.Player.GetSpellDamage(minion, SpellSlot.Q))
+                    if (HealthPrediction.GetHealthPrediction(minion, (int)(q.Delay + (minion.Distance(ObjectManager.Player.Position) / q.Speed))) < ObjectManager.Player.GetSpellDamage(minion, SpellSlot.Q))
                     {
                         q.Cast(minion);
                     }
@@ -214,7 +217,7 @@ namespace Kennen
             if (!Orbwalking.CanMove(40))
                 return;
 
-            var minions = MinionManager.GetMinions(CommonUtilities.Player.ServerPosition, q.Range, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+            var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, q.Range, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
             var minionsW = minions.Where(HasMark).Count();
 
             if (minions.Count > 0)
@@ -244,7 +247,7 @@ namespace Kennen
 
             if (ConfigMenu.config.Item("useQks").GetValue<bool>() && q.IsReady())
             {
-                foreach (var target in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(q.Range) && !enemy.HasBuffOfType(BuffType.Invulnerability)).Where(target => target.Health < CommonUtilities.Player.GetSpellDamage(target, SpellSlot.Q)))
+                foreach (var target in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(q.Range) && !enemy.HasBuffOfType(BuffType.Invulnerability)).Where(target => target.Health < ObjectManager.Player.GetSpellDamage(target, SpellSlot.Q)))
                 {
                     q.CastIfHitchanceEquals(target, CommonUtilities.GetHitChance("hitchanceQ"));
                 }
@@ -252,7 +255,7 @@ namespace Kennen
 
             if (ConfigMenu.config.Item("useWks").GetValue<bool>() && q.IsReady())
             {
-                foreach (var target in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(w.Range) && !enemy.HasBuffOfType(BuffType.Invulnerability)).Where(target => target.Health < CommonUtilities.Player.GetSpellDamage(target, SpellSlot.W)))
+                foreach (var target in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(w.Range) && !enemy.HasBuffOfType(BuffType.Invulnerability)).Where(target => target.Health < ObjectManager.Player.GetSpellDamage(target, SpellSlot.W)))
                 {
                     if (HasMark(target))
                     {
@@ -263,9 +266,9 @@ namespace Kennen
 
             if (ConfigMenu.config.Item("useIks").GetValue<bool>() && ignite.Slot.IsReady() && ignite != null && ignite.Slot != SpellSlot.Unknown)
             {
-                foreach (var target in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(ignite.SData.CastRange) && !enemy.HasBuffOfType(BuffType.Invulnerability)).Where(target => target.Health < CommonUtilities.Player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite)))
+                foreach (var target in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(ignite.SData.CastRange) && !enemy.HasBuffOfType(BuffType.Invulnerability)).Where(target => target.Health < ObjectManager.Player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite)))
                 {
-                    CommonUtilities.Player.Spellbook.CastSpell(ignite.Slot, target);
+                    ObjectManager.Player.Spellbook.CastSpell(ignite.Slot, target);
                 }
             }
         }
@@ -286,11 +289,29 @@ namespace Kennen
         {
             var castR = ConfigMenu.config.Item("useRmul").GetValue<bool>() && r.IsReady();
             var minR = ConfigMenu.config.Item("useRmulti").GetValue<Slider>().Value;
-            var enemiesCount = CommonUtilities.Player.CountEnemiesInRange(r.Range - 50);
+            var enemiesCount = ObjectManager.Player.CountEnemiesInRange(r.Range - 50);
 
             if (castR && enemiesCount >= minR)
             {
                 r.Cast();
+            }
+        }
+
+        private static void Flee()
+        {
+            var target = TargetSelector.GetTarget(q.Range, TargetSelector.DamageType.Magical);
+
+            var useQ = ConfigMenu.config.Item("qFlee").GetValue<bool>() && q.IsReady();
+            var useE = ConfigMenu.config.Item("eFlee").GetValue<bool>() && e.IsReady();
+
+            if (useQ && target.IsValidTarget(q.Range))
+            {
+                q.Cast(target);
+            }
+
+            if (useE)
+            {
+                e.Cast();
             }
         }
 
@@ -301,7 +322,7 @@ namespace Kennen
 
         private static bool HasR()
         {
-            return CommonUtilities.Player.HasBuff("KennenShurikenStorm");
+            return ObjectManager.Player.HasBuff("KennenShurikenStorm");
         }
 
         private static bool CanStun(Obj_AI_Base target)

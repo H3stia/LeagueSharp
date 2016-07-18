@@ -21,7 +21,7 @@ namespace Kennen
 
                 q.SetSkillshot(0.125f, 50, 1700, true, SkillshotType.SkillshotLine);
 
-                ignite = CommonUtilities.Player.Spellbook.GetSpell(CommonUtilities.Player.GetSpellSlot("summonerdot"));
+                ignite = ObjectManager.Player.Spellbook.GetSpell(ObjectManager.Player.GetSpellSlot("summonerdot"));
             }
             catch (Exception exception)
             {

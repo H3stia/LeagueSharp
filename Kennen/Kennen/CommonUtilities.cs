@@ -6,11 +6,6 @@ namespace Kennen
 {
     internal class CommonUtilities : Spells
     {
-        public static Obj_AI_Hero Player
-        {
-            get { return ObjectManager.Player; }
-        }
-
         public static HitChance GetHitChance(string name)
         {
             var hitChance = ConfigMenu.config.Item(name).GetValue<StringList>();
@@ -40,11 +35,11 @@ namespace Kennen
             if (!CheckZhonya())
                 return;
 
-            if (ItemData.Wooglets_Witchcap.GetItem().IsOwned(Player))
+            if (ItemData.Wooglets_Witchcap.GetItem().IsOwned(ObjectManager.Player))
             {
                 ItemData.Wooglets_Witchcap.GetItem().Cast();
             }
-            if (ItemData.Zhonyas_Hourglass.GetItem().IsOwned(Player))
+            if (ItemData.Zhonyas_Hourglass.GetItem().IsOwned(ObjectManager.Player))
             {
                 ItemData.Zhonyas_Hourglass.GetItem().Cast();
             }
@@ -56,22 +51,22 @@ namespace Kennen
 
             if (q.IsReady())
             {
-                comboDamage += Player.GetSpellDamage(target, SpellSlot.Q);
+                comboDamage += ObjectManager.Player.GetSpellDamage(target, SpellSlot.Q);
             }
 
             if (w.IsReady())
             {
-                comboDamage += Player.GetSpellDamage(target, SpellSlot.W);
+                comboDamage += ObjectManager.Player.GetSpellDamage(target, SpellSlot.W);
             }
 
             if (r.IsReady())
             {
-                comboDamage += Player.GetSpellDamage(target, SpellSlot.R);
+                comboDamage += ObjectManager.Player.GetSpellDamage(target, SpellSlot.R);
             }
 
             if (ignite.IsReady())
             {
-                comboDamage += Player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite);
+                comboDamage += ObjectManager.Player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite);
             }
                 
             return (float) comboDamage;
