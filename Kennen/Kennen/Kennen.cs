@@ -106,7 +106,7 @@ namespace Kennen
 
             if (castR && target.IsValidTarget(r.Range - 50))
             {
-                if (target.Health < CommonUtilities.GetComboDamage(target))
+                if (target.Health > CommonUtilities.GetComboDamage(target))
                 {
                     r.Cast();
 

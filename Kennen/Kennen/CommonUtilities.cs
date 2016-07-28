@@ -51,17 +51,12 @@ namespace Kennen
 
             if (q.IsReady())
             {
-                comboDamage += ObjectManager.Player.GetSpellDamage(target, SpellSlot.Q);
+                comboDamage += q.GetDamage(target);
             }
 
             if (w.IsReady())
             {
-                comboDamage += ObjectManager.Player.GetSpellDamage(target, SpellSlot.W);
-            }
-
-            if (r.IsReady())
-            {
-                comboDamage += ObjectManager.Player.GetSpellDamage(target, SpellSlot.R);
+                comboDamage += w.GetDamage(target);
             }
 
             if (ignite.IsReady())
