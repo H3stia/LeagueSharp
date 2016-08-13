@@ -299,7 +299,7 @@ namespace Mundo
 
             var target = TargetSelector.GetTarget(q.Range, TargetSelector.DamageType.Magical);
 
-            if (autoQ && ObjectManager.Player.HealthPercent >= qHealth && target.IsValidTarget(q.Range))
+            if (autoQ && ObjectManager.Player.HealthPercent >= qHealth && target.IsValidTarget(q.Range) && !ObjectManager.Player.UnderTurret())
             {
                 q.CastIfHitchanceEquals(target, CommonUtilities.GetHitChance("hitchanceQ"));
             }

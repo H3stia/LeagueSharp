@@ -107,7 +107,7 @@ namespace Mundo
                 drawingMenu.AddItem(new MenuItem("drawAutoQ", "Draw AutoQ status").SetValue(false));
 
                 config.AddItem(new MenuItem("spacer", ""));
-                config.AddItem(new MenuItem("version", "Version: 6.12.0.0"));
+                config.AddItem(new MenuItem("version", "Version: 6.16.0.0"));
                 config.AddItem(new MenuItem("author", "Author: Hestia"));
 
                 config.AddToMainMenu();
