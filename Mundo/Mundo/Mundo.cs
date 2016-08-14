@@ -32,7 +32,7 @@ namespace Mundo
         {
             if ((ConfigMenu.orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo || ConfigMenu.orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed) && unit.IsMe)
             {
-                if (ConfigMenu.config.Item("useE").GetValue<bool>() && e.IsReady() && target is Obj_AI_Hero && target.IsValidTarget(e.Range))
+                if (ConfigMenu.config.Item("useE").GetValue<bool>() && e.IsReady())
                 {
                     e.Cast();
                 }
@@ -41,7 +41,7 @@ namespace Mundo
 
             if (ConfigMenu.orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear && unit.IsMe)
             {
-                if (ConfigMenu.config.Item("useEj").GetValue<bool>() && e.IsReady() && target is Obj_AI_Minion && target.IsValidTarget(e.Range))
+                if (ConfigMenu.config.Item("useEj").GetValue<bool>() && e.IsReady())
                 {
                     e.Cast();
                 }
@@ -52,8 +52,7 @@ namespace Mundo
                  ConfigMenu.orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed) && unit.IsMe)
             {
                 if ((ConfigMenu.config.Item("titanicC").GetValue<bool>() || ConfigMenu.config.Item("ravenousC").GetValue<bool>() ||
-                     ConfigMenu.config.Item("tiamatC").GetValue<bool>()) && !e.IsReady() && target is Obj_AI_Hero &&
-                    target.IsValidTarget(e.Range) && CommonUtilities.CheckItem())
+                     ConfigMenu.config.Item("tiamatC").GetValue<bool>()) && !e.IsReady() && CommonUtilities.CheckItem())
                 {
                     CommonUtilities.UseItem();
                 }
@@ -63,8 +62,7 @@ namespace Mundo
             if (ConfigMenu.orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear && unit.IsMe)
             {
                 if ((ConfigMenu.config.Item("titanicF").GetValue<bool>() || ConfigMenu.config.Item("ravenousF").GetValue<bool>() ||
-                     ConfigMenu.config.Item("tiamatF").GetValue<bool>()) && !e.IsReady() && target is Obj_AI_Minion &&
-                    target.IsValidTarget(e.Range) && CommonUtilities.CheckItem())
+                     ConfigMenu.config.Item("tiamatF").GetValue<bool>()) && !e.IsReady() && CommonUtilities.CheckItem())
                 {
                     CommonUtilities.UseItem();
                 }
