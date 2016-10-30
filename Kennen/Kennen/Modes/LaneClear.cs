@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using Kennen.Core;
+﻿using Kennen.Core;
 using LeagueSharp;
 using LeagueSharp.Common;
 
@@ -18,15 +17,8 @@ namespace Kennen.Modes
 
             if (minions.Count > 0 && castQ && ObjectManager.Player.ManaPercent >= Configs.config.Item("useQlcMana").GetValue<Slider>().Value)
             {
-                foreach (
-                    var minion in
-                        minions.Where(
-                            minion =>
-                                minion.IsValidTarget() &&
-                                minion.Health < Spells.Q.GetDamage(minion)))
-                {
-                    Spells.Q.CastSpell(minion, "predMode", "hitchanceQ");
-                }
+                var minion = minions[0];
+                Spells.Q.CastSpell(minion, "predMode", "hitchanceQ");
             }
         }
     }
