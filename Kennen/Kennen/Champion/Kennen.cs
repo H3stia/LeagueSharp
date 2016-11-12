@@ -24,6 +24,7 @@ namespace Kennen.Champion
 
             Game.OnUpdate += Game_OnUpdate;
             Drawing.OnDraw += Drawings.Drawing_OnDraw;
+            //Utility.HpBarDamageIndicator.DamageToUnit = ComboDamage;
         }
 
         private static void Game_OnUpdate(EventArgs args)
@@ -65,7 +66,7 @@ namespace Kennen.Champion
             var castRmulti = Configs.config.Item("useRmulti").GetValue<bool>() && Spells.R.IsReady();
             var multiRtargets = Configs.config.Item("multiRtargets").GetValue<Slider>().Value;
 
-            if (castRmulti && ObjectManager.Player.CountEnemiesInRange(Spells.R.Range + ItemsHandler.ProtoBelt.Range) > multiRtargets)
+            if (castRmulti && ObjectManager.Player.CountEnemiesInRange(Spells.R.Range + 50) > multiRtargets)
             {
                 Spells.R.Cast();
             }
